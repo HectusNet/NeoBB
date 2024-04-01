@@ -1,0 +1,37 @@
+### Plugin Name ###
+name: BlockBattles
+
+### Plugin Description ###
+description: Two people compete in a turn-based match with random blocks which do random things.
+
+### Build Version ###
+version: ${version}
+
+### Main Class ###
+main: net.hectus.bb.BlockBattles
+
+### PaperAPI Version ###
+api-version: '1.20'
+
+### Developers of the Plugin ###
+authors:
+  - MarcPG
+
+### Plugin Website ###
+website: https://hectus.net/blockbattles
+
+### Logging Prefix ###
+prefix: BB
+
+### Plugin Loading Time ###
+load: STARTUP
+
+### All Commands ###
+commands:
+  ## Does stuff with the current BlockBattles™ game ##
+  game:
+    usage: /<command> <start|stop|info>
+    aliases: match
+    description: Interacts with the current match.
+    permission: bb.game
+    permission-message: Only administrators can interact with the game!
