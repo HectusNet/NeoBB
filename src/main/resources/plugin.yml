@@ -28,10 +28,30 @@ load: STARTUP
 
 ### All Commands ###
 commands:
-  ## Does stuff with the current BlockBattles™ game ##
+
+  ## Challenges another player to a match. ##
+  challenge:
+    usage: /<command> <player>
+    aliases: invite
+    description: Challenges another player to a 1v1.
+
+  ## Does stuff related to BlockBattles™ games. ##
   game:
-    usage: /<command> <start|stop|info>
+    usage: /<command> <start|stop|info> ...
     aliases: match
-    description: Interacts with the current match.
+    description: Interacts with the BlockBattles™ games.
     permission: bb.game
-    permission-message: Only administrators can interact with the game!
+    permission-message: Only administrators can interact with games!
+
+  ## Does stuff related to the structure system. ##
+  structure:
+    usage: /<command> <save|load|remove|reload> ...
+    description: Interacts with the structure-system.
+    permission: bb.structure
+    permission-message: Only administrators can interact with structures!
+
+  ## Gives up, which also gives you a small penalty. ##
+  giveup:
+    usage: /<command>
+    aliases: surrender
+    description: Gives up. Will give you a small XP penalty!

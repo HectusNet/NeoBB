@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
     implementation("com.marcpg:libpg:0.1.0")
-    compileOnly("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
 }
 
 tasks {
