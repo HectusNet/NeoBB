@@ -35,6 +35,9 @@ public final class BlockBattles extends JavaPlugin {
         DATA_DIR = getDataFolder().toPath();
 
         saveDefaultConfig();
+        if (StructureManager.STRUCTURE_DIR.mkdirs()) {
+            LOG.info("Created BlockBattles/structures directory, as it didn't exist before!");
+        }
 
         // TODO: Objects.requireNonNull(getCommand("challenge")).setExecutor(new Command());
         // TODO: Objects.requireNonNull(getCommand("game")).setExecutor(new Command());
