@@ -5,7 +5,9 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
-public record Cord(double x, double y, double z) {
+import java.io.Serializable;
+
+public record Cord(double x, double y, double z) implements Serializable {
     /**
      * Converts this current Cord to a {@link Location org.bukkit.Location}.
      * @param world The world of the converted Location.

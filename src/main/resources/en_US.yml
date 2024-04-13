@@ -1,0 +1,112 @@
+command:
+  player_not_found: "The player {0} could not be found!"
+  challenge:
+    no_incoming: "{0} didn't challenge you!"
+    confirm: "Successfully challenged {0}!"
+    confirm-target:
+      1: "You got challenged by {0} to a 1v1!"
+      2: "Click here"
+      3: "to accept."
+    already: "You already challenged {0}!"
+    start: "Starting a match between you and {0}!"
+  giveup:
+    not_in_match: "You aren't in any match!"
+    confirm: "You just gave up. You will get an increased penalty!"
+item-lore:
+  cost:
+    key: "Cost"
+    value: "{0} Coins"
+  description: "Description:"
+  usage: "Usage:"
+  buffs: "Buffs:"
+  buff:
+    extra-turn: "Extra Turn" # Singular
+    extra-turns: "+{0} Extra Turns" # Plural
+    luck: "{0} Luck" # Can be + or - luck!
+    opponent: "(Opponent)" # Added at the end of the line.
+    both: "(Both Players)" # Added at the end of the line.
+    effect:
+      blindness: "Blindness"
+      glowing: "Glowing"
+shop:
+  previous: "Previous Page"
+  next: "Next Page"
+  done:
+    name: "Done"
+    lore:
+      1: "Leaves the shop and gives you some time to relax."
+      2: "If your opponent is also done, the match will begin early."
+  menu:
+    name: "Menu"
+    lore: "Returns back to the shop menu, to filter based on different criteria."
+  filters: "Filters"
+
+info:
+  type:
+    type: "Type"
+    block: "Block"
+    item: "Item"
+    throwable: "Throwable"
+    mob: "Mob"
+    structure: "Structure"
+    other: "Special Type"
+  function:
+    function: "Function: "
+    attack: "Attack"
+    counter: "Counter"
+    counterattack: "Counterattack"
+    counterbuff: "Counterbuff"
+    buff: "Buff"
+    defense: "Defense"
+    event: "Event"
+    other: "Special Function"
+  class:
+    class: "Class: "
+    neutral: "Neutral"
+    hot: "Hot"
+    cold: "Cold"
+    water: "Water"
+    nature: "Nature"
+    redstone: "Redstone"
+    supernatural: "Supernatural"
+    other: "Special Class"
+  hotbar:
+    hotbar: "Hotbar: "
+    regular: "Regular-Only"
+    overtime: "Overtime-Only"
+    both: "Both"
+turn:
+  issue:
+    wrong_counter: "There is nothing to counter with that item!"
+    not_allowed: "You cannot use that item in the current conditions!"
+    attack_while_attacked: "You cannot attack your opponent while being attacked!"
+    opponent_defended: "Your opponent is defended! The attack has no effect."
+    opponent_already_attacked: "Your opponent is already under attack, you cannot attack him twice!"
+    defense_while_attacked: "You cannot use a defense to counter an attack, use actual counters instead!"
+    opponent_also_defended: "Your opponent already has a defense enabled! Only one player at a time!"
+  unusable:
+    purple_wool: "You can only use Purple Wool, if the last 5 turns weren't an attack!"
+gameplay:
+  info:
+    extra-turn:
+      turning: "You have an extra turn to use!"
+      opponent: "{0} has an extra turn to use."
+    next-turn:
+      turning: "It's now your turn, good luck!"
+      opponent: "Your turn is now over!"
+    ending:
+      win: "You Win!"
+      win-sub: "You won this match, good job!"
+      lose: "You Lose!"
+      lose-sub: "You lost this match, better luck next time!"
+      tie: "A Tie!"
+      tie-sub: "It's a tie, nobody won."
+      giveup: "{0} gave up!"
+      giveup-sub: "{0} gave up and will receive a penalty."
+  effects:
+    burning: "You are now burning! You have 3 turns to extinguish yourself."
+usage:
+  magenta_glazed_terracotta: "Place the Magenta Glazed Terracotta, so the arrow faces the attack that you want to counter."
+  sponge: "You CAN place it near water to counter it and gain 10 luck and jump boost."
+  magma_block: "Place it somewhere your opponent is likely to step on, as he dies when stepping on it."
+  lava: "You can only place lava in warm warps!"

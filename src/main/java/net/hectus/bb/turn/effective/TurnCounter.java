@@ -1,6 +1,6 @@
-package net.hectus.bb.counter;
+package net.hectus.bb.turn.effective;
 
-import net.hectus.bb.PlayerData;
+import net.hectus.bb.player.PlayerData;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 

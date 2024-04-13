@@ -1,0 +1,3 @@
+# Will store all structure files at ~/.config/neobb-structures/ instead of the plugin directory.
+# Will only work on Linux systems!
+global-structures: false

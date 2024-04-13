@@ -16,8 +16,8 @@ public record BlockData(Material type, Cord relativeCord, BlockFace blockFace) i
      * @param world The world in which this block is placed.
      * @param structurePoint The structure's starting point.
      */
-    public void place(@NotNull World world, Cord structurePoint) {
-        Block block = world.getBlockAt(relativeCord.toLocation(world));
+    public void place(@NotNull World world, @NotNull Cord structurePoint) {
+        Block block = world.getBlockAt(structurePoint.add(relativeCord).toLocation(world));
         block.setType(type);
         if (blockFace != null && block.getBlockData() instanceof Directional directional) {
             directional.setFacing(blockFace);

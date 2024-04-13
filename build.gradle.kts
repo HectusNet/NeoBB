@@ -1,6 +1,7 @@
 plugins {
     id("java")
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("xyz.jpenilla.run-paper") version "2.2.3"
 }
 
 group = "net.hectus.bb"
@@ -11,7 +12,6 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 java.targetCompatibility = JavaVersion.VERSION_17
 
 repositories {
-    mavenLocal()
     mavenCentral()
 
     maven("https://marcpg.com/repo/")
@@ -20,7 +20,9 @@ repositories {
 }
 
 dependencies {
-    implementation("com.marcpg:libpg:0.1.0")
+    implementation("com.marcpg:libpg:0.1.1")
+    implementation("org.postgresql:postgresql:42.7.3")
+    implementation("com.github.stefvanschie.inventoryframework:IF:0.10.13")
     compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
 }
 
@@ -30,5 +32,12 @@ tasks {
         filter {
             it.replace("\${version}", version.toString())
         }
+    }
+    shadowJar {
+        relocate("com.github.stefvanschie.inventoryframework", "net.hectus.bb.inventoryframework")
+        relocate("com.marcpg.libpg", "net.hectus.bb.libpg")
+    }
+    runServer {
+        minecraftVersion("1.20.4")
     }
 }
