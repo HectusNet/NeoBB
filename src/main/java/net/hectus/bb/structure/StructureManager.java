@@ -4,9 +4,6 @@ import net.hectus.bb.BlockBattles;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

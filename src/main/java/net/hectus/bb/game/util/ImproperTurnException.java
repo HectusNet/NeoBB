@@ -1,4 +1,4 @@
-package net.hectus.bb.game;
+package net.hectus.bb.game.util;
 
 import com.marcpg.libpg.lang.Translation;
 import net.hectus.bb.turn.TurnData;
@@ -16,7 +16,7 @@ public class ImproperTurnException extends Exception {
     }
 
     public enum ImproperTurnCause {
-        WRONG_COUNTER, ATTACK_WHILE_ATTACKED, DEFENSE_WHILE_ATTACKED, OPPONENT_ALREADY_ATTACKED, OPPONENT_DEFENDED, OPPONENT_ALSO_DEFENDED;
+        WRONG_COUNTER, NOT_ALLOWED, WRONG_WARP, ATTACK_WHILE_ATTACKED, DEFENSE_WHILE_ATTACKED, OPPONENT_ALREADY_ATTACKED, OPPONENT_DEFENDED, OPPONENT_ALSO_DEFENDED;
 
         public String translated(Locale l) {
             return Translation.string(l, "turn.issue." + name().toLowerCase());

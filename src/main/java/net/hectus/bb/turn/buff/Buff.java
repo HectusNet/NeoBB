@@ -9,6 +9,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
+import java.util.Objects;
 
 public abstract class Buff {
     public enum Target { YOU, BOTH, OPPONENT }
@@ -27,6 +28,7 @@ public abstract class Buff {
     }
 
     public abstract void apply(PlayerData player);
+    public void revert(PlayerData player) {}
     public abstract String text(Locale l);
     public abstract Result result();
 
@@ -42,8 +44,8 @@ public abstract class Buff {
             this.turns = turns;
         }
 
-        public ExtraTurn(Target target) {
-            super(target);
+        public ExtraTurn() {
+            super(Target.YOU);
             this.turns = 1;
         }
 
@@ -81,6 +83,11 @@ public abstract class Buff {
         }
 
         @Override
+        public void revert(@NotNull PlayerData player) {
+            player.removeLuck(luck);
+        }
+
+        @Override
         public String text(Locale l) {
             return Translation.string(l, "item-lore.buff.luck", luck);
         }
@@ -98,19 +105,24 @@ public abstract class Buff {
     public static class Effect extends Buff {
         private final PotionEffect effect;
 
-        public Effect(Target target, PotionEffect effect) {
-            super(target);
-            this.effect = effect;
-        }
-
         public Effect(Target target, PotionEffectType type) {
             super(target);
             this.effect = new PotionEffect(type, -1, 0, true);
         }
 
+        public Effect(Target target, PotionEffectType type, int amplifier) {
+            super(target);
+            this.effect = new PotionEffect(type, -1, amplifier, true);
+        }
+
         @Override
         public void apply(@NotNull PlayerData player) {
             player.player().addPotionEffect(effect);
+        }
+
+        @Override
+        public void revert(@NotNull PlayerData player) {
+            player.player().removePotionEffect(effect.getType());
         }
 
         @Override
@@ -133,6 +145,27 @@ public abstract class Buff {
                     case NEUTRAL -> Result.MID;
                 };
             };
+        }
+    }
+
+    public static class Teleport extends Buff {
+        public Teleport(Target target) {
+            super(target);
+        }
+
+        @Override
+        public void apply(@NotNull PlayerData player) {
+            player.player().teleport(Objects.requireNonNull(player.game().history().get(player.game().history().size() - 1).block()).getLocation().add(0, 0.5, 0));
+        }
+
+        @Override
+        public String text(Locale l) {
+            return Translation.string(l, "item-lore.buff.teleportation");
+        }
+
+        @Override
+        public Result result() {
+            return Result.GOOD;
         }
     }
 }

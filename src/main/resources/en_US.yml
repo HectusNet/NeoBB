@@ -28,6 +28,7 @@ item-lore:
     effect:
       blindness: "Blindness"
       glowing: "Glowing"
+    teleportation: "Teleportation"
 shop:
   previous: "Previous Page"
   next: "Next Page"
@@ -40,7 +41,6 @@ shop:
     name: "Menu"
     lore: "Returns back to the shop menu, to filter based on different criteria."
   filters: "Filters"
-
 info:
   type:
     type: "Type"
@@ -79,6 +79,7 @@ turn:
   issue:
     wrong_counter: "There is nothing to counter with that item!"
     not_allowed: "You cannot use that item in the current conditions!"
+    wrong_warp: "You cannot use that item in the current warp!"
     attack_while_attacked: "You cannot attack your opponent while being attacked!"
     opponent_defended: "Your opponent is defended! The attack has no effect."
     opponent_already_attacked: "Your opponent is already under attack, you cannot attack him twice!"
@@ -110,3 +111,11 @@ usage:
   sponge: "You CAN place it near water to counter it and gain 10 luck and jump boost."
   magma_block: "Place it somewhere your opponent is likely to step on, as he dies when stepping on it."
   lava: "You can only place lava in warm warps!"
+scoreboard:
+  turning: "Turning: "
+  warp: "Warp: "
+  attacked: "Attacked: "
+  defended: "Defended: "
+  luck: "Luck: "
+  yes: "Yes"
+  no: "No"

@@ -2,6 +2,7 @@ package net.hectus.bb.player;
 
 import com.marcpg.libpg.lang.Translatable;
 import com.marcpg.libpg.lang.Translation;
+import net.hectus.bb.shop.PreGameShop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.inventory.ItemStack;
@@ -13,12 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class PlayerInv {
+public final class PlayerInv {
     private final PlayerData player;
     private int coins = 40;
+    private boolean shopDone = false;
+    private Hotbar currentHotbar = Hotbar.REGULAR;
     private final List<ItemStack> regularHotbar = new ArrayList<>();
     private final List<ItemStack> overtimeHotbar = new ArrayList<>();
-    private Hotbar currentHotbar = Hotbar.REGULAR;
 
     public PlayerInv(PlayerData player) {
         this.player = player;
@@ -38,6 +40,14 @@ public class PlayerInv {
         return true;
     }
 
+    public void setShopDone(boolean shopDone) {
+        this.shopDone = shopDone;
+    }
+
+    public boolean shopDone() {
+        return shopDone;
+    }
+
     public Hotbar currentHotbar() {
         return currentHotbar;
     }
@@ -50,6 +60,11 @@ public class PlayerInv {
         return getHotbarContents(currentHotbar);
     }
 
+    public void setCurrentHotbarContents(List<ItemStack> items) {
+        getCurrentHotbarContents().clear();
+        getCurrentHotbarContents().addAll(items);
+    }
+
     public void addItem(Hotbar hotbar, ItemStack item) {
         List<ItemStack> items = getHotbarContents(hotbar);
         if (items.size() >= 9)
@@ -57,10 +72,36 @@ public class PlayerInv {
         items.add(item);
         updateYou();
         player.opponent().inv().updateOpponent();
+        if (items.size() >= 9)
+            currentDone();
+    }
+
+    public void currentDone() {
+        PlayerInv oppInv = player.opponent().inv();
+        shopDone = true;
+        if (oppInv.shopDone()) {
+            if (currentHotbar == Hotbar.REGULAR) {
+                oppInv.shopDone = false;
+                oppInv.currentHotbar = Hotbar.OVERTIME;
+                PreGameShop.menu(oppInv.player);
+
+                shopDone = false;
+                currentHotbar = Hotbar.OVERTIME;
+                PreGameShop.menu(player);
+
+                System.out.println("Done!");
+            } else {
+                player.game().startMainGame();
+            }
+        }
     }
 
     public void removeItem(@Range(from = 0, to = 8) int index, Hotbar hotbar) {
         getHotbarContents(hotbar).remove(index);
+    }
+
+    public void removeItem(ItemStack item, Hotbar hotbar) {
+        getHotbarContents(hotbar).remove(item);
     }
 
     public void enterOvertime() {
@@ -84,9 +125,9 @@ public class PlayerInv {
         List<ItemStack> items = player.opponent().inv().getCurrentHotbarContents();
         for (int i = 0; i < 9; i++) {
             if (i < items.size()) {
-                inv.setItem(i + 27, items.get(i));
+                inv.setItem(i + 18, items.get(i));
             } else {
-                inv.clear(i + 27);
+                inv.clear(i + 18);
             }
         }
     }

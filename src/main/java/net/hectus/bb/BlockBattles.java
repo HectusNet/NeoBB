@@ -4,9 +4,17 @@ import com.marcpg.libpg.data.database.sql.AutoCatchingSQLConnection;
 import com.marcpg.libpg.lang.Translation;
 import net.hectus.bb.command.ChallengeCommand;
 import net.hectus.bb.command.GiveupCommand;
+import net.hectus.bb.event.GameEvents;
+import net.hectus.bb.event.PlayerEvents;
+import net.hectus.bb.game.Game;
+import net.hectus.bb.game.GameManager;
+import net.hectus.bb.game.util.TurnScheduler;
+import net.hectus.bb.player.PlayerData;
 import net.hectus.bb.structure.StructureCommand;
 import net.hectus.bb.structure.StructureManager;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
 
@@ -15,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -22,6 +31,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public final class BlockBattles extends JavaPlugin {
+    public static  final String VERSION = "NeoBB-0.1.0 (d" + Integer.toHexString(LocalDateTime.now().getDayOfYear()) + "h" + Integer.toHexString(LocalDateTime.now().getHour()) + ")";
     public static Logger LOG;
     public static Path DATA_DIR;
     public static boolean globalStructures;
@@ -56,6 +66,10 @@ public final class BlockBattles extends JavaPlugin {
         // TODO: Objects.requireNonNull(getCommand("game")).setExecutor(new Command());
         Objects.requireNonNull(getCommand("structure")).setExecutor(new StructureCommand());
         Objects.requireNonNull(getCommand("giveup")).setExecutor(new GiveupCommand());
+
+        getServer().getPluginManager().registerEvents(new GameEvents(), this);
+        getServer().getPluginManager().registerEvents(new PlayerEvents(), this);
+        getServer().getPluginManager().registerEvents(new TurnScheduler(), this);
 
         try {
             translations();

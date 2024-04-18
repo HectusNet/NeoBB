@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChallengeCommand implements TabExecutor {
+public final class ChallengeCommand implements TabExecutor {
     public static final List<Challenge> challenges = new ArrayList<>();
 
     @Override

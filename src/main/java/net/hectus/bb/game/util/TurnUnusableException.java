@@ -1,4 +1,4 @@
-package net.hectus.bb.game;
+package net.hectus.bb.game.util;
 
 import com.marcpg.libpg.lang.Translation;
 import net.hectus.bb.turn.TurnData;

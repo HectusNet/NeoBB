@@ -11,7 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class GiveupCommand implements CommandExecutor {
+public final class GiveupCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (sender instanceof Player player) {
@@ -21,7 +21,6 @@ public class GiveupCommand implements CommandExecutor {
             } else {
                 playerData.game().giveUp(playerData);
                 player.sendMessage(Translation.component(player.locale(), "command.giveup.confirm").color(NamedTextColor.YELLOW));
-                // TODO: Give extra penalty!
             }
         } else {
             sender.sendMessage(Component.text("Only players can give up!"));

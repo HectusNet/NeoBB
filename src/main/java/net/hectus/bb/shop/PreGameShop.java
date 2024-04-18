@@ -11,7 +11,6 @@ import net.hectus.bb.BlockBattles;
 import net.hectus.bb.player.PlayerData;
 import net.hectus.bb.turn.Turn;
 import net.hectus.bb.util.ItemBuilder;
-import net.hectus.bb.util.ItemLoreBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -23,7 +22,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 public final class PreGameShop {
@@ -44,11 +42,8 @@ public final class PreGameShop {
         Locale l = player.player().locale();
 
         ChestGui gui = new ChestGui(6, "Shop - Menu");
-
         gui.setOnGlobalClick(event -> event.setCancelled(true));
-        gui.setOnClose(event -> {
-            // TODO: Mark player as done!
-        });
+        gui.setOnClose(event -> player.inv().currentDone());
 
         OutlinePane background = new OutlinePane(0, 0, 9, 6, Pane.Priority.LOWEST);
         background.addItem(new GuiItem(new ItemStack(Material.GRAY_STAINED_GLASS_PANE)));
@@ -92,7 +87,7 @@ public final class PreGameShop {
         classFilters.addItem(filter(l, Material.DIRT, "class", "neutral", player, t -> t.clazz == Turn.ItemClass.NEUTRAL), 0, 0);
         classFilters.addItem(filter(l, Material.MAGMA_BLOCK, "class", "hot", player, t -> t.clazz == Turn.ItemClass.HOT), 1, 0);
         classFilters.addItem(filter(l, Material.BLUE_ICE, "class", "cold", player, t -> t.clazz == Turn.ItemClass.COLD), 2, 0);
-        classFilters.addItem(filter(l, Material.WATER_BUCKET, "class", "water", player, t -> t.clazz == Turn.ItemClass.WATER), 3, 0);
+        classFilters.addItem(filter(l, Material.WATER_BUCKET, "class", "water", player, t -> t.clazz == Turn.ItemClass.WATER_CLASS), 3, 0);
         classFilters.addItem(filter(l, Material.AZALEA_LEAVES, "class", "nature", player, t -> t.clazz == Turn.ItemClass.NATURE), 4, 0);
         classFilters.addItem(filter(l, Material.REDSTONE_BLOCK, "class", "redstone", player, t -> t.clazz == Turn.ItemClass.REDSTONE), 5, 0);
         classFilters.addItem(filter(l, Material.REPEATING_COMMAND_BLOCK, "class", "supernatural", player, t -> t.clazz == Turn.ItemClass.SUPERNATURAL), 6, 0);
@@ -126,16 +121,13 @@ public final class PreGameShop {
         Locale l = player.player().locale();
 
         ChestGui gui = new ChestGui(6, "Shop - " + category + " - " + player.inv().currentHotbar().getTranslated(l));
-
         gui.setOnGlobalClick(event -> event.setCancelled(true));
         gui.setOnClose(event -> Bukkit.getScheduler().runTaskLater(BlockBattles.getPlugin(BlockBattles.class), () -> menu(player), 1));
 
         PaginatedPane items = new PaginatedPane(9, 5);
         items.populateWithItemStacks(ShopItemUtilities.ITEMS.stream()
                 .filter(m -> categoryFilter.test(ShopItemUtilities.getTurn(m)))
-                .map(m -> new ItemBuilder(m)
-                        .lore(ItemLoreBuilder.of(m, ShopItemUtilities.getPrice(m), Objects.requireNonNull(ShopItemUtilities.getTurn(m))).build(l))
-                        .build())
+                .map(m -> ShopItemUtilities.item(l, m))
                 .toList());
         items.setOnClick(event -> {
             ItemStack item = event.getCurrentItem();
@@ -165,7 +157,7 @@ public final class PreGameShop {
             }
         }), 0, 0);
         // Done
-        navigation.addItem(new GuiItem(new ItemBuilder(Material.LIME_DYE)
+        navigation.addItem(new GuiItem(new ItemBuilder(Material.GRAY_DYE)
                 .name(Translation.component(l, "shop.menu.name").color(NamedTextColor.BLUE).decorate(TextDecoration.BOLD))
                 .addLore(Translation.component(l, "shop.menu.lore").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
                 .build(),  event -> event.getWhoClicked().closeInventory()), 4, 0);

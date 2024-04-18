@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class StructureCommand implements TabExecutor {
+public final class StructureCommand implements TabExecutor {
     private static final List<String> OPERATIONS = List.of("reload", "info", "remove", "save", "place");
 
     @Override
