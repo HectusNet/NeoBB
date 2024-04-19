@@ -31,14 +31,13 @@ public class GameTicker extends Timer {
             timer.decrement();
             if (timer.get() == 0) {
                 game.players().forEach(this::scoreboard);
-                stop();
+                game.draw();
             }
         }, 0, 20);
     }
 
     @Override
     public void stop() {
-        game.draw();
         task.cancel();
     }
 

@@ -139,7 +139,7 @@ public class Game {
         PlayerData player = data.player();
         PlayerData opp = getOpponent(player);
         Turn turn = data.turn();
-        TurnData last = history.get(history.size() - 1);
+        TurnData last = history.isEmpty() ? TurnData.EMPTY : history.get(history.size() - 1);
 
         if (!allowed.contains(turn.clazz))
             throw new ImproperTurnException(ImproperTurnException.ImproperTurnCause.WRONG_WARP, data);
