@@ -17,6 +17,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +44,10 @@ public final class PreGameShop {
 
         ChestGui gui = new ChestGui(6, "Shop - Menu");
         gui.setOnGlobalClick(event -> event.setCancelled(true));
-        gui.setOnClose(event -> player.inv().currentDone());
+        gui.setOnClose(event -> {
+            if (event.getReason() == InventoryCloseEvent.Reason.OPEN_NEW) return;
+            player.inv().currentDone();
+        });
 
         OutlinePane background = new OutlinePane(0, 0, 9, 6, Pane.Priority.LOWEST);
         background.addItem(new GuiItem(new ItemStack(Material.GRAY_STAINED_GLASS_PANE)));
@@ -120,9 +124,12 @@ public final class PreGameShop {
     public static void shop(@NotNull PlayerData player, String category, Predicate<Turn> categoryFilter) {
         Locale l = player.player().locale();
 
-        ChestGui gui = new ChestGui(6, "Shop - " + category + " - " + player.inv().currentHotbar().getTranslated(l));
+        ChestGui gui = new ChestGui(6, Translation.string(l, "item-lore.cost.value", player.inv().coins()) + " - Shop - " + category);
         gui.setOnGlobalClick(event -> event.setCancelled(true));
-        gui.setOnClose(event -> Bukkit.getScheduler().runTaskLater(BlockBattles.getPlugin(BlockBattles.class), () -> menu(player), 1));
+        gui.setOnClose(event -> {
+            if (event.getReason() == InventoryCloseEvent.Reason.OPEN_NEW) return;
+            Bukkit.getScheduler().runTaskLater(BlockBattles.getPlugin(BlockBattles.class), () -> menu(player), 1);
+        });
 
         PaginatedPane items = new PaginatedPane(9, 5);
         items.populateWithItemStacks(ShopItemUtilities.ITEMS.stream()
@@ -133,7 +140,11 @@ public final class PreGameShop {
             ItemStack item = event.getCurrentItem();
             if (item == null || item.isEmpty()) return;
             if (player.inv().removeCoins(ShopItemUtilities.getPrice(item.getType()))) {
-                player.inv().addItem(player.inv().currentHotbar(), item);
+                try {
+                    player.inv().addItem(item);
+                } catch (IndexOutOfBoundsException e) {
+                    player.player().playSound(player.player(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+                }
             } else {
                 player.player().playSound(player.player(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
             }

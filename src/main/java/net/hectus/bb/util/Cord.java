@@ -45,15 +45,6 @@ public record Cord(double x, double y, double z) implements Serializable {
     }
 
     /**
-     * Multiplies the input cord with this cord. Does not affect this object and creates a new one for the result.
-     * @param cord The second factor of this multiplication.
-     * @return The result/product of this multiplication as a new Cord.
-     */
-    public @NotNull Cord multiply(@NotNull Cord cord) {
-        return new Cord(x * cord.x, y * cord.y, z * cord.z);
-    }
-
-    /**
      * Converts a {@link Location org.bukkit.Location} to a simple {@link Cord}.
      * @param location The Location to convert.
      * @return The converted Cord.

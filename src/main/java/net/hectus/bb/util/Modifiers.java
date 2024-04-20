@@ -19,10 +19,6 @@ public class Modifiers {
         return modifiers.contains(modifier);
     }
 
-    public void reset() {
-        modifiers.clear();
-    }
-
     @Override
     public String toString() {
         return modifiers.toString();

@@ -7,9 +7,11 @@ import net.hectus.bb.game.GameManager;
 import net.hectus.bb.player.PlayerData;
 import net.hectus.bb.turn.effective.Burning;
 import net.hectus.bb.warp.Warp;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -47,13 +49,8 @@ public final class PlayerEvents implements Listener {
     public void onPlayerInventorySlotChange(@NotNull PlayerInventorySlotChangeEvent event) {
         if (!event.getOldItemStack().isEmpty() && event.getNewItemStack().isEmpty()) {
             PlayerData player = GameManager.getPlayerData(event.getPlayer());
-            if (player != null) {
-                int slot = event.getSlot();
-                if (slot <= 8) {
-                    player.inv().removeItem(slot, player.inv().currentHotbar());
-                } else if (slot >= 27 && slot <= 35) {
-                    player.inv().removeItem(slot - 27, player.inv().currentHotbar().getOpposite());
-                }
+            if (player != null && player.game().hasStarted() && event.getSlot() <= 8) {
+                player.inv().removeItemWithoutUpdating(event.getSlot());
             }
         }
     }
@@ -63,14 +60,25 @@ public final class PlayerEvents implements Listener {
         if (event.getClickedInventory() instanceof PlayerInventory && event.getSlotType() == InventoryType.SlotType.QUICKBAR) {
             PlayerData player = GameManager.getPlayerData((Player) event.getWhoClicked());
             if (player != null && !player.inv().shopDone()) {
-                player.inv().removeItem(event.getSlot(), player.inv().currentHotbar());
+                player.inv().removeItem(event.getSlot());
             }
         }
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerMove(@NotNull PlayerMoveEvent event) {
-        if (event.hasChangedPosition() && FROZEN.contains(event.getPlayer()))
+        if (!event.hasChangedPosition()) return;
+
+        PlayerData p = GameManager.getPlayerData(event.getPlayer());
+        if (p == null) return;
+
+        if (p.modifiers.isEnabled("frozen") || (p != p.game().turning() && !p.modifiers.isEnabled("always_move")))
+            event.setCancelled(true);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockBreak(@NotNull BlockBreakEvent event) {
+        if (event.getPlayer().getGameMode() != GameMode.CREATIVE)
             event.setCancelled(true);
     }
 }

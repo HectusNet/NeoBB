@@ -6,6 +6,8 @@ import net.hectus.bb.turn.effective.Attack;
 import net.hectus.bb.turn.effective.Defense;
 import net.hectus.bb.turn.effective.TurnCounter;
 import net.hectus.bb.util.Modifiers;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,6 +36,7 @@ public final class PlayerData {
     public PlayerData(Player player, Game game) {
         this.player = player;
         this.game = game;
+        player.showBossBar(bossBar);
     }
 
     public Player player() {
@@ -48,7 +51,7 @@ public final class PlayerData {
         return game;
     }
 
-    public Pair<Boolean, @Nullable Attack> getAttack() {
+    public @NotNull Pair<Boolean, @Nullable Attack> getAttack() {
         return Pair.of(attacked, attack);
     }
 
@@ -57,7 +60,7 @@ public final class PlayerData {
         this.attack = attack.right();
     }
 
-    public Pair<Boolean, @Nullable Defense> getDefense() {
+    public @NotNull Pair<Boolean, @Nullable Defense> getDefense() {
         return Pair.of(defensive, defense);
     }
 
@@ -75,7 +78,7 @@ public final class PlayerData {
     }
 
     public boolean extraTurn() {
-        return --extraTurns <= 0;
+        return --extraTurns > 0;
     }
 
     public void addExtraTurns(int amount) {
@@ -92,5 +95,26 @@ public final class PlayerData {
 
     public void removeLuck(int amount) {
         luck -= amount;
+    }
+
+    // ========== BOSSBAR ==========
+
+    private final BossBar bossBar = BossBar.bossBar(Component.empty(), 0.0f, BossBar.Color.RED, BossBar.Overlay.NOTCHED_10);
+
+    public void updateBossBar() {
+        bossBar.name(Component.text(game.turnCountdown() + "s"));
+        bossBar.progress(1.0f / game.turnCountdown());
+        bossBar.color(getColor());
+    }
+
+    private BossBar.Color getColor() {
+        return switch (game.turnCountdown()) {
+            case 5 -> BossBar.Color.WHITE;
+            case 4 -> BossBar.Color.BLUE;
+            case 3 -> BossBar.Color.GREEN;
+            case 2 -> BossBar.Color.YELLOW;
+            case 1 -> BossBar.Color.RED;
+            default -> BossBar.Color.PINK;
+        };
     }
 }

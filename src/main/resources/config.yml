@@ -1,3 +1,19 @@
 # Will store all structure files at ~/.config/neobb-structures/ instead of the plugin directory.
 # Will only work on Linux systems!
 global-structures: false
+
+# Database-related configuration:
+database:
+
+  # Sets whether to try to connect to the database or just use no database.
+  enabled: false
+
+  # The address of the database. Should follow "jdbc:postgresql://[ADDRESS]:[PORT]/[DATABASE]".
+  address: "jdbc:postgresql://localhost:5432/hectus"
+
+  # The name of the table of the database to use.
+  table: "neobb_playerdata"
+
+  # The credentials to log into the database. The account should not have more permissions than it needs!
+  username: "neobb_plugin"
+  password: "Ye8ZfAZ6DohcuC"

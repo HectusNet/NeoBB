@@ -3,7 +3,6 @@ package net.hectus.bb.game;
 import com.marcpg.libpg.lang.Translation;
 import com.marcpg.libpg.storing.Pair;
 import com.marcpg.libpg.util.Randomizer;
-import net.hectus.bb.event.PlayerEvents;
 import net.hectus.bb.event.custom.PlayerWarpEvent;
 import net.hectus.bb.event.custom.TurnDoneEvent;
 import net.hectus.bb.game.util.ImproperTurnException;
@@ -41,6 +40,7 @@ import java.util.*;
 public class Game {
     public final Modifiers modifiers = new Modifiers();
     public final UUID uuid = UUID.randomUUID();
+    public boolean started = false;
 
     private final List<TurnData> history = new ArrayList<>();
     private final List<PlayerData> players = new ArrayList<>();
@@ -67,6 +67,10 @@ public class Game {
         return players;
     }
 
+    public int turnCountdown() {
+        return ticker.turnCountdown();
+    }
+
     public PlayerData turning() {
         return turning;
     }
@@ -84,13 +88,23 @@ public class Game {
     }
 
     public void warp(Warp warp) {
-        new PlayerWarpEvent(turning, this.warp, warp).callEvent();
-        this.allowed = warp.allowed;
-        this.warp = warp;
+        if (modifiers.isEnabled("warp_100") || Randomizer.boolByChance(warp.chance)) {
+            new PlayerWarpEvent(turning, this.warp, warp).callEvent();
+            this.allowed = warp.allowed;
+            this.warp = warp;
+        } else {
+            turning.player().sendMessage(Translation.component(turning.player().locale(), "gameplay.info.warp-unsuccessful.turning").color(NamedTextColor.RED));
+            getOpponent(turning).player().sendMessage(Translation.component(turning.player().locale(), "gameplay.info.warp-unsuccessful.opponent", turning.player().getName()).color(NamedTextColor.YELLOW));
+        }
     }
 
     public void startMainGame() {
+        this.started = true;
         ticker.start();
+    }
+
+    public boolean hasStarted() {
+        return started;
     }
 
     // ========== ENDING LOGIC ==========
@@ -208,7 +222,7 @@ public class Game {
                 }
             }
             case POWDER_SNOW -> {
-                PlayerEvents.FROZEN.add(opp.player());
+                opp.modifiers.enable("frozen");
                 TurnScheduler.runTaskLater(this, "powder_snow", 3, () -> lose(opp));
             }
             case SEA_LANTERN -> {
@@ -226,7 +240,7 @@ public class Game {
             }
             case RED_CARPET -> {
                 if (Randomizer.boolByChance(10)) {
-                    player.inv().addItem(player.inv().currentHotbar(), new ItemStack(Material.RED_WOOL));
+                    player.inv().addItem(new ItemStack(Material.RED_WOOL));
                     player.player().playSound(player.player(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1.0f);
                 }
             }
@@ -259,7 +273,6 @@ public class Game {
                 }
             }
             case BEE -> {
-                player.modifiers.enable("sticky");
                 if (last.turn().name().startsWith("FLOWER_") && last.turn().buffs != null) {
                     last.turn().buffs.forEach(b -> b.revert(player));
                 }
@@ -278,7 +291,7 @@ public class Game {
                             if (data.player().getAttack().left())
                                 Objects.requireNonNull(data.player().getAttack().right()).decrement();
                         }
-                        case BROWN -> player.inv().addItem(player.inv().currentHotbar(), ShopItemUtilities.item(player.player().locale(), randomItem()));
+                        case BROWN -> player.inv().addItem(ShopItemUtilities.item(player.player().locale(), randomItem()));
                         case BLACK -> new Buff.Luck(Buff.Target.OPPONENT, -15);
                     }
                 }
@@ -295,12 +308,12 @@ public class Game {
             }
             case DIRT, FLOWER_POT -> new Buff.ExtraTurn().apply(player);
             case FLOWER_POPPY -> {
-                List<ItemStack> yourInv = List.copyOf(player.inv().getCurrentHotbarContents());
-                player.inv().setCurrentHotbarContents(opp.inv().getCurrentHotbarContents());
-                opp.inv().setCurrentHotbarContents(yourInv);
+                List<ItemStack> yourInv = List.copyOf(player.inv().getContents());
+                player.inv().setContents(opp.inv().getContents());
+                opp.inv().setContents(yourInv);
             }
             case FLOWER_BLUE_ORCHID -> modifiers.enable("warp_100");
-            case FLOWER_ALLIUM -> opp.inv().removeItem(Randomizer.fromCollection(opp.inv().getCurrentHotbarContents()), opp.inv().currentHotbar());
+            case FLOWER_ALLIUM -> opp.inv().removeItem(Randomizer.fromCollection(opp.inv().getContents()));
             case FLOWER_AZURE_BLUET -> {
                 modifiers.enable("azure_bluet_used");
                 new Buff.Luck(Buff.Target.YOU, 20).apply(player);
@@ -331,18 +344,23 @@ public class Game {
             }
         }
 
-        if (player.getAttack().left()) {
-            if (player.modifiers.isEnabled("revive")) {
-                player.player().playSound(player.player(), Sound.ITEM_TOTEM_USE, 1.5f, 1.0f);
+        done(data);
+    }
+
+    public void done(@NotNull TurnData data) {
+        if (data.player().getAttack().left()) {
+            if (data.player().modifiers.isEnabled("revive")) {
+                data.player().player().playSound(data.player().player(), Sound.ITEM_TOTEM_USE, 1.5f, 1.0f);
+                data.player().modifiers.disable("revive");
             } else {
-                lose(player);
+                lose(data.player());
             }
         }
 
         new TurnDoneEvent(data).callEvent();
 
-        Player current = player.player();
-        Player opponent = opp.player();
+        Player current = data.player().player();
+        Player opponent = data.player().opponent().player();
         if (turning.extraTurn()) {
             current.sendActionBar(Translation.component(current.locale(), "gameplay.info.extra-turn.turning").color(NamedTextColor.GREEN));
             opponent.sendActionBar(Translation.component(opponent.locale(), "gameplay.info.extra-turn.opponent", current.getName()).color(NamedTextColor.YELLOW));
@@ -355,7 +373,7 @@ public class Game {
 
     private void counter(@NotNull TurnData data, @NotNull TurnData last) throws ImproperTurnException {
         if (last.turn() == Turn.POWDER_SNOW) {
-            PlayerEvents.FROZEN.remove(data.player().player());
+            data.player().modifiers.disable("frozen");
             TurnScheduler.cancel(this, "powder_snow");
         } else if (last.turn() == Turn.LAVA) {
             data.player().specialEffects().removeIf(tc -> tc instanceof Burning);

@@ -12,8 +12,9 @@ public class Attack extends TurnCounter {
     public boolean decrement() {
         boolean result = super.decrement();
         if (result) {
-            player.game().lose(player);
             player.setAttack(Pair.of(false, null));
+        } else {
+            player.game().lose(player);
         }
         return result;
     }

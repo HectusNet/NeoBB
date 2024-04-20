@@ -2,9 +2,9 @@ package net.hectus.bb.util;
 
 import com.marcpg.libpg.lang.Translation;
 import com.marcpg.libpg.text.Formatter;
-import net.hectus.bb.player.PlayerInv;
 import net.hectus.bb.turn.Turn;
 import net.hectus.bb.turn.buff.Buff;
+import net.hectus.bb.turn.counter.CounterFilter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -22,7 +22,6 @@ public final class ItemLoreBuilder {
     private final Material item;
     private int cost;
 
-    private PlayerInv.Hotbar hotbar;
     private Turn.ItemType type;
     private Turn.ItemFunction function;
     private Turn.ItemClass clazz;
@@ -30,18 +29,18 @@ public final class ItemLoreBuilder {
     private boolean hasUsage;
 
     private List<Buff> buffs = new ArrayList<>();
+    private List<CounterFilter> counters = new ArrayList<>();
 
-    public ItemLoreBuilder(Material item, int cost, PlayerInv.Hotbar hotbar, Turn.ItemType type, Turn.ItemFunction function, Turn.ItemClass clazz) {
+    public ItemLoreBuilder(Material item, int cost, Turn.ItemType type, Turn.ItemFunction function, Turn.ItemClass clazz) {
         this.item = item;
         this.cost = cost;
-        this.hotbar = hotbar;
         this.type = type;
         this.function = function;
         this.clazz = clazz;
     }
 
     public ItemLoreBuilder(Material item, int cost) {
-        this(item, cost, PlayerInv.Hotbar.BOTH, Turn.ItemType.OTHER, Turn.ItemFunction.OTHER, Turn.ItemClass.OTHER);
+        this(item, cost, Turn.ItemType.OTHER, Turn.ItemFunction.OTHER, Turn.ItemClass.OTHER);
     }
 
     public ItemLoreBuilder(Material item) {
@@ -65,11 +64,6 @@ public final class ItemLoreBuilder {
 
     public ItemLoreBuilder clazz(Turn.ItemClass clazz) {
         this.clazz = clazz;
-        return this;
-    }
-
-    public ItemLoreBuilder hotbar(PlayerInv.Hotbar hotbar) {
-        this.hotbar = hotbar;
         return this;
     }
 
@@ -97,12 +91,26 @@ public final class ItemLoreBuilder {
         return this;
     }
 
+    public ItemLoreBuilder counters(List<CounterFilter> counters) {
+        this.counters = counters;
+        return this;
+    }
+
+    public ItemLoreBuilder addCounter(CounterFilter counter) {
+        this.counters.add(counter);
+        return this;
+    }
+
+    public ItemLoreBuilder removeCounter(CounterFilter counter) {
+        this.counters.remove(counter);
+        return this;
+    }
+
     public @NotNull List<Component> build(Locale l) {
         List<Component> lore = new ArrayList<>();
 
         lore.add(SEPARATOR);
         lore.add(key(l, "item-lore.cost.key", "₪").append(Translation.component(l, "item-lore.cost.value", cost).color(NamedTextColor.GOLD)));
-        lore.add(key(l, "info.hotbar.hotbar", "❖").append(hotbar.getTranslatedComponent(l)));
         lore.add(SEPARATOR);
         lore.add(key(l, "info.type.type", "❖").append(type.translate(l)));
         lore.add(key(l, "info.function.function", "❖").append(function.translate(l)));
@@ -114,6 +122,12 @@ public final class ItemLoreBuilder {
             lore.add(SEPARATOR);
             lore.add(key(l, "item-lore.usage", "➽"));
             lore.addAll(longText(l, "usage"));
+        }
+        if (counters != null && !counters.isEmpty()) {
+            lore.add(SEPARATOR);
+            lore.add(key(l, "item-lore.counters", "🛡"));
+            lore.addAll(buffs.stream().map(b -> b.line(l)).toList());
+            lore.addAll(counters.stream().map(b -> b.line(l)).toList());
         }
         if (buffs != null && !buffs.isEmpty()) {
             lore.add(SEPARATOR);
@@ -138,8 +152,9 @@ public final class ItemLoreBuilder {
     }
 
     public static ItemLoreBuilder of(Material m, int cost, @NotNull Turn t) {
-        return new ItemLoreBuilder(m, cost, t.hotbar, t.type, t.function, t.clazz)
+        return new ItemLoreBuilder(m, cost, t.type, t.function, t.clazz)
                 .setUsageInfo(t.usage)
-                .buffs(t.buffs);
+                .buffs(t.buffs)
+                .counters(t.countering);
     }
 }

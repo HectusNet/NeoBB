@@ -33,7 +33,7 @@ public abstract class Buff {
     public abstract Result result();
 
     public Component line(Locale l) {
-        return Component.text("   | " + text(l) + (target != Target.YOU ? "" : " " + Translation.string(l, "item-lore.buff." + target.name().toLowerCase())), result().color());
+        return Component.text("   | " + text(l) + (target == Target.YOU ? "" : " " + Translation.string(l, "item-lore.buff." + target.name().toLowerCase())), result().color());
     }
 
     public static class ExtraTurn extends Buff {
@@ -45,8 +45,7 @@ public abstract class Buff {
         }
 
         public ExtraTurn() {
-            super(Target.YOU);
-            this.turns = 1;
+            this(Target.YOU, 1);
         }
 
         @Override

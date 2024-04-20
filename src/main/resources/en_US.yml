@@ -1,24 +1,33 @@
 command:
-  player_not_found: "The player {0} could not be found!"
+  player_not_found: "The player {0} could not be found!" # May be shown in various contexts.
   challenge:
     no_incoming: "{0} didn't challenge you!"
     confirm: "Successfully challenged {0}!"
     confirm-target:
-      1: "You got challenged by {0} to a 1v1!"
-      2: "Click here"
-      3: "to accept."
+      1: "You got challenged by {0} to a 1v1!" # First part of the message.
+      2: "Click here" # Second part. Is appended to the first one with a space in between.
+      3: "to accept." # Third part. Is appended to the second one with a space in between.
     already: "You already challenged {0}!"
     start: "Starting a match between you and {0}!"
   giveup:
-    not_in_match: "You aren't in any match!"
+    not_in_match: "You aren't in any match!" # May be shown in various contexts.
     confirm: "You just gave up. You will get an increased penalty!"
 item-lore:
   cost:
-    key: "Cost"
-    value: "{0} Coins"
-  description: "Description:"
-  usage: "Usage:"
-  buffs: "Buffs:"
+    key: "Cost" # Shown as "Cost: ..."
+    value: "{0} Coins" # Appended to item-lore.cost.key, to form "Cost: ? Coins"
+  description: "Description:" # Followed by a few lines of detailed description.
+  usage: "Usage:" # Followed by a few lines of usage guidance.
+  counters: "Counters:" # Followed by a a list of all things this item can counter.
+  buffs: "Buffs:" # Followed by a a list of all buffs that this item has.
+  counter:
+    wool: "Any Wool Block" # Applies to only wool blocks, no matter the color.
+    walls: "Any Wall" # May also be used for attacks that bypass walls.
+    waterloggable: "Anything Waterloggable" # Waterloggable just means that you can use a water bucket on it.
+    all: "Everything"
+    cauldron: "Cauldrons" # Plural!
+    blue-sheep: "Blue Sheep" # Plural!
+    solid: "Solid Blocks" # Solid blocks are all blocks the player can build upon.
   buff:
     extra-turn: "Extra Turn" # Singular
     extra-turns: "+{0} Extra Turns" # Plural
@@ -26,8 +35,8 @@ item-lore:
     opponent: "(Opponent)" # Added at the end of the line.
     both: "(Both Players)" # Added at the end of the line.
     effect:
-      blindness: "Blindness"
-      glowing: "Glowing"
+      blindness: "Blindness" # Should be the same as the vanilla blindness effect.
+      glowing: "Glowing" # Should be the same as the vanilla glowing effect.
     teleportation: "Teleportation"
 shop:
   previous: "Previous Page"
@@ -40,45 +49,44 @@ shop:
   menu:
     name: "Menu"
     lore: "Returns back to the shop menu, to filter based on different criteria."
-  filters: "Filters"
+  filters: "Filters" # Filtering items
 info:
   type:
     type: "Type"
-    block: "Block"
-    item: "Item"
-    throwable: "Throwable"
-    mob: "Mob"
-    structure: "Structure"
-    other: "Special Type"
+    block: "Block" # Anything that's placed.
+    item: "Item" # Anything not placed and used in a special way.
+    throwable: "Throwable" # Anything that you throw to use.
+    mob: "Mob" # Mobs just means living entities.
+    structure: "Structure" # Anything that you need to place multiple blocks for.
+    other: "Special Type" # Stuff that can't be categorized or isn't categorized due to coding reasons.
   function:
-    function: "Function: "
-    attack: "Attack"
+    function: "Function"
+    attack: "Attack" # Attacks your opponent and requires him to counter it.
     counter: "Counter"
-    counterattack: "Counterattack"
-    counterbuff: "Counterbuff"
-    buff: "Buff"
-    defense: "Defense"
-    event: "Event"
-    other: "Special Function"
+    counterattack: "Counterattack" # First counters, then attacks.
+    counterbuff: "Counterbuff" # First counters, then applies buff(s).
+    buff: "Buff" # Applies one or more effects to you, your opponent, or all players.
+    defense: "Defense" # Defends you from being attacked.
+    event: "Event" # Does some special stuff, which may not be immediately.
+    other: "Special Function" # Stuff that can't be categorized or isn't categorized due to coding reasons.
   class:
-    class: "Class: "
-    neutral: "Neutral"
-    hot: "Hot"
-    cold: "Cold"
-    water: "Water"
+    class: "Class"
+    neutral: "Neutral" # Can always be used in medium temperature warps.
+    hot: "Hot" # Can always be used in warm warps.
+    cold: "Cold" # Can always be used in cold warps.
+    water-class: "Water"
     nature: "Nature"
     redstone: "Redstone"
-    supernatural: "Supernatural"
-    other: "Special Class"
+    supernatural: "Supernatural" # Formally known as the "Dream" item class.
+    other: "Special Class" # Stuff that can't be categorized or isn't categorized due to coding reasons.
   hotbar:
-    hotbar: "Hotbar: "
-    regular: "Regular-Only"
-    overtime: "Overtime-Only"
-    both: "Both"
+    hotbar: "Hotbar"
+    regular: "Regular-Only" # The first hotbar you play with.
+    overtime: "Overtime-Only" # The second one you play with. Only called "overtime", because of an old misunderstanding, but got adapted already.
+    both: "Both" # The default for items.
 turn:
   issue:
     wrong_counter: "There is nothing to counter with that item!"
-    not_allowed: "You cannot use that item in the current conditions!"
     wrong_warp: "You cannot use that item in the current warp!"
     attack_while_attacked: "You cannot attack your opponent while being attacked!"
     opponent_defended: "Your opponent is defended! The attack has no effect."
@@ -90,20 +98,26 @@ turn:
 gameplay:
   info:
     extra-turn:
-      turning: "You have an extra turn to use!"
-      opponent: "{0} has an extra turn to use."
+      turning: "You have an extra turn to use!" # Shown to the current player.
+      opponent: "{0} has an extra turn to use." # Shown to the current player's opponent.
     next-turn:
-      turning: "It's now your turn, good luck!"
-      opponent: "Your turn is now over!"
+      turning: "It's now your turn, good luck!" # Shown to the now turning player.
+      opponent: "Your turn is now over!" # Shown to the one whose turn ended.
+    too-slow:
+      turning: "Your opponent was too slow, it's now your turn!" # Shown to the now turning player.
+      opponent: "You were too slow, your turn is now over!" # Shown to the one who was too slow.
     ending:
       win: "You Win!"
       win-sub: "You won this match, good job!"
       lose: "You Lose!"
       lose-sub: "You lost this match, better luck next time!"
-      tie: "A Tie!"
+      tie: "A Tie!" # May be known as a draw.
       tie-sub: "It's a tie, nobody won."
       giveup: "{0} gave up!"
       giveup-sub: "{0} gave up and will receive a penalty."
+    warp-unsuccessful:
+      turning: "You were unlucky and the warp didn't work!" # Shown to the current player.
+      opponent: "{0} was unlucky and his warp didn't work!" # Shown to the current player's opponent.
   effects:
     burning: "You are now burning! You have 3 turns to extinguish yourself."
 usage:
@@ -112,10 +126,11 @@ usage:
   magma_block: "Place it somewhere your opponent is likely to step on, as he dies when stepping on it."
   lava: "You can only place lava in warm warps!"
 scoreboard:
-  turning: "Turning: "
-  warp: "Warp: "
-  attacked: "Attacked: "
-  defended: "Defended: "
-  luck: "Luck: "
-  yes: "Yes"
-  no: "No"
+  turning: "Turning: " # Example: "Turning: You" OR "Turning: PlayerName"
+  time: "Time: " # Example: "Time: 3:30min"
+  warp: "Warp: " # Example: "Warp: Default"
+  attacked: "Attacked: " # Example: "Attacked: Yes"
+  defended: "Defended: " # Example: "Defended: Yes"
+  luck: "Luck: " # Example: "Luck: 20"
+  yes: "Yes" # Used for attacked and defended.
+  no: "No" # Used for attacked and defended.

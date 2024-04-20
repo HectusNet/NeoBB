@@ -128,6 +128,8 @@ public final class GameEvents implements Listener {
         PlayerData playerData = GameManager.getPlayerData(player);
         if (playerData == null) {
             player.sendActionBar(Translation.component(player.locale(), "command.giveup.not_in_match"));
+        } else if (!playerData.game().hasStarted()) {
+            return true;
         } else {
             try {
                 playerData.game().turn(new TurnData(playerData, turn, block, entity));

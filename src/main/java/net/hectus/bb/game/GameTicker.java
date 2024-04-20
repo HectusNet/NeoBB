@@ -7,7 +7,9 @@ import com.marcpg.libpg.lang.Translation;
 import com.marcpg.libpg.text.Formatter;
 import net.hectus.bb.BlockBattles;
 import net.hectus.bb.player.PlayerData;
+import net.hectus.bb.turn.TurnData;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
@@ -19,6 +21,7 @@ import java.util.Locale;
 public class GameTicker extends Timer {
     private final Game game;
     private BukkitTask task;
+    private int turnCountdown = 5;
 
     public GameTicker(Game game) {
         super(new Time(5, Time.Unit.MINUTES));
@@ -28,10 +31,20 @@ public class GameTicker extends Timer {
     @Override
     public void start() {
         task = Bukkit.getScheduler().runTaskTimer(BlockBattles.getPlugin(BlockBattles.class), () -> {
+            game.players().forEach(this::scoreboard);
             timer.decrement();
             if (timer.get() == 0) {
-                game.players().forEach(this::scoreboard);
                 game.draw();
+                return;
+            }
+
+            turnCountdown--;
+            game.players().forEach(PlayerData::updateBossBar);
+            if (turnCountdown <= 0) {
+                game.done(new TurnData(game.turning(), null, null, null));
+                game.getOpponent(game.turning()).player().sendActionBar(Translation.component(game.turning().player().locale(), "gameplay.info.too-slow.turning").color(NamedTextColor.GREEN));
+                game.turning().player().sendActionBar(Translation.component(game.getOpponent(game.turning()).player().locale(), "gameplay.info.too-slow.opponent").color(NamedTextColor.RED));
+                turnCountdown = 5; // Reset the timer!
             }
         }, 0, 20);
     }
@@ -39,6 +52,10 @@ public class GameTicker extends Timer {
     @Override
     public void stop() {
         task.cancel();
+    }
+
+    public int turnCountdown() {
+        return turnCountdown;
     }
 
     // ========== SCOREBOARD ==========
@@ -55,6 +72,7 @@ public class GameTicker extends Timer {
 
         objective.getScore("   ").setScore(8);
         objective.getScore(Translation.string(l, "scoreboard.turning") + (game.turning() == player ? McFormat.GREEN + "You" : McFormat.YELLOW + game.turning().player().getName())).setScore(7);
+        objective.getScore(Translation.string(l, "scoreboard.time") + timer.getPreciselyFormatted()).setScore(7);
         objective.getScore(Translation.string(l, "scoreboard.warp") + game.warp().temperature.color() + Formatter.toPascalCase(game.warp().name())).setScore(6);
         objective.getScore("  ").setScore(5);
         objective.getScore(Translation.string(l, "scoreboard.attacked") + yesNo(l, player.getAttack().left(), false)).setScore(4);
@@ -71,6 +89,6 @@ public class GameTicker extends Timer {
     }
 
     public String yesNo(Locale l, boolean bool, boolean inverted) {
-        return (bool ^ inverted ? McFormat.GREEN : McFormat.RED) + Translation.string(l, bool ? "scoreboard.yes" : "scoreboard.no");
+        return (bool ^ inverted ? McFormat.RED : McFormat.GREEN) + Translation.string(l, "scoreboard." + (bool ? "yes" : "no"));
     }
 }
