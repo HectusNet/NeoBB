@@ -5,6 +5,7 @@ import com.marcpg.libpg.data.database.sql.SQLConnection;
 import com.marcpg.libpg.lang.Translation;
 import net.hectus.bb.command.ChallengeCommand;
 import net.hectus.bb.command.GiveupCommand;
+import net.hectus.bb.command.InitializeBBCommand;
 import net.hectus.bb.event.GameEvents;
 import net.hectus.bb.event.PlayerEvents;
 import net.hectus.bb.game.util.TurnScheduler;
@@ -15,6 +16,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -51,6 +53,7 @@ public final class BlockBattles extends JavaPlugin {
         Objects.requireNonNull(getCommand("challenge")).setExecutor(new ChallengeCommand());
         Objects.requireNonNull(getCommand("structure")).setExecutor(new StructureCommand());
         Objects.requireNonNull(getCommand("giveup")).setExecutor(new GiveupCommand());
+        Objects.requireNonNull(getCommand("initialize-bb")).setExecutor(new InitializeBBCommand());
 
         getServer().getPluginManager().registerEvents(new GameEvents(), this);
         getServer().getPluginManager().registerEvents(new PlayerEvents(), this);
@@ -64,21 +67,23 @@ public final class BlockBattles extends JavaPlugin {
             throw new RuntimeException(e);
         }
 
-        LOG.info("Successfully started up BlockBattles's plugin!");
+        LOG.info("Successfully started up BlockBattles' plugin!");
     }
 
     @Override
     public void onDisable() {
         if (DATABASE != null) DATABASE.closeConnection();
         StructureManager.save();
-        LOG.info("Successfully shut down all components of BlockBattles's plugin!");
+        LOG.info("Successfully shut down all components of BlockBattles' plugin!");
     }
 
     void translations() throws IOException {
         Files.copy(Objects.requireNonNull(getResource("en_US.yml")), DATA_DIR.resolve("lang/en_US.yml"), StandardCopyOption.REPLACE_EXISTING);
-        Map<String, String> en_US = YamlConfiguration.loadConfiguration(DATA_DIR.resolve("lang/en_US.yml").toFile()).getValues(true)
-                .entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, o -> String.valueOf(o.getValue())));
-        Translation.loadSingleMap(new Locale("en", "US"), en_US);
+        for (File file : Objects.requireNonNull(DATA_DIR.resolve("lang").toFile().listFiles())) {
+            String[] lang = file.getName().replace(".yml", "").split("_");
+            Translation.loadSingleMap(new Locale(lang[0], lang[1]), YamlConfiguration.loadConfiguration(file).getValues(true)
+                    .entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, o -> String.valueOf(o.getValue()))));
+        }
     }
 
     void connectDatabase() {

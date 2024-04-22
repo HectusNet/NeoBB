@@ -48,8 +48,7 @@ commands:
     aliases: surrender
     description: Gives up. Will give you a small XP penalty!
 
-  ## Some Debugging Stuff, Not Important! ##
-  debug:
+  ## Sets everything to the recommended settings! ##
+  initialize-bb:
     usage: /<command>
-    aliases: test
-    description: Does some debugging stuff. Not important for the user.
+    description: Sets all server and world settings to the recommended ones.

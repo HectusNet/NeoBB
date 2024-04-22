@@ -1,7 +1,12 @@
 package net.hectus.bb.player;
 
+import com.marcpg.libpg.lang.Translation;
+import net.hectus.bb.shop.ShopItemUtilities;
+import net.hectus.bb.util.ItemBuilder;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import java.util.ArrayList;
@@ -59,16 +64,18 @@ public final class PlayerInv {
             currentDone();
     }
 
-    public void removeItem(@Range(from = 0, to = 8) int index) {
+    public void removeItemInGame(@Range(from = 0, to = 8) int index) {
+        hotbar.remove(index);
+    }
+
+    public void removeItemInShop(@Range(from = 0, to = 8) int index) {
+        coins += ShopItemUtilities.getPrice(hotbar.get(index).getType());
         hotbar.remove(index);
         fullUpdate();
     }
 
-    public void removeItemWithoutUpdating(@Range(from = 0, to = 8) int index) {
-        hotbar.remove(index);
-    }
-
-    public void removeItem(ItemStack item) {
+    public void removeItemInShop(@NotNull ItemStack item) {
+        coins += ShopItemUtilities.getPrice(item.getType());
         hotbar.remove(item);
         fullUpdate();
     }
@@ -88,6 +95,10 @@ public final class PlayerInv {
                 inv.clear(i);
             }
         }
+        inv.setItem(13, new ItemBuilder(Material.GOLD_NUGGET)
+                .name(Translation.component(player.player().locale(), "item-lore.cost.value", coins))
+                .build()
+        );
     }
 
     public void updateOpponent() {

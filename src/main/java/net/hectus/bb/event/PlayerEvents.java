@@ -50,7 +50,7 @@ public final class PlayerEvents implements Listener {
         if (!event.getOldItemStack().isEmpty() && event.getNewItemStack().isEmpty()) {
             PlayerData player = GameManager.getPlayerData(event.getPlayer());
             if (player != null && player.game().hasStarted() && event.getSlot() <= 8) {
-                player.inv().removeItemWithoutUpdating(event.getSlot());
+                player.inv().removeItemInGame(event.getSlot());
             }
         }
     }
@@ -60,7 +60,7 @@ public final class PlayerEvents implements Listener {
         if (event.getClickedInventory() instanceof PlayerInventory && event.getSlotType() == InventoryType.SlotType.QUICKBAR) {
             PlayerData player = GameManager.getPlayerData((Player) event.getWhoClicked());
             if (player != null && !player.inv().shopDone()) {
-                player.inv().removeItem(event.getSlot());
+                player.inv().removeItemInShop(event.getSlot());
             }
         }
     }

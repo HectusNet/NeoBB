@@ -313,7 +313,7 @@ public class Game {
                 opp.inv().setContents(yourInv);
             }
             case FLOWER_BLUE_ORCHID -> modifiers.enable("warp_100");
-            case FLOWER_ALLIUM -> opp.inv().removeItem(Randomizer.fromCollection(opp.inv().getContents()));
+            case FLOWER_ALLIUM -> opp.inv().removeItemInShop(Randomizer.fromCollection(opp.inv().getContents()));
             case FLOWER_AZURE_BLUET -> {
                 modifiers.enable("azure_bluet_used");
                 new Buff.Luck(Buff.Target.YOU, 20).apply(player);
