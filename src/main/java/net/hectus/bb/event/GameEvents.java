@@ -45,15 +45,9 @@ public final class GameEvents implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockPlace(@NotNull BlockPlaceEvent event) {
-        for (Turn turn : Turn.values()) {
-            if (turn.type == Turn.ItemType.BLOCK && (turn.name().equals(event.getBlock().getType().name()) || turn.items.contains(event.getBlock().getType()))) {
-                try {
-                    event.setCancelled(turn(event.getPlayer(), Turn.valueOf(event.getBlock().getType().name()), event.getBlock(), null));
-                    return;
-                } catch (IllegalArgumentException ignored) {}
-            }
-        }
-        event.setCancelled(true);
+        Game game = GameManager.getGame(event.getPlayer());
+        if (game != null)
+            game.placementHandler.add(event.getBlock(), event.getPlayer());
     }
 
     @EventHandler(ignoreCancelled = true)

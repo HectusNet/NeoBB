@@ -58,6 +58,10 @@ public class GameTicker extends Timer {
         return turnCountdown;
     }
 
+    public void setCountCountdown(int turnCountdown) {
+        this.turnCountdown = turnCountdown;
+    }
+
     // ========== SCOREBOARD ==========
 
     private static final ScoreboardManager SCOREBOARD_MANAGER = Bukkit.getScoreboardManager();

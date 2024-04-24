@@ -102,17 +102,17 @@ public final class PlayerData {
     private final BossBar bossBar = BossBar.bossBar(Component.empty(), 0.0f, BossBar.Color.RED, BossBar.Overlay.NOTCHED_10);
 
     public void updateBossBar() {
-        bossBar.name(Component.text(game.turnCountdown() + "s"));
-        bossBar.progress(1.0f / game.turnCountdown());
+        bossBar.name(Component.text(game.ticker().turnCountdown() + "s"));
+        bossBar.progress(game.ticker().turnCountdown() * 0.1f);
         bossBar.color(getColor());
     }
 
     private BossBar.Color getColor() {
-        return switch (game.turnCountdown()) {
-            case 5 -> BossBar.Color.WHITE;
-            case 4 -> BossBar.Color.BLUE;
-            case 3 -> BossBar.Color.GREEN;
-            case 2 -> BossBar.Color.YELLOW;
+        return switch (game.ticker().turnCountdown()) {
+            case 10, 9, 8 -> BossBar.Color.WHITE;
+            case 7, 6 -> BossBar.Color.BLUE;
+            case 5, 4 -> BossBar.Color.GREEN;
+            case 3, 2 -> BossBar.Color.YELLOW;
             case 1 -> BossBar.Color.RED;
             default -> BossBar.Color.PINK;
         };

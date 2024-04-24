@@ -6,6 +6,7 @@ import com.marcpg.libpg.util.Randomizer;
 import net.hectus.bb.event.custom.PlayerWarpEvent;
 import net.hectus.bb.event.custom.TurnDoneEvent;
 import net.hectus.bb.game.util.ImproperTurnException;
+import net.hectus.bb.game.util.PlacementHandler;
 import net.hectus.bb.game.util.TurnScheduler;
 import net.hectus.bb.game.util.TurnUnusableException;
 import net.hectus.bb.player.PlayerData;
@@ -40,13 +41,14 @@ import java.util.*;
 public class Game {
     public final Modifiers modifiers = new Modifiers();
     public final UUID uuid = UUID.randomUUID();
-    public boolean started = false;
+    public final PlacementHandler placementHandler = new PlacementHandler();
 
     private final List<TurnData> history = new ArrayList<>();
     private final List<PlayerData> players = new ArrayList<>();
     private final GameTicker ticker = new GameTicker(this);
     private final World world;
 
+    public boolean started = false;
     private PlayerData turning;
     private Warp warp = Warp.DEFAULT;
     private List<Turn.ItemClass> allowed = Warp.DEFAULT.allowed;
@@ -67,8 +69,8 @@ public class Game {
         return players;
     }
 
-    public int turnCountdown() {
-        return ticker.turnCountdown();
+    public GameTicker ticker() {
+        return ticker;
     }
 
     public PlayerData turning() {
@@ -76,6 +78,7 @@ public class Game {
     }
 
     public void swapTurning() {
+        placementHandler.reset();
         turning = getOpponent(turning);
     }
 

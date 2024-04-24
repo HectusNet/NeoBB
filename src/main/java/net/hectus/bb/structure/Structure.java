@@ -44,6 +44,24 @@ public class Structure implements Serializable {
     }
 
     /**
+     * Gets the Structure's material weights.
+     * @return The Structure's material weights.
+     */
+    public Map<Material, Integer> materialWeights() {
+        return materialWeights;
+    }
+
+    /**
+     * Adds a block to this structure, based on a full block data.
+     * Is pretty efficient and the recommended way.
+     * @param blockData The block data to add to this structure.
+     */
+    public void addBlock(BlockData blockData) {
+        data.add(blockData);
+        materialWeights.put(blockData.type(), materialWeights.getOrDefault(blockData.type(), 0) + 1);
+    }
+
+    /**
      * Gets the Structure's most common material and it's amount of blocks.
      * @return The Structure's most common material.
      */
@@ -85,6 +103,13 @@ public class Structure implements Serializable {
         place(structureLocation.getWorld(), Cord.ofLocation(structureLocation));
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Structure structure)) return false;
+        return StructureCalculator.compare(this, structure) >= 1.0;
+    }
+
     /**
      * Saves a specific region of the world as a Structure, by going though all blocks,
      * converting them to {@link BlockData} and then saving the structure into memory.
@@ -107,12 +132,33 @@ public class Structure implements Serializable {
                 for (double z = lowest.z(); z <= highest.z(); z++) {
                     Block block = world.getBlockAt((int) x, (int) y, (int) z);
                     Material type = block.getType();
-                    if (!type.isAir()) {
-                        structure.data.add(BlockData.ofBlock(block, lowest));
-                        structure.materialWeights.put(type, structure.materialWeights.getOrDefault(type, 0) + 1);
-                    }
+                    if (!type.isAir())
+                        structure.addBlock(BlockData.ofBlock(block, lowest));
                 }
             }
+        }
+        return structure;
+    }
+
+    /**
+     * Converts multiple blocks to a Structure, by going though all pf them, converting
+     * them to {@link BlockData} and then saving the structure into memory.
+     * Use {@link StructureManager#save()} afterwards to also save it as a file.
+     * @param blocks All the blocks this structure consists of.
+     * @param name The name/identifier of the structure, which should be unique.
+     * @return The loaded Structure.
+     */
+    public static @NotNull Structure ofBlocks(@NotNull Iterable<Block> blocks, String name) {
+        Structure structure = new Structure(name);
+
+        Cord lowestCord = Cord.ofLocation(blocks.iterator().next().getLocation());
+        for (Block block : blocks) {
+            Cord blockCord = Cord.ofLocation(block.getLocation());
+            lowestCord = new Cord(Math.min(lowestCord.x(), blockCord.x()), Math.min(lowestCord.y(), blockCord.y()), Math.min(lowestCord.z(), blockCord.z()));
+        }
+
+        for (Block block : blocks) {
+            structure.addBlock(BlockData.ofBlock(block, lowestCord));
         }
         return structure;
     }

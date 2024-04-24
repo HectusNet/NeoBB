@@ -56,4 +56,8 @@ public final class StructureManager {
     public static List<String> names() {
         return LOADED_STRUCTURES.stream().map(Structure::name).toList();
     }
+
+    public static List<Structure> loadedStructures() {
+        return LOADED_STRUCTURES;
+    }
 }
