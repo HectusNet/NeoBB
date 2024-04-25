@@ -1,7 +1,11 @@
 package net.hectus.bb.warp;
 
 import com.marcpg.libpg.color.McFormat;
+import net.hectus.bb.BlockBattles;
+import net.hectus.bb.game.Game;
 import net.hectus.bb.turn.Turn;
+import net.hectus.bb.util.Parser;
+import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -35,6 +39,12 @@ public enum Warp {
         this.temperature = temperature;
         this.allowed = new ArrayList<>(List.of(OTHER, temperature.itemClass()));
         this.allowed.addAll(List.of(allowed));
+    }
+
+    public void teleport(@NotNull Game game) {
+        Location location = Parser.listToLocation(BlockBattles.CONFIG.getIntegerList("warps." + name().toLowerCase()));
+        game.turning().player().teleport(location.clone().add(2, 0, 0));
+        game.getOpponent(game.turning()).player().teleport(location.clone().subtract(2, 0, 0));
     }
 
     public enum Temperature {

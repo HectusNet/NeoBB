@@ -35,8 +35,4 @@ public class PlayerWarpEvent extends GameEvent {
     public @NotNull HandlerList getHandlers() {
         return HANDLER_LIST;
     }
-
-    public static @NotNull HandlerList getHandlerList() {
-        return HANDLER_LIST;
-    }
 }

@@ -1,7 +1,5 @@
 package net.hectus.bb.event.custom;
 
-import net.hectus.bb.player.PlayerData;
-import net.hectus.bb.turn.Turn;
 import net.hectus.bb.turn.TurnData;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
@@ -16,24 +14,12 @@ public class TurnDoneEvent extends GameEvent {
         this.turnData = turnData;
     }
 
-    public PlayerData player() {
-        return turnData.player();
-    }
-
     public TurnData turnData() {
         return turnData;
     }
 
-    public Turn turn() {
-        return turnData.turn();
-    }
-
     @Override
     public @NotNull HandlerList getHandlers() {
-        return HANDLER_LIST;
-    }
-
-    public static @NotNull HandlerList getHandlerList() {
         return HANDLER_LIST;
     }
 }

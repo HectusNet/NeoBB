@@ -46,8 +46,10 @@ public final class GameEvents implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onBlockPlace(@NotNull BlockPlaceEvent event) {
         Game game = GameManager.getGame(event.getPlayer());
-        if (game != null)
+        if (game != null) {
+            game.ticker().setTurnCountdown(10);
             game.placementHandler.add(event.getBlock(), event.getPlayer());
+        }
     }
 
     @EventHandler(ignoreCancelled = true)

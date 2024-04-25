@@ -12,6 +12,7 @@ import net.hectus.bb.game.util.TurnScheduler;
 import net.hectus.bb.structure.StructureCommand;
 import net.hectus.bb.structure.StructureManager;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
@@ -33,7 +34,7 @@ public final class BlockBattles extends JavaPlugin {
     public static  final String VERSION = "NeoBB-0.1.0 (d" + Integer.toHexString(LocalDateTime.now().getDayOfYear()) + "h" + Integer.toHexString(LocalDateTime.now().getHour()) + ")";
     public static Logger LOG;
     public static Path DATA_DIR;
-    public static boolean GLOBAL_STRUCTURES;
+    public static FileConfiguration CONFIG;
     public static AutoCatchingSQLConnection<UUID> DATABASE = null;
 
     @Override
@@ -42,7 +43,7 @@ public final class BlockBattles extends JavaPlugin {
         DATA_DIR = getDataFolder().toPath();
 
         saveDefaultConfig();
-        GLOBAL_STRUCTURES = getConfig().getBoolean("global-structures");
+        CONFIG = getConfig();
 
         // Create the plugin directory tree:
         if (StructureManager.STRUCTURE_DIR.mkdirs())
@@ -87,7 +88,7 @@ public final class BlockBattles extends JavaPlugin {
     }
 
     void connectDatabase() {
-        ConfigurationSection db = Objects.requireNonNull(getConfig().getConfigurationSection("database"));
+        ConfigurationSection db = Objects.requireNonNull(CONFIG.getConfigurationSection("database"));
         if (db.getBoolean("enabled")) {
             try {
                 DATABASE = new AutoCatchingSQLConnection<>(

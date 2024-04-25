@@ -58,7 +58,7 @@ public class GameTicker extends Timer {
         return turnCountdown;
     }
 
-    public void setCountCountdown(int turnCountdown) {
+    public void setTurnCountdown(int turnCountdown) {
         this.turnCountdown = turnCountdown;
     }
 

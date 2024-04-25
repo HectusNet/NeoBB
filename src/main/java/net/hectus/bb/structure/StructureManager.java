@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 public final class StructureManager {
-    public final static File STRUCTURE_DIR = BlockBattles.GLOBAL_STRUCTURES ? new File("~/.config/neobb-structures") : BlockBattles.DATA_DIR.resolve("structures").toFile();
+    public final static File STRUCTURE_DIR = BlockBattles.CONFIG.getBoolean("global-structures") ? new File("~/.config/neobb-structures") : BlockBattles.DATA_DIR.resolve("structures").toFile();
     private static final List<Structure> LOADED_STRUCTURES = new ArrayList<>();
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

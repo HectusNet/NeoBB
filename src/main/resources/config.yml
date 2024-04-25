@@ -17,3 +17,21 @@ database:
   # The credentials to log into the database. The account should not have more permissions than it needs!
   username: "neobb_plugin"
   password: "Ye8ZfAZ6DohcuC"
+
+# Warp/Map locations (centers):
+warps:
+  default: [ 0, 0, 0 ]
+  nether: [ 0, 0, 0 ]
+  end: [ 0, 0, 0 ]
+  ocean: [ 0, 0, 0 ]
+  frozen: [ 0, 0, 0 ]
+  mushroom: [ 0, 0, 0 ]
+  cliff: [ 0, 0, 0 ]
+  meadow: [ 0, 0, 0 ]
+  void: [ 0, 0, 0 ]
+  redstone: [ 0, 0, 0 ]
+  wood: [ 0, 0, 0 ]
+  desert: [ 0, 0, 0 ]
+  nerd: [ 0, 0, 0 ]
+  amethyst: [ 0, 0, 0 ]
+  sun: [ 0, 0, 0 ]

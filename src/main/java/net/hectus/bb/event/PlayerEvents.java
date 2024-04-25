@@ -20,12 +20,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public final class PlayerEvents implements Listener {
-    public static final Set<Player> FROZEN = new HashSet<>();
-
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamageByBlock(@NotNull EntityDamageByBlockEvent event) {
         if (event.getCause() == EntityDamageEvent.DamageCause.HOT_FLOOR && event.getEntity() instanceof Player player) {
@@ -39,6 +34,7 @@ public final class PlayerEvents implements Listener {
 
     @EventHandler
     public void onPlayerWarp(@NotNull PlayerWarpEvent event) {
+        event.to().teleport(event.game());
         event.game().players().forEach(p -> p.player().clearActivePotionEffects());
         if (event.to().temperature == Warp.Temperature.COLD) {
             event.player().specialEffects().removeIf(turnCounter -> turnCounter instanceof Burning);
