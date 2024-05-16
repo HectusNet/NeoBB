@@ -21,7 +21,7 @@ import java.util.Locale;
 public class GameTicker extends Timer {
     private final Game game;
     private BukkitTask task;
-    private int turnCountdown = 5;
+    private int turnCountdown = 10;
 
     public GameTicker(Game game) {
         super(new Time(5, Time.Unit.MINUTES));
@@ -39,13 +39,13 @@ public class GameTicker extends Timer {
             }
 
             turnCountdown--;
-            game.players().forEach(PlayerData::updateBossBar);
             if (turnCountdown <= 0) {
                 game.done(new TurnData(game.turning(), null, null, null));
                 game.getOpponent(game.turning()).player().sendActionBar(Translation.component(game.turning().player().locale(), "gameplay.info.too-slow.turning").color(NamedTextColor.GREEN));
                 game.turning().player().sendActionBar(Translation.component(game.getOpponent(game.turning()).player().locale(), "gameplay.info.too-slow.opponent").color(NamedTextColor.RED));
-                turnCountdown = 5; // Reset the timer!
+                resetTurnCountdown();
             }
+            game.players().forEach(PlayerData::updateBossBar);
         }, 0, 20);
     }
 
@@ -58,8 +58,8 @@ public class GameTicker extends Timer {
         return turnCountdown;
     }
 
-    public void setTurnCountdown(int turnCountdown) {
-        this.turnCountdown = turnCountdown;
+    public void resetTurnCountdown() {
+        this.turnCountdown = 10;
     }
 
     // ========== SCOREBOARD ==========
@@ -77,7 +77,7 @@ public class GameTicker extends Timer {
         objective.getScore("   ").setScore(8);
         objective.getScore(Translation.string(l, "scoreboard.turning") + (game.turning() == player ? McFormat.GREEN + "You" : McFormat.YELLOW + game.turning().player().getName())).setScore(7);
         objective.getScore(Translation.string(l, "scoreboard.time") + timer.getPreciselyFormatted()).setScore(7);
-        objective.getScore(Translation.string(l, "scoreboard.warp") + game.warp().temperature.color() + Formatter.toPascalCase(game.warp().name())).setScore(6);
+        objective.getScore(Translation.string(l, "scoreboard.warp") + game.warp().temperature.mcFormat() + Formatter.toPascalCase(game.warp().name())).setScore(6);
         objective.getScore("  ").setScore(5);
         objective.getScore(Translation.string(l, "scoreboard.attacked") + yesNo(l, player.getAttack().left(), false)).setScore(4);
         objective.getScore(Translation.string(l, "scoreboard.defended") + yesNo(l, player.getDefense().left(), true)).setScore(3);

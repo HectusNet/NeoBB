@@ -1,10 +1,11 @@
-package net.hectus.bb.game.util;
+package net.hectus.bb.game;
 
 import net.hectus.bb.BlockBattles;
 import net.hectus.bb.event.GameEvents;
 import net.hectus.bb.structure.Structure;
 import net.hectus.bb.structure.StructureCalculator;
 import net.hectus.bb.turn.Turn;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -28,9 +29,10 @@ public class PlacementHandler {
                         }
                     }
                 }
-            }, 50); // 2.5 Seconds
+            }, 30); // 1.5 Seconds
         } else {
             Map.Entry<Structure, Double> result = StructureCalculator.predict(Structure.ofBlocks(placedBlocks, "placed")).entrySet().iterator().next();
+            player.sendActionBar(Component.text(result.getKey().name() + " (" + (result.getValue() * 100) + "%)"));
             if (result.getValue() >= 1.0)
                 GameEvents.turn(player, Turn.valueOf(result.getKey().name().toUpperCase()), null, null);
         }

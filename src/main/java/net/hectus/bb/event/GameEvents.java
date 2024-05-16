@@ -22,10 +22,16 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,7 +53,7 @@ public final class GameEvents implements Listener {
     public void onBlockPlace(@NotNull BlockPlaceEvent event) {
         Game game = GameManager.getGame(event.getPlayer());
         if (game != null) {
-            game.ticker().setTurnCountdown(10);
+            game.ticker().resetTurnCountdown();
             game.placementHandler.add(event.getBlock(), event.getPlayer());
         }
     }
@@ -74,6 +80,48 @@ public final class GameEvents implements Listener {
                 event.setCancelled(true);
             } else if (material == Material.IRON_SHOVEL) {
                 turn(player, Turn.IRON_SHOVEL, null, null);
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerTeleport(@NotNull PlayerTeleportEvent event) {
+        if (event.getCause() == PlayerTeleportEvent.TeleportCause.ENDER_PEARL) {
+            turn(event.getPlayer(), Turn.ENDER_PEARL, null, null);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityPlace(@NotNull EntityPlaceEvent event) {
+        if (event.getEntity() instanceof Boat)
+            turn(event.getPlayer(), Turn.BOAT, null, event.getEntity());
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onVehicleEnter(@NotNull VehicleEnterEvent event) {
+        if (event.getEntered() instanceof Player player && event.getVehicle() instanceof Boat) {
+            PlayerData playerData = GameManager.getPlayerData(player);
+            if (playerData != null) {
+                playerData.modifiers.disable("boat_damage");
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onProjectileHit(@NotNull ProjectileHitEvent event) {
+        if (event.getEntity().getShooter() instanceof Player player) {
+            if (event.getEntity() instanceof ThrownPotion potion) {
+                if (potion.getPotionMeta().getBasePotionType() == PotionType.WATER) {
+                    turn(player, Turn.SPLASH_WATER_BOTTLE, null, null);
+                } else if (potion.getEffects().size() == 1) {
+                    if (potion.getEffects().iterator().next().getType() == PotionEffectType.JUMP) {
+                        turn(player, Turn.SPLASH_JUMP_BOOST_POTION, null, null);
+                    } else if (potion.getEffects().iterator().next().getType() == PotionEffectType.LEVITATION) {
+                        turn(player, Turn.SPLASH_LEVITATION_POTION, null, null);
+                    }
+                }
+            } else if (event.getEntity() instanceof Snowball && event.getHitEntity() instanceof Player) {
+                turn(player, Turn.SNOWBALL, null, null);
             }
         }
     }

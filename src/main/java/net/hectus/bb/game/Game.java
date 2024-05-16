@@ -3,10 +3,10 @@ package net.hectus.bb.game;
 import com.marcpg.libpg.lang.Translation;
 import com.marcpg.libpg.storing.Pair;
 import com.marcpg.libpg.util.Randomizer;
+import net.hectus.bb.BlockBattles;
 import net.hectus.bb.event.custom.PlayerWarpEvent;
 import net.hectus.bb.event.custom.TurnDoneEvent;
 import net.hectus.bb.game.util.ImproperTurnException;
-import net.hectus.bb.game.util.PlacementHandler;
 import net.hectus.bb.game.util.TurnScheduler;
 import net.hectus.bb.game.util.TurnUnusableException;
 import net.hectus.bb.player.PlayerData;
@@ -23,6 +23,7 @@ import net.hectus.bb.warp.Warp;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -198,15 +199,14 @@ public class Game {
 
         // Additional turn logic, if the basic things from the enumeration aren't enough:
         switch (turn) {
-            case PURPLE_WOOL -> win(player);
-            case CYAN_CARPET -> {
+            case CYAN_CARPET, SPLASH_WATER_BOTTLE, SNOWBALL -> { // Counter OR Buff
                 if (player.getAttack().left()) {
                     counter(data, last);
-                    attack(data);
                 } else {
                     buffs(data);
                 }
             }
+            case PURPLE_WOOL -> win(player);
             case SPONGE -> {
                 world.setStorm(true);
                 if (last.turn() == Turn.WATER) {
@@ -254,6 +254,20 @@ public class Game {
             case CHORUS_FRUIT -> {
                 // TODO: Do this once maps are implemented!
             }
+            case ENDER_PEARL -> {
+                try {
+                    counter(data, last);
+                } catch (ImproperTurnException ignored) {}
+                buffs(data);
+            }
+            case SPLASH_LEVITATION_POTION -> {
+                if (player.player().hasPotionEffect(PotionEffectType.LEVITATION))
+                    new Buff.ExtraTurn().apply(player);
+            }
+            case SPLASH_JUMP_BOOST_POTION -> {
+                if (opp.player().hasPotionEffect(PotionEffectType.LEVITATION))
+                    opp.player().addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 600, 200, false, false)); // 30 Seconds
+            }
             case PIGLIN -> Objects.requireNonNull(data.entity()).addScoreboardTag(this.uuid.toString());
             case POLAR_BEAR -> player.modifiers.enable("no_jump");
             case AXOLOTL -> {
@@ -274,6 +288,16 @@ public class Game {
                         case BLUE -> win(player);
                     }
                 }
+            }
+            case BOAT -> {
+                opp.modifiers.enable("boat_damage");
+                Bukkit.getScheduler().runTaskTimer(BlockBattles.getPlugin(BlockBattles.class), task -> {
+                    if (opp.modifiers.isEnabled("boat_damage")) {
+                        opp.player().damage(2.0);
+                    } else {
+                        task.cancel();
+                    }
+                }, 20, 20);
             }
             case BEE -> {
                 if (last.turn().name().startsWith("FLOWER_") && last.turn().buffs != null) {
@@ -361,6 +385,7 @@ public class Game {
         }
 
         new TurnDoneEvent(data).callEvent();
+        players.forEach(p -> p.player().sendMessage(Translation.component(p.player().locale(), "gameplay.info.turn-used", data.player().player().getName(), "").color(NamedTextColor.YELLOW).append(data.turn().getTranslatedComponent(p.player().locale()))));
 
         Player current = data.player().player();
         Player opponent = data.player().opponent().player();
@@ -384,9 +409,8 @@ public class Game {
 
         if (data.turn().countering.stream().noneMatch(f -> f.doCounter(last)))
             throw new ImproperTurnException(ImproperTurnException.ImproperTurnCause.WRONG_COUNTER, data);
-        if (data.player().getAttack().left()) {
+        if (data.player().getAttack().left())
             Objects.requireNonNull(data.player().getAttack().right()).decrement();
-        }
     }
 
     private void attack(@NotNull TurnData data) throws ImproperTurnException {

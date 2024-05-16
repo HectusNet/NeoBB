@@ -112,9 +112,9 @@ public final class ItemLoreBuilder {
         lore.add(SEPARATOR);
         lore.add(key(l, "item-lore.cost.key", "₪").append(Translation.component(l, "item-lore.cost.value", cost).color(NamedTextColor.GOLD)));
         lore.add(SEPARATOR);
-        lore.add(key(l, "info.type.type", "❖").append(type.translate(l)));
-        lore.add(key(l, "info.function.function", "❖").append(function.translate(l)));
-        lore.add(key(l, "info.class.class", "❖").append(clazz.translate(l)));
+        lore.add(key(l, "info.type.type", "❖").append(type.getTranslatedComponent(l)));
+        lore.add(key(l, "info.function.function", "❖").append(function.getTranslatedComponent(l)));
+        lore.add(key(l, "info.class.class", "❖").append(clazz.getTranslatedComponent(l)));
         lore.add(SEPARATOR);
         lore.add(key(l, "item-lore.description", "❖"));
         lore.addAll(longText(l, "description"));
@@ -126,7 +126,6 @@ public final class ItemLoreBuilder {
         if (counters != null && !counters.isEmpty()) {
             lore.add(SEPARATOR);
             lore.add(key(l, "item-lore.counters", "🛡"));
-            lore.addAll(buffs.stream().map(b -> b.line(l)).toList());
             lore.addAll(counters.stream().map(b -> b.line(l)).toList());
         }
         if (buffs != null && !buffs.isEmpty()) {

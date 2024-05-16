@@ -1,11 +1,13 @@
 package net.hectus.bb.turn;
 
+import com.marcpg.libpg.lang.Translatable;
 import com.marcpg.libpg.lang.Translation;
 import net.hectus.bb.turn.buff.Buff;
 import net.hectus.bb.turn.buff.ChanceBuff;
 import net.hectus.bb.turn.counter.CounterFilter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.block.data.Waterlogged;
@@ -22,7 +24,7 @@ import static net.hectus.bb.turn.Turn.ItemClass.*;
 import static net.hectus.bb.turn.Turn.ItemFunction.*;
 import static net.hectus.bb.turn.Turn.ItemType.*;
 
-public enum Turn {
+public enum Turn implements Translatable {
     PURPLE_WOOL(false, null, null, BLOCK, ATTACK, NEUTRAL, Material.PURPLE_WOOL),
     SPRUCE_TRAPDOOR(false, null, List.of(NEUTRAL, WATER_CLASS, NATURE), BLOCK, COUNTER, NEUTRAL, Material.SPRUCE_TRAPDOOR),
     IRON_TRAPDOOR(false, null, List.of(NEUTRAL, WATER_CLASS, REDSTONE), BLOCK, COUNTERATTACK, NEUTRAL, Material.IRON_TRAPDOOR),
@@ -33,7 +35,7 @@ public enum Turn {
     GREEN_CARPET(false, null, List.of(CounterFilter.of(last -> last.turn().name().endsWith("_WOOL"), "wool")), BLOCK, COUNTERATTACK, NEUTRAL, Material.GREEN_CARPET),
     STONECUTTER(false, List.of(new Buff.ExtraTurn()), List.of(CounterFilter.of(last -> last.player().opponent().getDefense().left() && Objects.requireNonNull(last.player().opponent().getDefense().right()).isWall, "walls")), BLOCK, COUNTERATTACK, NEUTRAL, Material.STONECUTTER),
     MAGENTA_GLAZED_TERRACOTTA(true, null, List.of(NEUTRAL, HOT, COLD, WATER_CLASS, NATURE), BLOCK, COUNTERATTACK, NEUTRAL, Material.MAGENTA_GLAZED_TERRACOTTA),
-    CYAN_CARPET(false, List.of(new Buff.ExtraTurn()), List.of(REDSTONE, SUPERNATURAL), BLOCK, ItemFunction.OTHER, NEUTRAL, Material.CYAN_CARPET),
+    CYAN_CARPET(false, List.of(new Buff.ExtraTurn()), List.of(REDSTONE, SUPERNATURAL), BLOCK, COUNTER_OR_BUFF, NEUTRAL, Material.CYAN_CARPET),
     SPONGE(true, List.of(new Buff.ExtraTurn(), new Buff.Luck(Buff.Target.YOU, 5)), List.of(NEUTRAL, WATER_CLASS, SUPERNATURAL), BLOCK, COUNTERBUFF, NEUTRAL, Material.SPONGE),
     MAGMA_BLOCK(true, null, null, BLOCK, ATTACK, HOT, Material.MAGMA_BLOCK),
     NETHERRACK(false, null, List.of(HOT, COLD, WATER_CLASS), BLOCK, COUNTERATTACK, HOT, Material.NETHERRACK),
@@ -80,17 +82,30 @@ public enum Turn {
     SOUL_SAND(false, null, null, BLOCK, ATTACK, SUPERNATURAL, Material.SOUL_SAND),
     CHORUS_FRUIT(false, null, null, ITEM, EVENT, NEUTRAL, Material.CHORUS_FRUIT),
     IRON_SHOVEL(true, List.of(new Buff.ExtraTurn()), List.of(CounterFilter.of(last -> last.turn() == CAULDRON, "cauldron"), HOT), ITEM, COUNTERBUFF, NEUTRAL, Material.IRON_SHOVEL),
+    ENDER_PEARL(false, List.of(new Buff.ExtraTurn()), List.of(CounterFilter.of(last -> last.player().opponent().getDefense().left() && Objects.requireNonNull(last.player().opponent().getDefense().right()).isWall, "walls"), CounterFilter.of(last -> last.player().player().hasPotionEffect(PotionEffectType.LEVITATION), "levitation")), THROWABLE, ItemFunction.OTHER, NEUTRAL, Material.ENDER_PEARL),
+    SNOWBALL(false, List.of(new Buff.ExtraTurn(), new Buff.Luck(Buff.Target.YOU, 15), new Buff.Effect(Buff.Target.OPPONENT, PotionEffectType.GLOWING)), List.of(HOT), THROWABLE, COUNTER_OR_BUFF, COLD, Material.SNOWBALL),
+    SPLASH_WATER_BOTTLE(false, List.of(new Buff.Luck(Buff.Target.YOU, 20), new Buff.Effect(Buff.Target.OPPONENT, PotionEffectType.SLOW), new Buff.Effect(Buff.Target.OPPONENT, PotionEffectType.BLINDNESS)), null, THROWABLE, COUNTER_OR_BUFF, WATER_CLASS, Material.SPLASH_POTION),
+    SPLASH_LEVITATION_POTION(false, List.of(new Buff.ExtraTurn()), null, THROWABLE, BUFF, SUPERNATURAL, Material.SPLASH_POTION),
+    SPLASH_JUMP_BOOST_POTION(false, null, null, THROWABLE, BUFF, SUPERNATURAL, Material.SPLASH_POTION),
     BLAZE(false, null, null, MOB, ATTACK, HOT, Material.BLAZE_SPAWN_EGG),
     PIGLIN(true, List.of(new Buff.Effect(Buff.Target.YOU, PotionEffectType.BLINDNESS), new Buff.Effect(Buff.Target.YOU, PotionEffectType.SLOW), new Buff.Luck(Buff.Target.YOU, -30)), null, ItemType.OTHER, EVENT, HOT, Material.PIGLIN_SPAWN_EGG),
     POLAR_BEAR(false, List.of(new Buff.Effect(Buff.Target.OPPONENT, PotionEffectType.SPEED, 2)), null, MOB, BUFF, COLD, Material.POLAR_BEAR_SPAWN_EGG),
     AXOLOTL(false, List.of(new Buff.Luck(Buff.Target.OPPONENT, -10), new Buff.Luck(Buff.Target.OPPONENT, 10)), null, MOB, BUFF, WATER_CLASS, Material.AXOLOTL_SPAWN_EGG),
+    BOAT(true, null, null, MOB, EVENT, WATER_CLASS, Material.OAK_BOAT),
     BEE(false, null, null, MOB, BUFF, NATURE, Material.BEE_SPAWN_EGG),
     SHEEP(false, List.of(new Buff.Luck(Buff.Target.YOU, 5)), null, MOB, BUFF, SUPERNATURAL, Material.SHEEP_SPAWN_EGG),
     PHANTOM(false, null, null, MOB, ATTACK, SUPERNATURAL, Material.PHANTOM_SPAWN_EGG),
-    EVOKER(false, List.of(new Buff.Luck(Buff.Target.YOU, 20), new Buff.ExtraTurn()), List.of(CounterFilter.of(last -> last.entity() instanceof Sheep sheep && sheep.getColor() == DyeColor.BLUE, "blue-sheep")), MOB, ItemFunction.OTHER, SUPERNATURAL, Material.EVOKER_SPAWN_EGG),
-    OAK_DOOR_TURTLING(true, null, null, STRUCTURE, DEFENSE, NEUTRAL, Material.OAK_DOOR),
-    PUMPKIN_WALL(true, null, null, STRUCTURE, BUFF, NATURE, Material.CARVED_PUMPKIN),
-    DAYLIGHT_SENSOR_LINE(true, null, List.of(HOT, NATURE, WATER_CLASS, REDSTONE), STRUCTURE, COUNTERBUFF, REDSTONE, Material.DAYLIGHT_DETECTOR),
+    EVOKER(false, List.of(new Buff.Luck(Buff.Target.YOU, 20), new Buff.ExtraTurn()), List.of(CounterFilter.of(last -> last.entity() instanceof Sheep sheep && sheep.getColor() == DyeColor.BLUE, "blue-sheep")), MOB, COUNTER_OR_BUFF, SUPERNATURAL, Material.EVOKER_SPAWN_EGG),
+    OAK_DOOR_TURTLING(true, null, null, DEFENSE, NEUTRAL, Material.OAK_DOOR, 4),
+    PUMPKIN_WALL(true, null, null, BUFF, NATURE, Material.CARVED_PUMPKIN, 14),
+    DAYLIGHT_SENSOR_LINE(true, null, List.of(HOT, NATURE, WATER_CLASS, REDSTONE), COUNTERBUFF, REDSTONE, Material.DAYLIGHT_DETECTOR, 7),
+    GLASS_WALL(false, List.of(new Buff.Luck(Buff.Target.YOU, 5)), null, DEFENSE, NEUTRAL, Material.GLASS, 6),
+    ORANGE_GLASS_WALL(false, List.of(new Buff.Luck(Buff.Target.YOU, 5)), null, DEFENSE, HOT, Material.ORANGE_STAINED_GLASS, 6),
+    WHITE_GLASS_WALL(false, List.of(new Buff.Luck(Buff.Target.YOU, 5)), null, DEFENSE, COLD, Material.WHITE_STAINED_GLASS, 6),
+    BLUE_GLASS_WALL(false, List.of(new Buff.Luck(Buff.Target.YOU, 5)), null, DEFENSE, WATER_CLASS, Material.BLUE_STAINED_GLASS, 6),
+    GREEN_GLASS_WALL(false, List.of(new Buff.Luck(Buff.Target.YOU, 5)), null, DEFENSE, NATURE, Material.GREEN_STAINED_GLASS, 6),
+    RED_GLASS_WALL(false, List.of(new Buff.Luck(Buff.Target.YOU, 5)), null, DEFENSE, REDSTONE, Material.RED_STAINED_GLASS, 6),
+    PINK_GLASS_WALL(false, List.of(new Buff.Luck(Buff.Target.YOU, 5)), null, DEFENSE, SUPERNATURAL, Material.PINK_STAINED_GLASS, 6),
     NOTE_BLOCK(true, List.of(new Buff.Luck(Buff.Target.YOU, 10)), List.of(CounterFilter.of(last -> last.block() != null && last.block().isSolid(), "solid")), BLOCK, COUNTERBUFF, REDSTONE, Material.NOTE_BLOCK),
     // ========== FLOWERS ==========
     DIRT(false, null, null, BLOCK, ItemFunction.OTHER, NATURE, Material.DIRT),
@@ -117,8 +132,8 @@ public enum Turn {
     public final ItemFunction function;
     public final ItemClass clazz;
     public final List<Material> items;
+    public final int itemAmount;
 
-    // Keep in mind that the ItemType is also used for determining what event is used to call the turn!
     Turn(boolean usage, @Nullable List<Buff> buffs, @Nullable List<CounterFilter> countering, ItemType type, ItemFunction function, ItemClass clazz, Material... items) {
         this.usage = usage;
         this.buffs = buffs;
@@ -127,44 +142,97 @@ public enum Turn {
         this.function = function;
         this.clazz = clazz;
         this.items = List.of(items);
+        this.itemAmount = 1;
     }
 
-    public enum ItemType {
+    Turn(boolean usage, @Nullable List<Buff> buffs, @Nullable List<CounterFilter> countering, ItemFunction function, ItemClass clazz, Material item, int amount) {
+        this.usage = usage;
+        this.buffs = buffs;
+        this.countering = countering;
+        this.type = STRUCTURE;
+        this.function = function;
+        this.clazz = clazz;
+        this.items = List.of(item);
+        this.itemAmount = amount;
+    }
+
+    @Override
+    public String getTranslated(Locale locale) {
+        return Translation.string(locale, "turns." + name().toLowerCase());
+    }
+
+    @Override
+    public @NotNull Component getTranslatedComponent(Locale locale) {
+        return Translation.component(locale, "turns." + name().toLowerCase());
+    }
+
+    public enum ItemType implements Translatable {
         BLOCK, ITEM, THROWABLE, MOB, STRUCTURE, OTHER;
 
-        public @NotNull Component translate(Locale l) {
-            return Translation.component(l, "info.type." + name().toLowerCase()).color(switch (this) {
+        @Override
+        public String getTranslated(Locale locale) {
+            return Translation.string(locale, "info.type." + name().toLowerCase());
+        }
+
+        @Override
+        public @NotNull Component getTranslatedComponent(Locale locale) {
+            return Component.text(getTranslated(locale), color());
+        }
+
+        public TextColor color() {
+            return switch (this) {
                 case BLOCK -> NamedTextColor.BLUE;
                 case ITEM -> NamedTextColor.RED;
                 case THROWABLE -> NamedTextColor.LIGHT_PURPLE;
                 case MOB -> NamedTextColor.GREEN;
                 case STRUCTURE -> NamedTextColor.YELLOW;
                 case OTHER -> NamedTextColor.GRAY;
-            });
+            };
         }
     }
 
-    public enum ItemFunction {
-        ATTACK, COUNTER, COUNTERATTACK, COUNTERBUFF, BUFF, DEFENSE, EVENT, OTHER;
+    public enum ItemFunction implements Translatable {
+        ATTACK, COUNTER, COUNTERATTACK, COUNTERBUFF, COUNTER_OR_BUFF, BUFF, DEFENSE, EVENT, OTHER;
 
-        public @NotNull Component translate(Locale l) {
-            return Translation.component(l, "info.function." + name().toLowerCase()).color(switch (this) {
+        @Override
+        public String getTranslated(Locale locale) {
+            return Translation.string(locale, "info.function." + name().toLowerCase());
+        }
+
+        @Override
+        public @NotNull Component getTranslatedComponent(Locale locale) {
+            return Component.text(getTranslated(locale), color());
+        }
+
+        public TextColor color() {
+            return switch (this) {
                 case ATTACK -> NamedTextColor.RED;
                 case COUNTER -> NamedTextColor.YELLOW;
                 case COUNTERATTACK, COUNTERBUFF -> NamedTextColor.GOLD;
-                case BUFF -> NamedTextColor.GREEN;
+                case COUNTER_OR_BUFF -> NamedTextColor.GREEN;
+                case BUFF -> NamedTextColor.DARK_GREEN;
                 case DEFENSE -> NamedTextColor.BLUE;
                 case EVENT -> NamedTextColor.LIGHT_PURPLE;
                 case OTHER -> NamedTextColor.GRAY;
-            });
+            };
         }
     }
 
-    public enum ItemClass implements CounterFilter {
+    public enum ItemClass implements Translatable, CounterFilter {
         NEUTRAL, HOT, COLD, WATER_CLASS, NATURE, REDSTONE, SUPERNATURAL, OTHER;
 
-        public @NotNull Component translate(Locale l) {
-            return Translation.component(l, "info.class." + name().toLowerCase()).color(switch (this) {
+        @Override
+        public String getTranslated(Locale locale) {
+            return Translation.string(locale, "info.class." + name().toLowerCase());
+        }
+
+        @Override
+        public @NotNull Component getTranslatedComponent(Locale locale) {
+            return Component.text(getTranslated(locale), color());
+        }
+
+        public TextColor color() {
+            return switch (this) {
                 case HOT -> NamedTextColor.GOLD;
                 case COLD -> NamedTextColor.WHITE;
                 case WATER_CLASS -> NamedTextColor.BLUE;
@@ -172,7 +240,7 @@ public enum Turn {
                 case REDSTONE -> NamedTextColor.RED;
                 case SUPERNATURAL -> NamedTextColor.YELLOW;
                 default -> NamedTextColor.GRAY;
-            });
+            };
         }
 
         @Override

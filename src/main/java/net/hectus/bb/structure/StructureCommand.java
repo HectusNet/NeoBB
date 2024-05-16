@@ -59,6 +59,7 @@ public final class StructureCommand implements TabExecutor {
                 Location corner1 = Parser.argumentToLocation(args[2], args[3], args[4], sender);
                 Location corner2 = Parser.argumentToLocation(args[5], args[6], args[7], sender);
                 StructureManager.add(Structure.save(sender instanceof Player p ? p.getWorld() : corner1.getWorld(), corner1, corner2, args[1]));
+                StructureManager.save();
                 sender.sendMessage(Component.text("Done! Took " + (System.currentTimeMillis() - start) + "ms!"));
             } else {
                 sender.sendMessage(Component.text("Invalid Structure name! Name should only contain a-z, 0-9, underscores and hyphens.", NamedTextColor.RED));

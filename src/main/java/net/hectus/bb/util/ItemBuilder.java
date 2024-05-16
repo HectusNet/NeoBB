@@ -63,6 +63,7 @@ public class ItemBuilder {
         return this;
     }
 
+    @Deprecated
     public ItemBuilder material(Material material) {
         item.setType(material);
         return this;

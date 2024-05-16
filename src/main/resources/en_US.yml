@@ -97,6 +97,8 @@ turn:
     purple_wool: "You can only use Purple Wool if the last 5 turns weren't an attack!"
 gameplay:
   info:
+    turn-used: "{0} used {1}"
+    warp-used: "{0} warped from {1} to {2}"
     extra-turn:
       turning: "You have an extra turn to use!" # Shown to the current player.
       opponent: "{0} has an extra turn to use." # Shown to the current player's opponent.
@@ -129,6 +131,8 @@ scoreboard:
   luck: "Luck: " # Example: "Luck: 20"
   yes: "Yes" # Used for attacked and defended.
   no: "No" # Used for attacked and defended.
+turns:
+
 usage:
   magenta_glazed_terracotta: "Place the Magenta Glazed Terracotta, so the arrow faces the attack that you want to counter."
   sponge: "If possible, you can place it near water to counter it and gain 10 luck and jump boost."

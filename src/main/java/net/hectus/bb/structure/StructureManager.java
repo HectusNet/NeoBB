@@ -50,7 +50,7 @@ public final class StructureManager {
     }
 
     public static boolean remove(String name) {
-        return LOADED_STRUCTURES.removeIf(s -> s.name().equals(name));
+        return LOADED_STRUCTURES.removeIf(s -> s.name().equals(name)) && new File(STRUCTURE_DIR, name).delete();
     }
 
     public static List<String> names() {

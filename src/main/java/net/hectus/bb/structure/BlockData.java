@@ -18,7 +18,7 @@ public record BlockData(Material type, Cord relativeCord, BlockFace blockFace) i
      */
     public void place(@NotNull World world, @NotNull Cord structurePoint) {
         Block block = world.getBlockAt(structurePoint.add(relativeCord).toLocation(world));
-        block.setType(type);
+        block.setType(type, false);
         if (blockFace != null && block.getBlockData() instanceof Directional directional) {
             directional.setFacing(blockFace);
         }

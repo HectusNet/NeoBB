@@ -36,6 +36,7 @@ public final class ShopItemUtilities {
     public static ItemStack item(Locale l, Material m) {
         return new ItemBuilder(m)
                 .lore(ItemLoreBuilder.of(m, ShopItemUtilities.getPrice(m), Objects.requireNonNull(ShopItemUtilities.getTurn(m))).build(l))
+                .amount(Objects.requireNonNull(getTurn(m)).itemAmount)
                 .build();
     }
 }

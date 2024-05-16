@@ -1,6 +1,8 @@
 package net.hectus.bb.warp;
 
 import com.marcpg.libpg.color.McFormat;
+import com.marcpg.libpg.lang.Translatable;
+import com.marcpg.libpg.lang.Translation;
 import net.hectus.bb.BlockBattles;
 import net.hectus.bb.game.Game;
 import net.hectus.bb.turn.Turn;
@@ -10,10 +12,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static net.hectus.bb.turn.Turn.ItemClass.*;
 
-public enum Warp {
+public enum Warp implements Translatable {
     DEFAULT(1.0, Temperature.MEDIUM, WATER_CLASS, NATURE),
     NETHER(0.8, Temperature.WARM, Turn.ItemClass.REDSTONE),
     END(0.6, Temperature.COLD, SUPERNATURAL),
@@ -47,10 +50,15 @@ public enum Warp {
         game.getOpponent(game.turning()).player().teleport(location.clone().subtract(2, 0, 0));
     }
 
+    @Override
+    public @NotNull String getTranslated(Locale locale) {
+        return Translation.string(locale, "warp." + name().toLowerCase());
+    }
+
     public enum Temperature {
         COLD, MEDIUM, WARM;
 
-        public McFormat color() {
+        public McFormat mcFormat() {
             return switch (this) {
                 case COLD -> McFormat.BLUE;
                 case MEDIUM -> McFormat.RESET;
