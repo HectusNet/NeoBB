@@ -136,9 +136,9 @@ public final class GameEvents implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerFlowerPotManipulate(PlayerFlowerPotManipulateEvent event) {
         for (Turn turn : Turn.values()) {
-            if (turn.type == Turn.ItemType.BLOCK && turn.name().startsWith("FLOWER_") && turn.items.contains(event.getItem().getType())) {
+            if (turn.type == Turn.ItemType.BLOCK && turn.name().startsWith("FLOWER_") && turn.materials().contains(event.getItem().getType())) {
                 try {
-                    event.setCancelled(turn(event.getPlayer(), ShopItemUtilities.getTurn(event.getItem().getType()), event.getFlowerpot(), null));
+                    event.setCancelled(turn(event.getPlayer(), ShopItemUtilities.getTurn(event.getItem()), event.getFlowerpot(), null));
                     return;
                 } catch (IllegalArgumentException ignored) {}
             }

@@ -8,8 +8,8 @@ import net.hectus.bb.game.Game;
 import net.hectus.bb.game.GameManager;
 import net.hectus.bb.player.PlayerData;
 import net.hectus.bb.turn.Suggestions;
+import net.hectus.bb.turn.Warp;
 import net.hectus.bb.turn.effective.Burning;
-import net.hectus.bb.warp.Warp;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -70,7 +70,10 @@ public final class PlayerEvents implements Listener {
         if (!event.getOldItemStack().isEmpty() && event.getNewItemStack().isEmpty()) {
             PlayerData player = GameManager.getPlayerData(event.getPlayer());
             if (player != null && player.game().hasStarted() && event.getSlot() <= 8) {
-                player.inv().removeItemInGame(event.getSlot());
+                try { // Really not a good solution, but I'm not able to find where the issue lays,
+                    // so this is my only solution for now. TODO: Find the Cause & Fix It
+                    player.inv().removeItemInGame(event.getSlot());
+                } catch (IndexOutOfBoundsException ignored) {}
             }
         }
     }

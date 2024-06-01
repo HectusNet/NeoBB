@@ -12,9 +12,9 @@ public final class Parser {
     public static @NotNull Location argumentToLocation(@NotNull String x, @NotNull String y, @NotNull String z, CommandSender sender) {
         if (sender instanceof Player player) {
             return new Location(player.getWorld(),
-                    x.equals("~") ? player.getX() : Double.parseDouble(x),
-                    y.equals("~") ? player.getY() : Double.parseDouble(y),
-                    z.equals("~") ? player.getZ() : Double.parseDouble(z)
+                    x.startsWith("~") ? player.getX() + Double.parseDouble(x.replace("~", "")) : Double.parseDouble(x),
+                    y.startsWith("~") ? player.getY() + Double.parseDouble(y.replace("~", "")) : Double.parseDouble(y),
+                    z.startsWith("~") ? player.getZ() + Double.parseDouble(z.replace("~", "")) : Double.parseDouble(z)
             );
         } else {
             return new Location(Bukkit.getWorld("world"), Double.parseDouble(x), Double.parseDouble(y), Double.parseDouble(z));

@@ -1,7 +1,7 @@
 package net.hectus.bb.event.custom;
 
 import net.hectus.bb.player.PlayerData;
-import net.hectus.bb.warp.Warp;
+import net.hectus.bb.turn.Warp;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 

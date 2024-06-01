@@ -2,13 +2,15 @@ package net.hectus.bb.util;
 
 import com.marcpg.libpg.lang.Translation;
 import com.marcpg.libpg.text.Formatter;
+import net.hectus.bb.shop.ShopItemUtilities;
+import net.hectus.bb.turn.CounterFilter;
 import net.hectus.bb.turn.Turn;
 import net.hectus.bb.turn.buff.Buff;
-import net.hectus.bb.turn.counter.CounterFilter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -150,10 +152,13 @@ public final class ItemLoreBuilder {
                 .toList();
     }
 
-    public static ItemLoreBuilder of(Material m, int cost, @NotNull Turn t) {
-        return new ItemLoreBuilder(m, cost, t.type, t.function, t.clazz)
-                .setUsageInfo(t.usage)
-                .buffs(t.buffs)
-                .counters(t.countering);
+    public static ItemLoreBuilder of(ItemStack item) {
+        Turn turn = ShopItemUtilities.getTurn(item);
+        if (turn == null) return new ItemLoreBuilder(Material.AIR);
+
+        return new ItemLoreBuilder(item.getType(), ShopItemUtilities.getPrice(item), turn.type, turn.function, turn.clazz)
+                .setUsageInfo(turn.usage)
+                .buffs(turn.buffs)
+                .counters(turn.countering);
     }
 }

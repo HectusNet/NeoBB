@@ -16,13 +16,18 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public final class ChallengeCommand implements TabExecutor {
     public static final List<Challenge> challenges = new ArrayList<>();
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-        Player player = (Player) sender; // Not a public plugin, so I don't assume being executed by anything else.
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(Translation.component(Locale.getDefault(), "command.only_players").color(NamedTextColor.RED));
+            return true;
+        }
+
         if (args.length == 2 && args[0].equalsIgnoreCase("accept")) {
             Player target = Bukkit.getPlayer(args[1]);
             if (target == null) {

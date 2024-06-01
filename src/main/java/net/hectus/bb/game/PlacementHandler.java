@@ -23,7 +23,7 @@ public class PlacementHandler {
             Bukkit.getScheduler().runTaskLater(BlockBattles.getPlugin(BlockBattles.class), () -> {
                 if (placedBlocks.size() == 1) { // No other block has been placed.
                     for (Turn turn : Turn.values()) {
-                        if (turn.type == Turn.ItemType.BLOCK && (turn.name().equals(block.getType().name()) || turn.items.contains(block.getType()))) {
+                        if (turn.type == Turn.ItemType.BLOCK && (turn.name().equals(block.getType().name()) || turn.materials().contains(block.getType()))) {
                             GameEvents.turn(player, Turn.valueOf(block.getType().name()), block, null);
                             break;
                         }

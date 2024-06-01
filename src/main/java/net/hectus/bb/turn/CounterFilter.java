@@ -1,7 +1,6 @@
-package net.hectus.bb.turn.counter;
+package net.hectus.bb.turn;
 
 import com.marcpg.libpg.lang.Translation;
-import net.hectus.bb.turn.TurnData;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 

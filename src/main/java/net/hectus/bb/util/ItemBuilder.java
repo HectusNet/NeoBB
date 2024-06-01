@@ -26,8 +26,7 @@ public class ItemBuilder {
     }
 
     public ItemBuilder(Material material) {
-        this.item = new ItemStack(material);
-        this.meta = this.item.getItemMeta();
+        this(new ItemStack(material));
     }
 
     public ItemBuilder editItem(@NotNull Consumer<ItemStack> itemEdit) {

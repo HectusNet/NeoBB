@@ -69,13 +69,13 @@ public final class PlayerInv {
     }
 
     public void removeItemInShop(@Range(from = 0, to = 8) int index) {
-        coins += ShopItemUtilities.getPrice(hotbar.get(index).getType());
+        coins += ShopItemUtilities.getPrice(hotbar.get(index));
         hotbar.remove(index);
         fullUpdate();
     }
 
     public void removeItemInShop(@NotNull ItemStack item) {
-        coins += ShopItemUtilities.getPrice(item.getType());
+        coins += ShopItemUtilities.getPrice(item);
         hotbar.remove(item);
         fullUpdate();
     }
@@ -95,7 +95,7 @@ public final class PlayerInv {
                 inv.clear(i);
             }
         }
-        inv.setItem(13, new ItemBuilder(Material.GOLD_NUGGET)
+        inv.setItem(13, new ItemBuilder(new ItemStack(Material.GOLD_NUGGET, coins))
                 .name(Translation.component(player.player().locale(), "item-lore.cost.value", coins))
                 .build()
         );

@@ -11,6 +11,7 @@ import net.hectus.bb.BlockBattles;
 import net.hectus.bb.player.PlayerData;
 import net.hectus.bb.turn.Turn;
 import net.hectus.bb.util.ItemBuilder;
+import net.hectus.bb.util.ItemLoreBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -46,7 +47,7 @@ public final class PreGameShop {
         gui.setOnGlobalClick(event -> event.setCancelled(true));
         gui.setOnClose(event -> {
             if (event.getReason() == InventoryCloseEvent.Reason.OPEN_NEW) return;
-            player.inv().currentDone();
+            Bukkit.getScheduler().runTaskLater(BlockBattles.getPlugin(BlockBattles.class), () -> menu(player), 1);
         });
 
         OutlinePane background = new OutlinePane(0, 0, 9, 6, Pane.Priority.LOWEST);
@@ -59,7 +60,10 @@ public final class PreGameShop {
                 .name(Translation.component(l, "shop.done.name").color(NamedTextColor.BLUE).decorate(TextDecoration.BOLD))
                 .addLore(Translation.component(l, "shop.done.lore.1").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
                 .addLore(Translation.component(l, "shop.done.lore.2").color(NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false))
-                .build(), event -> event.getWhoClicked().closeInventory()), 4, 0);
+                .build(), event -> {
+            event.getWhoClicked().closeInventory(InventoryCloseEvent.Reason.OPEN_NEW);
+            player.inv().currentDone();
+        }), 4, 0);
         gui.addPane(navigation);
 
         StaticPane filters = new StaticPane(1, 5);
@@ -132,14 +136,14 @@ public final class PreGameShop {
         });
 
         PaginatedPane items = new PaginatedPane(9, 5);
-        items.populateWithItemStacks(ShopItemUtilities.ITEMS.stream()
-                .filter(m -> categoryFilter.test(ShopItemUtilities.getTurn(m)))
-                .map(m -> ShopItemUtilities.item(l, m))
+        items.populateWithItemStacks(ShopItemUtilities.ITEM_STACKS.stream()
+                .filter(item -> categoryFilter.test(ShopItemUtilities.getTurn(item)))
+                .map(item -> new ItemBuilder(item).lore(ItemLoreBuilder.of(item).build(l)).build())
                 .toList());
         items.setOnClick(event -> {
             ItemStack item = event.getCurrentItem();
             if (item == null || item.isEmpty()) return;
-            if (player.inv().removeCoins(ShopItemUtilities.getPrice(item.getType()))) {
+            if (player.inv().removeCoins(ShopItemUtilities.getPrice(item))) {
                 try {
                     player.inv().addItem(item);
                 } catch (IndexOutOfBoundsException e) {

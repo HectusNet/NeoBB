@@ -86,7 +86,7 @@ public class InitializeBBCommand implements TabExecutor {
             world.setGameRule(GameRule.SPAWN_RADIUS, 0);
         }
 
-        sender.sendMessage(Component.text("Done! (Took " + (System.nanoTime() - start) + "nanoseconds)", NamedTextColor.GREEN));
+        sender.sendMessage(Component.text("Done! (Took " + (System.nanoTime() - start) + "ns)", NamedTextColor.GREEN));
         return true;
     }
 

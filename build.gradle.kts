@@ -13,6 +13,7 @@ java.targetCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
+    mavenLocal()
 
     maven("https://marcpg.com/repo/")
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")

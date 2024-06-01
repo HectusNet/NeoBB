@@ -2,6 +2,10 @@
 # Will only work on Linux systems!
 global-structures: false
 
+# Will give some more info in the chat, such as all suggestions, turns, etc.
+# All this information is not translated and will only be available in english!
+debug-mode: false
+
 # Database-related configuration:
 database:
 

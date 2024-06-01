@@ -11,15 +11,16 @@ import net.hectus.bb.game.util.TurnScheduler;
 import net.hectus.bb.game.util.TurnUnusableException;
 import net.hectus.bb.player.PlayerData;
 import net.hectus.bb.shop.PreGameShop;
-import net.hectus.bb.shop.ShopItemUtilities;
 import net.hectus.bb.turn.Turn;
 import net.hectus.bb.turn.TurnData;
+import net.hectus.bb.turn.Warp;
 import net.hectus.bb.turn.buff.Buff;
 import net.hectus.bb.turn.effective.Attack;
 import net.hectus.bb.turn.effective.Burning;
 import net.hectus.bb.turn.effective.Defense;
+import net.hectus.bb.util.ItemBuilder;
+import net.hectus.bb.util.ItemLoreBuilder;
 import net.hectus.bb.util.Modifiers;
-import net.hectus.bb.warp.Warp;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -318,7 +319,10 @@ public class Game {
                             if (data.player().getAttack().left())
                                 Objects.requireNonNull(data.player().getAttack().right()).decrement();
                         }
-                        case BROWN -> player.inv().addItem(ShopItemUtilities.item(player.player().locale(), randomItem()));
+                        case BROWN -> {
+                            ItemStack randomItem = Randomizer.fromCollection(Randomizer.fromArray(Turn.values()).itemStacks);
+                            player.inv().addItem(new ItemBuilder(randomItem).lore(ItemLoreBuilder.of(randomItem).build(player.player().locale())).build());
+                        }
                         case BLACK -> new Buff.Luck(Buff.Target.OPPONENT, -15);
                     }
                 }
@@ -369,6 +373,8 @@ public class Game {
                     }).apply(player);
                 }
             }
+            case NETHER_WARP, END_WARP, OCEAN_WARP, FROZEN_WARP, MUSHROOM_WARP, ClIFF_WARP, MEADOW_WARP, VOID_WARP, REDSTONE_WARP, WOOD_WARP, DESERT_WARP, NERD_WARP, AMETHYST_WARP, SUN_WARP ->
+                    warp(Warp.valueOf(turn.name().replace("_WARP", "")));
         }
 
         done(data);
@@ -385,7 +391,7 @@ public class Game {
         }
 
         new TurnDoneEvent(data).callEvent();
-        players.forEach(p -> p.player().sendMessage(Translation.component(p.player().locale(), "gameplay.info.turn-used", data.player().player().getName(), "").color(NamedTextColor.YELLOW).append(data.turn().getTranslatedComponent(p.player().locale()))));
+        players.forEach(p -> p.player().sendMessage(Translation.component(p.player().locale(), "gameplay.info.turn-used", data.player().player().getName(), data.turn().getTranslated(p.player().locale())).color(NamedTextColor.YELLOW)));
 
         Player current = data.player().player();
         Player opponent = data.player().opponent().player();
@@ -436,9 +442,5 @@ public class Game {
     private void buffs(@NotNull TurnData data) {
         if (data.turn().buffs == null) return;
         data.turn().buffs.forEach(buff -> buff.apply(data.player()));
-    }
-
-    private static Material randomItem() {
-        return Randomizer.fromCollection(Randomizer.fromArray(Turn.values()).items);
     }
 }

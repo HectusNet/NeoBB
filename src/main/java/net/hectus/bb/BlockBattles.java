@@ -31,11 +31,13 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public final class BlockBattles extends JavaPlugin {
-    public static  final String VERSION = "NeoBB-0.1.0 (d" + Integer.toHexString(LocalDateTime.now().getDayOfYear()) + "h" + Integer.toHexString(LocalDateTime.now().getHour()) + ")";
+    public static final String VERSION = "NeoBB-0.1.0 (d" + Integer.toHexString(LocalDateTime.now().getDayOfYear()) + "h" + Integer.toHexString(LocalDateTime.now().getHour()) + ")";
     public static Logger LOG;
     public static Path DATA_DIR;
     public static FileConfiguration CONFIG;
     public static AutoCatchingSQLConnection<UUID> DATABASE = null;
+
+    public static boolean DEBUG_MODE;
 
     @Override
     public void onEnable() {
@@ -44,6 +46,8 @@ public final class BlockBattles extends JavaPlugin {
 
         saveDefaultConfig();
         CONFIG = getConfig();
+
+        DEBUG_MODE = CONFIG.getBoolean("debug-mode");
 
         // Create the plugin directory tree:
         if (StructureManager.STRUCTURE_DIR.mkdirs())
