@@ -12,11 +12,11 @@ public class PlayerWarpEvent extends GameEvent {
     private final Warp from;
     private final Warp to;
 
-    public PlayerWarpEvent(@NotNull PlayerData player, Warp from, Warp warp) {
+    public PlayerWarpEvent(@NotNull PlayerData player, Warp from, Warp to) {
         super(player.game());
         this.player = player;
         this.from = from;
-        to = warp;
+        this.to = to;
     }
 
     public PlayerData player() {

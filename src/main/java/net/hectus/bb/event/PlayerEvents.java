@@ -88,7 +88,7 @@ public final class PlayerEvents implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    // TODO: @EventHandler(ignoreCancelled = true)
     public void onPlayerMove(@NotNull PlayerMoveEvent event) {
         if (!event.hasChangedPosition()) return;
 

@@ -46,6 +46,14 @@ public record BlockData(Material type, Cord relativeCord, BlockFace blockFace) i
      * @return The converted BlockData.
      */
     public static @NotNull BlockData ofBlock(@NotNull Block block, Cord structurePoint) {
-        return new BlockData(block.getType(), Cord.ofLocation(block.getLocation()).subtract(structurePoint), block.getBlockData() instanceof Directional directional ? directional.getFacing() : null);
+        return new BlockData(block.getType(), Cord.ofLocation(block.getLocation()).subtract(structurePoint), block.getBlockData() instanceof Directional directional ? directional.getFacing() : BlockFace.SELF);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BlockData blockData)) return false;
+
+        return type == blockData.type && relativeCord.equals(blockData.relativeCord) && blockFace == blockData.blockFace;
     }
 }

@@ -74,7 +74,6 @@ public final class ChallengeCommand implements TabExecutor {
             return Bukkit.getOnlinePlayers().stream()
                     .map(Player::getName)
                     .filter(s -> s.toLowerCase().contains(args[0].toLowerCase()) && !s.equals(sender.getName()))
-
                     .toList();
         }
         return List.of();

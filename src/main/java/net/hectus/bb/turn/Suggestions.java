@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class Suggestions {
+public final class Suggestions {
     public static List<Material> suggest(@NotNull PlayerData player, TurnData lastTurn) {
         Predicate<ItemStack> filter = i -> checkItem(i, t -> lastTurn.player().game().warp().allowed.contains(t.clazz));
 
