@@ -1,0 +1,30 @@
+### Plugin Name ###
+name: PooperMC
+
+### Plugin Description ###
+description: A reworked version of NeoBB with some interesting spins.
+
+### Build Version ###
+version: '${version}'
+
+### Main Class ###
+main: net.hectus.neobb.NeoBB
+
+### PaperAPI Version ###
+api-version: '1.21'
+
+### Developers of the Plugin ###
+authors:
+  - MarcPG
+
+### Plugin Website ###
+website: https://hectus.net/blockbattles
+
+### Logging Prefix ###
+prefix: NBB
+
+dependencies:
+  server:
+    WorldEdit:
+      load: BEFORE
+      required: true
