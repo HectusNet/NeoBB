@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "net.hectus.neobb"
-version = "0.0.1"
+version = "0.0.2"
 description = "A reworked version of NeoBB with some interesting spins."
 
 java.sourceCompatibility = JavaVersion.VERSION_21
@@ -48,6 +48,7 @@ tasks {
         }
     }
     processResources {
+        exclude("en_US.properties")
         filter {
             it.replace("\${version}", version.toString())
         }

@@ -7,6 +7,7 @@ import static net.kyori.adventure.text.format.TextColor.color;
 
 public final class Colors {
     public static final TextColor ACCENT = color(0xB47ACE);
+    public static final TextColor SECONDARY = color(0xCE2440);
     public static final TextColor GREEN = color(0x5CE673);
     public static final TextColor YELLOW = color(0xDAE65C);
     public static final TextColor RED = color(0xE65C67);

@@ -11,8 +11,8 @@ import java.util.List;
 public abstract class BossBarGame extends Game {
     protected BossBar bossBar;
 
-    public BossBarGame(World world, @NotNull List<Player> players, Cord corner1, Cord corner2) {
-        super(world, players, corner1, corner2);
+    public BossBarGame(boolean ranked, World world, @NotNull List<Player> players, Cord corner1, Cord corner2) {
+        super(ranked, world, players, corner1, corner2);
     }
 
     public abstract BossBar initialBossBar();

@@ -1,5 +1,6 @@
 package net.hectus.neobb.player;
 
+import net.hectus.neobb.turn.Turn;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -37,6 +38,10 @@ public class NeoInventory {
         return true;
     }
 
+    public synchronized void addCoins(int coins) {
+        this.coins += coins;
+    }
+
     public ItemStack[] deck() {
         return deck;
     }
@@ -59,6 +64,14 @@ public class NeoInventory {
             }
         }
         throw new ArrayIndexOutOfBoundsException("Deck is already full!");
+    }
+
+    public boolean allowItem(Turn<?> turn, Material material) {
+        int count = 0;
+        for (ItemStack item : deck) {
+            if (item != null && item.getType() == material) count++;
+        }
+        return count < turn.maxAmount();
     }
 
     public boolean shopDone() {

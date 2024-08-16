@@ -28,13 +28,14 @@ import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class NeoBB extends JavaPlugin {
-    public static final String VERSION = "0.0.1";
+    public static final String VERSION = "0.0.2";
 
     public static NeoBB PLUGIN;
     public static Logger LOG;
     public static Path DATA_DIR;
     public static FileConfiguration CONFIG;
     public static AutoCatchingSQLConnection<UUID> DATABASE;
+    public static Path STRUCTURE_DIR;
 
     @Override
     public void onEnable() {
@@ -46,10 +47,14 @@ public final class NeoBB extends JavaPlugin {
         CONFIG = getConfig();
 
         try {
-            Class.forName("com.marcpg.libpg.LibPG");
-            Class.forName("com.github.stefvanschie.inventoryframework.gui.type.util.InventoryBased");
-        } catch (ClassNotFoundException e) {
-            LOG.error("Could not find all dependencies: {}", e.getMessage());
+            if (Objects.requireNonNullElse(CONFIG.getString("structure-mode"), "local").equals("global")) {
+                STRUCTURE_DIR = new File("~/.config/neobb-structures").toPath();
+            } else {
+                STRUCTURE_DIR = DATA_DIR.resolve("structures");
+            }
+            Files.createDirectories(STRUCTURE_DIR);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         try {
@@ -67,11 +72,7 @@ public final class NeoBB extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new TurnEvents(), this);
         getServer().getPluginManager().registerEvents(new GameEvents(), this);
 
-        try {
-            Files.createDirectories(CONFIG.getBoolean("global-structures") ? DATA_DIR.resolve("structures") : new File("~/.config/neobb-structures").toPath());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "pooper:joining");
     }
 
     @Override
@@ -93,8 +94,8 @@ public final class NeoBB extends JavaPlugin {
                         Objects.requireNonNull(CONFIG.getString("database.address")),
                         CONFIG.getInt("database.port"),
                         CONFIG.getString("database.database"),
-                        CONFIG.getString("database.username"),
-                        CONFIG.getString("database.password"),
+                        CONFIG.getString("database.user"),
+                        CONFIG.getString("database.passwd"),
                         CONFIG.getString("database.table"),
                         "uuid",
                         e -> LOG.error("Database error: {}", e.getMessage())

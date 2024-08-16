@@ -19,13 +19,19 @@
 #     | -> local   : in the plugin folder
 #     | -> global  : at '~/.config/neobb-structures' on your system
 # Default: server
-structure-mode: false
+structure-mode: server
 
 
 ## The maximum arena height. ##
 # Keep in mind that higher values will require much more RAM.
 # Default: 9
 max-arena-height: 9
+
+
+## At how many players a game will start. ##
+# This will only count players which are in adventure mode and have an empty inventory.
+# Default: 2
+starting-players: 2
 
 
 ## The database configuration. ##
@@ -40,7 +46,7 @@ database:
   address: localhost
 
   # The port of the database. If set to 0, will use the database's default port.
-  port: 0
+  port: 5432
 
   # The name of the database.
   database: database_name

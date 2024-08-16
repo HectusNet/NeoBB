@@ -3,9 +3,9 @@ package net.hectus.neobb.util;
 import com.marcpg.libpg.lang.Translation;
 import com.marcpg.libpg.text.Formatter;
 import net.hectus.neobb.turn.Turn;
-import net.hectus.neobb.turn.attributes.clazz.*;
-import net.hectus.neobb.turn.attributes.function.*;
-import net.hectus.neobb.turn.attributes.usage.*;
+import net.hectus.neobb.turn.default_game.attributes.clazz.*;
+import net.hectus.neobb.turn.default_game.attributes.function.*;
+import net.hectus.neobb.turn.default_game.attributes.usage.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.jetbrains.annotations.NotNull;
@@ -43,12 +43,12 @@ public final class ItemLoreBuilder {
         if (turn instanceof CounterFunction counter) {
             lore.add(SEPARATOR);
             lore.add(key(l, "item-lore.counters", "🛡"));
-            lore.addAll(counter.counters().stream().map(b -> Component.empty()).toList()); // TODO: Set actual counter info.
+            lore.addAll(counter.counters().stream().map(c -> c.line(l)).toList());
         }
         if (turn instanceof BuffFunction buff) {
             lore.add(SEPARATOR);
             lore.add(key(l, "item-lore.buffs", "↑"));
-            lore.addAll(List.of(Component.empty(), Component.empty())); // TODO: Set actual buff info.
+            lore.addAll(buff.buffs().stream().map(b -> b.line(l)).toList());
         }
 
         return lore;

@@ -10,4 +10,12 @@ public class Utilities {
     public static @NotNull String counterFilterName(@NotNull String className) {
         return className.replaceAll("^T(?!.*(Function|Usage|Clazz)$)|Function$|Usage$|Clazz$", "").toLowerCase();
     }
+
+    public static @NotNull String turnKey(@NotNull String className) {
+        return "turns." + camelToSnake(counterFilterName(className));
+    }
+
+    public static @NotNull String capitalizeFirstLetter(@NotNull String input) {
+        return input.substring(0, 1).toUpperCase() + input.substring(1);
+    }
 }

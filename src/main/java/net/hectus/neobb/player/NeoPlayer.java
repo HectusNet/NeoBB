@@ -1,6 +1,7 @@
 package net.hectus.neobb.player;
 
 import io.papermc.paper.scoreboard.numbers.NumberFormat;
+import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.BossBarGame;
 import net.hectus.neobb.game.Game;
 import net.kyori.adventure.audience.Audience;
@@ -11,9 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class NeoPlayer implements Target, ForwardingAudience.Single {
     private static final ScoreboardManager SCOREBOARD_MANAGER = Bukkit.getScoreboardManager();
@@ -23,12 +22,19 @@ public class NeoPlayer implements Target, ForwardingAudience.Single {
     public final NeoInventory inventory;
 
     private final Set<String> modifiers = new HashSet<>();
-    private int luck;
+    private int luck = 20;
+
+    private int elo;
+    private int wins;
+    private int losses;
+    private int draws;
+    private int turns;
 
     public NeoPlayer(Player player, Game game) {
         this.player = player;
         this.game = game;
         this.inventory = new NeoInventory(this);
+        fetchDatabase();
     }
 
     public void tick() {
@@ -56,19 +62,20 @@ public class NeoPlayer implements Target, ForwardingAudience.Single {
         }
     }
 
-    public List<NeoPlayer> opponents() {
-        return game.players().stream()
+    public List<NeoPlayer> opponents(boolean onlyAlive) {
+        return (onlyAlive ? game.players() : game.initialPlayers()).stream()
                 .filter(p -> p != this)
                 .toList();
-    }
-
-    public TargetObj opponentTarget() {
-        return new TargetObj(opponents());
     }
 
     @Override
     public @NotNull Audience audience() {
         return player;
+    }
+
+    public NeoPlayer nextPlayer() {
+        List<NeoPlayer> players = game.players();
+        return players.get((players.indexOf(this) + 1) % players.size());
     }
 
     public final void addModifier(String modifier) {
@@ -82,4 +89,75 @@ public class NeoPlayer implements Target, ForwardingAudience.Single {
     public final boolean hasModifier(String modifier) {
         return modifiers.contains(modifier);
     }
+
+    public int luck() {
+        return luck;
+    }
+
+    public Locale locale() {
+        return player.locale();
+    }
+
+    public UUID uuid() {
+        return player.getUniqueId();
+    }
+
+    public void fetchDatabase() {
+        if (!NeoBB.DATABASE.contains(uuid())) {
+            NeoBB.DATABASE.add(Map.of("uuid", uuid()));
+        }
+        elo = (int) NeoBB.DATABASE.get(uuid(), "elo");
+        wins = (int) NeoBB.DATABASE.get(uuid(), "wins");
+        losses = (int) NeoBB.DATABASE.get(uuid(), "losses");
+        draws = (int) NeoBB.DATABASE.get(uuid(), "draws");
+        turns = (int) NeoBB.DATABASE.get(uuid(), "turns");
+    }
+
+    public void setLuck(int luck) {
+        this.luck = luck;
+    }
+
+    public void addLuck(int luck) {
+        this.luck += luck;
+    }
+
+    public void removeLuck(int luck) {
+        this.luck -= luck;
+    }
+
+    // ====================================
+    // ========== DATABASE STATS ==========
+    // ====================================
+
+    public int elo() { return elo; }
+    public void setElo(int elo) {
+        this.elo = elo;
+        NeoBB.DATABASE.set(uuid(), "elo", elo);
+    }
+
+    public int wins() { return wins; }
+    public void addWin() {
+        wins++;
+        NeoBB.DATABASE.set(uuid(), "wins", wins);
+    }
+
+    public int losses() { return losses; }
+    public void addLoss() {
+        losses++;
+        NeoBB.DATABASE.set(uuid(), "losses", losses);
+    }
+
+    public int draws() { return draws; }
+    public void addDraw() {
+        draws++;
+        NeoBB.DATABASE.set(uuid(), "draws", draws);
+    }
+
+    public int turns() { return draws; }
+    public void addTurn() {
+        turns++;
+        NeoBB.DATABASE.set(uuid(), "turns", turns);
+    }
+
+    public int gamesPlayed() { return wins + losses + draws; }
 }
