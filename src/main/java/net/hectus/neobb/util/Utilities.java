@@ -1,6 +1,10 @@
 package net.hectus.neobb.util;
 
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class Utilities {
     public static @NotNull String camelToSnake(@NotNull String input) {
@@ -17,5 +21,9 @@ public class Utilities {
 
     public static @NotNull String capitalizeFirstLetter(@NotNull String input) {
         return input.substring(0, 1).toUpperCase() + input.substring(1);
+    }
+
+    public static @NotNull Location listToLocation(World world, @NotNull List<Integer> list) {
+        return new Location(world, list.get(0), list.get(1), list.get(2));
     }
 }

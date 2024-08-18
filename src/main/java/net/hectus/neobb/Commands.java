@@ -10,7 +10,6 @@ import net.hectus.neobb.game.DefaultGame;
 import net.hectus.neobb.game.util.GameManager;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.util.Colors;
-import net.hectus.neobb.util.Cord;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -52,8 +51,8 @@ public class Commands {
                             Player examplePlayer = players.getFirst();
                             source.sendMessage(Translation.component(l, "command.start.starting", players.size()).color(Colors.POSITIVE));
                             try {
-                                new DefaultGame(true, examplePlayer.getWorld(), players, Cord.ofLocation(examplePlayer.getLocation()), Cord.ofLocation(examplePlayer.getLocation()).add(new Cord(9, 0, 9)));
-                            } catch (ReflectiveOperationException e) {
+                                new DefaultGame(true, examplePlayer.getWorld(), players);
+                            } catch (Exception e) {
                                 source.sendMessage(Translation.component(l, "command.start.error").color(Colors.NEGATIVE));
                                 NeoBB.LOG.error("Couldn't start match!", e);
                             }

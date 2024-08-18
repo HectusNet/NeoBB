@@ -8,6 +8,7 @@ import com.marcpg.libpg.lang.Translation;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.hectus.neobb.event.GameEvents;
 import net.hectus.neobb.event.TurnEvents;
+import net.hectus.neobb.structure.StructureManager;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class NeoBB extends JavaPlugin {
-    public static final String VERSION = "0.0.2";
+    public static final String VERSION = "0.0.3";
 
     public static NeoBB PLUGIN;
     public static Logger LOG;
@@ -63,6 +64,7 @@ public final class NeoBB extends JavaPlugin {
             LOG.error("Could not load translations: {}", e.getMessage());
         }
         connectDatabase();
+        StructureManager.load();
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             event.registrar().register(Commands.startCommand());
@@ -89,6 +91,7 @@ public final class NeoBB extends JavaPlugin {
     void connectDatabase() {
         if (CONFIG.getBoolean("database.enabled")) {
             try {
+                Class.forName("org.postgresql.Driver"); // Make sure the PostgreSQL driver is loaded.
                 DATABASE = new AutoCatchingSQLConnection<>(
                         SQLConnection.DatabaseType.POSTGRESQL,
                         Objects.requireNonNull(CONFIG.getString("database.address")),

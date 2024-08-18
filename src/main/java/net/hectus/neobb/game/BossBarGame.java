@@ -1,6 +1,5 @@
 package net.hectus.neobb.game;
 
-import net.hectus.neobb.util.Cord;
 import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -11,8 +10,8 @@ import java.util.List;
 public abstract class BossBarGame extends Game {
     protected BossBar bossBar;
 
-    public BossBarGame(boolean ranked, World world, @NotNull List<Player> players, Cord corner1, Cord corner2) {
-        super(ranked, world, players, corner1, corner2);
+    public BossBarGame(boolean ranked, World world, @NotNull List<Player> players) {
+        super(ranked, world, players);
     }
 
     public abstract BossBar initialBossBar();

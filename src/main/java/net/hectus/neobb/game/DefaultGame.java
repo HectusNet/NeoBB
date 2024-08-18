@@ -11,8 +11,9 @@ import net.hectus.neobb.turn.default_game.attributes.function.*;
 import net.hectus.neobb.turn.default_game.block.*;
 import net.hectus.neobb.turn.default_game.item.TChorusFruit;
 import net.hectus.neobb.turn.default_game.item.TIronShovel;
+import net.hectus.neobb.turn.default_game.mob.*;
+import net.hectus.neobb.turn.default_game.warp.*;
 import net.hectus.neobb.util.Colors;
-import net.hectus.neobb.util.Cord;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Sound;
@@ -29,11 +30,17 @@ public class DefaultGame extends Game {
     public static final GameInfo INFO = new GameInfo(25, 9, false, List.of(
             TBlackWool.class, TCauldron.class, TCyanCarpet.class, TFire.class, TGoldBlock.class, TGreenCarpet.class,
             TIronTrapdoor.class, TMagentaGlazedTerracotta.class, TMagmaBlock.class, TNetherrack.class, TPurpleWool.class,
-            TSculk.class, TSponge.class, TSpruceTrapdoor.class, TStonecutter.class, TChorusFruit.class, TIronShovel.class
+            TSculk.class, TSponge.class, TSpruceTrapdoor.class, TStonecutter.class, TChorusFruit.class, TIronShovel.class,
+            TBlueIce.class, TBrainCoralBlock.class, TCampfire.class, TFireCoral.class, TFireCoralFan.class, THornCoral.class,
+            TLava.class, TLightBlueWool.class, TOrangeWool.class, TPackedIce.class, TPowderSnow.class, TRespawnAnchor.class,
+            TSpruceLeaves.class, TWhiteWool.class, TAxolotl.class, TBee.class, TBlaze.class, TEvoker.class, TPhantom.class,
+            TPiglin.class, TPolarBear.class, TPufferfish.class, TSheep.class, TAmethystWarp.class, TCliffWarp.class,
+            TDesertWarp.class, TEndWarp.class, TFrozenWarp.class, TMeadowWarp.class, TMushroomWarp.class, TNerdWarp.class,
+            TNetherWarp.class, TOceanWarp.class, TRedstoneWarp.class, TSunWarp.class, TVoidWarp.class, TWoodWarp.class
     ));
 
-    public DefaultGame(boolean ranked, World world, @NotNull List<Player> players, Cord corner1, Cord corner2) throws ReflectiveOperationException {
-        super(ranked, world, players, corner1, corner2);
+    public DefaultGame(boolean ranked, World world, @NotNull List<Player> players) {
+        super(ranked, world, players);
         this.shop = new DefaultShop(this);
         this.players.forEach(player -> shop.open(player));
     }
@@ -69,8 +76,10 @@ public class DefaultGame extends Game {
             }
         }
 
-        if (turn instanceof AttackFunction)
-            getNextPlayer().addModifier("attacked");
+        if (turn instanceof AttackFunction) {
+            if (!(getNextPlayer().hasModifier("defended") || turn instanceof TPhantom))
+                getNextPlayer().addModifier("attacked");
+        }
 
         if (turn instanceof BuffFunction buff) buff.buffs().forEach(b -> b.apply(turn.player()));
         if (turn instanceof DefenseFunction defense) defense.applyDefense();

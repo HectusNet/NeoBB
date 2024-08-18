@@ -18,6 +18,9 @@ public class TMagentaGlazedTerracotta extends Turn<Block> implements BlockUsage,
     public TMagentaGlazedTerracotta(Block data, NeoPlayer player) { super(data, data.getLocation(), player); }
 
     @Override
+    public boolean requiresUsageGuide() { return true; }
+
+    @Override
     public ItemStack item() {
         return new ItemStack(Material.MAGENTA_GLAZED_TERRACOTTA);
     }

@@ -12,14 +12,14 @@ import java.util.List;
 
 public abstract class Shop {
     protected final Game game;
-    protected final List<Class<? extends Turn<?>>> turns;
+    public final List<Class<? extends Turn<?>>> turns;
 
     protected Shop(@NotNull Game game) {
         this.game = game;
         this.turns = game.info().turns();
     }
 
-    protected static Turn<?> turn(@NotNull Class<? extends Turn<?>> clazz, NeoPlayer player) {
+    public static Turn<?> turn(@NotNull Class<? extends Turn<?>> clazz, NeoPlayer player) {
         try {
             return clazz.getConstructor(NeoPlayer.class).newInstance(player);
         } catch (ReflectiveOperationException e) {

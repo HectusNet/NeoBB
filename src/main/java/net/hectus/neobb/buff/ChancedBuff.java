@@ -9,23 +9,23 @@ import java.util.Locale;
 
 public class ChancedBuff extends Buff {
     private final Buff buff;
-    private final double chance;
+    private final double percentage;
 
-    public ChancedBuff(@NotNull Buff buff, double chance) {
+    public ChancedBuff(@NotNull Buff buff, double percentage) {
         super(buff.buffTarget);
         this.buff = buff;
-        this.chance = chance;
+        this.percentage = percentage;
     }
 
     @Override
     public void apply(NeoPlayer source) {
-        if (Randomizer.boolByChance(chance))
+        if (Randomizer.boolByChance(percentage))
             buff.apply(source);
     }
 
     @Override
     public String text(Locale l) {
-        return chance + "% | " + buff.text(l);
+        return percentage + "% | " + buff.text(l);
     }
 
     @Override

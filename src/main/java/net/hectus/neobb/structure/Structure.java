@@ -1,11 +1,16 @@
 package net.hectus.neobb.structure;
 
+import net.hectus.neobb.game.util.Arena;
+import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Structure implements Serializable {
     public final String name;
+    public final Set<Material> materials = new HashSet<>();
     public final BlockInfo[][][] blocks;
     public final int blocksX;
     public final int blocksY;
@@ -17,6 +22,25 @@ public class Structure implements Serializable {
         this.blocksX = blocks.length;
         this.blocksY = blocks[0].length;
         this.blocksZ = blocks[0][0].length;
+
+        materials.addAll(Arrays.stream(blocks).parallel() // I'm actually not sure if bukkit supports parallel streams, but it shouldn't cause any issues even if it doesn't.
+                .flatMap(Arrays::stream)
+                .flatMap(Arrays::stream)
+                .filter(Objects::nonNull)
+                .map(BlockInfo::material)
+                .collect(Collectors.toSet()));
+    }
+
+    public boolean isInArena(@NotNull Arena arena) {
+        return matchMaterials(arena.currentPlacedMaterials(), materials) && isInRegion(arena.currentPlacedBlocks());
+    }
+
+    public boolean matchMaterials(Collection<Material> reference, @NotNull Collection<Material> comparison) {
+        for (Material material : comparison) {
+            if (!reference.contains(material))
+                return false;
+        }
+        return true;
     }
 
     public boolean isInRegion(BlockInfo @NotNull [][][] region) {

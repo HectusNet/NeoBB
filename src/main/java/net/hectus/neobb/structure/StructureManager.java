@@ -3,6 +3,9 @@ package net.hectus.neobb.structure;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import net.hectus.neobb.NeoBB;
+import net.hectus.neobb.game.util.Arena;
+import net.hectus.neobb.player.NeoPlayer;
+import net.hectus.neobb.turn.default_game.warp.*;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,8 +21,22 @@ public class StructureManager {
     private static final List<Structure> STRUCTURES = new ArrayList<>();
     private static final Set<Material> STRUCTURE_MATERIALS = new HashSet<>();
 
+    private static final List<Class<? extends Warp>> WARPS = List.of(
+            TAmethystWarp.class, TCliffWarp.class, TDesertWarp.class, TEndWarp.class, TFrozenWarp.class,
+            TMeadowWarp.class, TMushroomWarp.class, TNerdWarp.class, TNetherWarp.class, TOceanWarp.class,
+            TRedstoneWarp.class, TSunWarp.class, TVoidWarp.class, TWoodWarp.class
+    );
+
     public static void load() {
         getStructures().forEach(StructureManager::addStructure);
+
+        for (Class<? extends Warp> warp : WARPS) {
+            try {
+                addStructure(warp.getConstructor(NeoPlayer.class).newInstance((Object) null).referenceStructure());
+            } catch (Exception e) {
+                NeoBB.LOG.warn("Couldn't load warp structure!", e);
+            }
+        }
     }
 
     public static void addStructure(Structure structure) {
@@ -46,8 +63,7 @@ public class StructureManager {
             if (mode.equals("server")) {
                 HttpRequest request = HttpRequest.newBuilder(new URI("https://marcpg.com/neobb/structure/all")).GET().build();
                 String response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString()).body();
-                return new Gson().fromJson(response, new TypeToken<List<Structure>>() {
-                }.getType());
+                return new Gson().fromJson(response, new TypeToken<List<Structure>>() {}.getType());
             } else {
                 List<Structure> structures = new ArrayList<>();
                 File[] structureFiles = NeoBB.STRUCTURE_DIR.toFile().listFiles();
@@ -60,5 +76,13 @@ public class StructureManager {
         } catch (Exception e) {
             return List.of();
         }
+    }
+
+    public static @Nullable Structure match(Arena arena) {
+        for (Structure structure : STRUCTURES) {
+            if (structure.isInArena(arena))
+                return structure;
+        }
+        return null;
     }
 }

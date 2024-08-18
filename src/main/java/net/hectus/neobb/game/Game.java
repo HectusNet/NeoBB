@@ -2,6 +2,7 @@ package net.hectus.neobb.game;
 
 import com.marcpg.libpg.data.time.Time;
 import com.marcpg.libpg.lang.Translation;
+import com.marcpg.libpg.util.Randomizer;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.Rating;
 import net.hectus.neobb.event.GameEvents;
@@ -12,8 +13,10 @@ import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.player.TargetObj;
 import net.hectus.neobb.shop.Shop;
 import net.hectus.neobb.turn.Turn;
+import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
+import net.hectus.neobb.turn.default_game.warp.TDefaultWarp;
+import net.hectus.neobb.turn.default_game.warp.Warp;
 import net.hectus.neobb.util.Colors;
-import net.hectus.neobb.util.Cord;
 import net.hectus.neobb.util.EffectUtil;
 import net.hectus.neobb.util.Utilities;
 import net.kyori.adventure.text.Component;
@@ -27,12 +30,15 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public abstract class Game {
-    public final UUID uuid = UUID.randomUUID();
+    public final String id = Randomizer.generateRandomString(10, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
     public final Arena arena;
-    protected final boolean ranked;
+    public final boolean ranked;
 
     protected final List<NeoPlayer> initialPlayers = new ArrayList<>();
     protected final List<NeoPlayer> players = new ArrayList<>();
@@ -43,12 +49,15 @@ public abstract class Game {
     protected int turningIndex = 0;
     protected Shop shop;
 
-    public long startTick;
+    protected Warp warp;
+    protected Set<Class<? extends Clazz>> allowedClazzes;
+
+    protected long startTick;
     protected Time timeLeft;
 
-    public Game(boolean ranked, World world, @NotNull List<Player> players, Cord corner1, Cord corner2) {
+    public Game(boolean ranked, World world, @NotNull List<Player> players) {
         this.ranked = ranked;
-        this.arena = new Arena(world, corner1, corner2);
+        this.arena = new Arena(this, world);
         players.stream()
                 .map(player -> new NeoPlayer(player, this))
                 .peek(initialPlayers::add)
@@ -59,12 +68,18 @@ public abstract class Game {
             cleanPlayer(p);
             p.setGameMode(GameMode.SURVIVAL);
         });
+
+        warp = new TDefaultWarp(currentPlayer());
     }
 
     public abstract GameInfo info();
 
     @MustBeInvokedByOverriders
     public void turn(@NotNull Turn<?> turn) {
+        try {
+            turn.player().inventory.setDeckSlot(turn.player().player.getInventory().getHeldItemSlot(), null);
+        } catch (ArrayIndexOutOfBoundsException ignored) {}
+
         turn.apply();
 
         history.add(turn);
@@ -76,6 +91,7 @@ public abstract class Game {
         initialPlayers.forEach(p -> p.sendMessage(Translation.component(p.locale(), "gameplay.info.turn-used",
                 turn.player().player.getName(), Utilities.turnKey(turn.getClass().getSimpleName())).color(Colors.EXTRA)));
 
+        arena.resetCurrentBlocks();
         moveToNextPlayer();
     }
 
@@ -110,9 +126,15 @@ public abstract class Game {
 
     public final void eliminatePlayer(NeoPlayer player) {
         players.remove(player);
-        if (players.size() == 1) {
-            win(players.getFirst());
-        }
+        player.player.setHealth(0.0);
+
+        Bukkit.getScheduler().runTaskLater(NeoBB.PLUGIN, () -> {
+            if (players.size() == 1) {
+                win(players.getFirst());
+            }
+            player.player.teleport(warp.center);
+            player.player.setGameMode(GameMode.SPECTATOR);
+        }, 20);
     }
 
     public final @NotNull TargetObj gameTarget(boolean onlyAlive) {
@@ -149,6 +171,16 @@ public abstract class Game {
 
     public final Shop shop() {
         return shop;
+    }
+
+    public Warp warp() {
+        return warp;
+    }
+
+    public void warp(@NotNull Warp warp) {
+        this.warp = warp;
+        this.allowedClazzes.clear();
+        this.allowedClazzes.addAll(warp.allows());
     }
 
     public final Time timeLeft() {

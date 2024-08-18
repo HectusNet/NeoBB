@@ -83,6 +83,7 @@ public class DefaultShop extends Shop {
         typeFilters.addItem(filter(l, Material.FIRE_CHARGE, "usage", "throwable", player, t -> t instanceof ThrowableUsage), 2, 0);
         typeFilters.addItem(filter(l, Material.CREEPER_SPAWN_EGG, "usage", "mob", player, t -> t instanceof MobUsage), 3, 0);
         typeFilters.addItem(filter(l, Material.BAMBOO_BLOCK, "usage", "structure", player, t -> t instanceof StructureUsage), 4, 0);
+        typeFilters.addItem(filter(l, Material.NETHER_PORTAL, "usage", "warp", player, t -> t instanceof WarpFunction), 6, 0);
         typeFilters.addItem(filter(l, Material.STRUCTURE_BLOCK, "usage", "other", player, t -> t instanceof OtherUsage<?>), 5, 0);
         gui.addPane(typeFilters);
 

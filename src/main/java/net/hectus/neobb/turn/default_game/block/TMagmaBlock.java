@@ -14,6 +14,9 @@ public class TMagmaBlock extends Turn<Block> implements BlockUsage, AttackFuncti
     public TMagmaBlock(Block data, NeoPlayer player) { super(data, data.getLocation(), player); }
 
     @Override
+    public boolean requiresUsageGuide() { return true; }
+
+    @Override
     public ItemStack item() {
         return new ItemStack(Material.MAGMA_BLOCK);
     }

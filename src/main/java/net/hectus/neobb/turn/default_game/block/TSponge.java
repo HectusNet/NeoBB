@@ -22,6 +22,9 @@ public class TSponge extends Turn<Block> implements BlockUsage, CounterbuffFunct
     public TSponge(Block data, NeoPlayer player) { super(data, data.getLocation(), player); }
 
     @Override
+    public boolean requiresUsageGuide() { return true; }
+
+    @Override
     public ItemStack item() {
         return new ItemStack(Material.SPONGE);
     }

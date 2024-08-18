@@ -21,6 +21,9 @@ public class TIronShovel extends Turn<ItemStack> implements ItemUsage, Counterbu
     public TIronShovel(ItemStack data, Location location, NeoPlayer player) { super(data, location, player); }
 
     @Override
+    public boolean requiresUsageGuide() { return true; }
+
+    @Override
     public ItemStack item() {
         return new ItemStack(Material.IRON_SHOVEL);
     }

@@ -6,15 +6,22 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 public final class GameManager {
     public static final List<Game> GAMES = new ArrayList<>();
 
-    public static @Nullable Game game(UUID uuid) {
+    public static @Nullable Game game(String id) {
         for (Game game : GAMES) {
-            if (game.uuid == uuid) return game;
+            if (game.id.equals(id)) return game;
+        }
+        return null;
+    }
+
+    public static @Nullable Game game(Collection<String> scoreboardIDs) {
+        for (Game game : GAMES) {
+            if (scoreboardIDs.contains(game.id)) return game;
         }
         return null;
     }
