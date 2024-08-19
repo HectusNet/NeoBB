@@ -52,13 +52,13 @@ public class TurnEvents implements Listener {
             if (player.game.arena.currentPlacedBlocksAmount() == 0) {
                 Bukkit.getScheduler().runTaskLater(NeoBB.PLUGIN, () -> {
                     if (player.game.arena.currentPlacedBlocksAmount() > 1) {
-                        StructureManager.match(player.game.arena);
+                        handleStructure(player, block);
                     } else {
                         blockTurn(event, block, player);
                     }
                 }, 30);
             } else {
-                StructureManager.match(player.game.arena);
+                handleStructure(player, block);
             }
         } else {
             blockTurn(event, block, player);
