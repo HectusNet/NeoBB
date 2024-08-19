@@ -40,7 +40,10 @@ public class TSheep extends Turn<Sheep> implements MobUsage, BuffFunction, Super
             case LIGHT_GRAY -> new Buff.ExtraTurn().apply(player);
             case GRAY -> new Buff.Luck(Buff.BuffTarget.YOU, 25).apply(player);
             case BLACK -> new Buff.Luck(Buff.BuffTarget.OPPONENTS, -15).apply(player);
-            case BROWN -> player.inventory.addToDeck(Shop.turn(Randomizer.fromCollection(player.game.shop().turns), player).item());
+            case BROWN -> {
+                Turn<?> turn = Shop.turn(Randomizer.fromCollection(player.game.shop().turns), player);
+                player.inventory.addToDeck(turn.item(), turn);
+            }
             case null, default -> {
                 if (true) // TODO: Check if cold turns are allowed.
                     new Buff.ExtraTurn().apply(player);

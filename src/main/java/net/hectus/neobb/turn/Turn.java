@@ -1,6 +1,8 @@
 package net.hectus.neobb.turn;
 
 import net.hectus.neobb.player.NeoPlayer;
+import net.hectus.neobb.turn.default_game.attributes.function.AttackFunction;
+import net.hectus.neobb.turn.default_game.attributes.function.CounterFunction;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -44,8 +46,18 @@ public abstract class Turn<T> {
         return player;
     }
 
+    public boolean goodChoice(NeoPlayer player) {
+        if (!canBeUsed()) return false;
+
+        if (player.hasModifier("attacked") && !player.hasModifier("defended"))
+            return this instanceof CounterFunction counter && counter.counters().stream().anyMatch(filter -> filter.doCounter(player.game.history().getLast()));
+
+        return !(this instanceof AttackFunction) || !player.nextPlayer().hasModifier("defended");
+    }
+
     public static final Turn<Void> DUMMY = new Turn<>(null) {
         @Override public @NotNull ItemStack item() { return ItemStack.empty(); }
         @Override public int cost() { return 0; }
+        @Override public boolean goodChoice(NeoPlayer player) { return false; }
     };
 }

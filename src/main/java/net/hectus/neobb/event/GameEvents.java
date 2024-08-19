@@ -41,7 +41,6 @@ public class GameEvents implements Listener {
             player.game.arena.addBlock(event.getBlock());
     }
 
-
     @EventHandler(ignoreCancelled = true)
     public void onPlayerMove(@NotNull PlayerMoveEvent event) {
         if (event.getTo().clone().subtract(0, 1, 0).getBlock().getType() == Material.MAGMA_BLOCK) {

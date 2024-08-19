@@ -7,6 +7,7 @@ import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.Rating;
 import net.hectus.neobb.event.GameEvents;
 import net.hectus.neobb.game.util.Arena;
+import net.hectus.neobb.game.util.EffectManager;
 import net.hectus.neobb.game.util.GameInfo;
 import net.hectus.neobb.game.util.GameManager;
 import net.hectus.neobb.player.NeoPlayer;
@@ -14,10 +15,10 @@ import net.hectus.neobb.player.TargetObj;
 import net.hectus.neobb.shop.Shop;
 import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
+import net.hectus.neobb.turn.default_game.other.TTimeLimit;
 import net.hectus.neobb.turn.default_game.warp.TDefaultWarp;
 import net.hectus.neobb.turn.default_game.warp.Warp;
 import net.hectus.neobb.util.Colors;
-import net.hectus.neobb.util.EffectUtil;
 import net.hectus.neobb.util.Utilities;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
@@ -38,6 +39,7 @@ import java.util.Set;
 public abstract class Game {
     public final String id = Randomizer.generateRandomString(10, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
     public final Arena arena;
+    public final EffectManager effectManager;
     public final boolean ranked;
 
     protected final List<NeoPlayer> initialPlayers = new ArrayList<>();
@@ -54,14 +56,18 @@ public abstract class Game {
 
     protected long startTick;
     protected Time timeLeft;
+    protected int turnCountdown;
 
     public Game(boolean ranked, World world, @NotNull List<Player> players) {
         this.ranked = ranked;
         this.arena = new Arena(this, world);
+        this.effectManager = new EffectManager(this);
+
         players.stream()
                 .map(player -> new NeoPlayer(player, this))
                 .peek(initialPlayers::add)
                 .forEach(this.players::add);
+
         GameManager.GAMES.add(this);
 
         players.forEach(p -> {
@@ -69,7 +75,7 @@ public abstract class Game {
             p.setGameMode(GameMode.SURVIVAL);
         });
 
-        warp = new TDefaultWarp(currentPlayer());
+        warp = new TDefaultWarp(world);
     }
 
     public abstract GameInfo info();
@@ -77,7 +83,7 @@ public abstract class Game {
     @MustBeInvokedByOverriders
     public void turn(@NotNull Turn<?> turn) {
         try {
-            turn.player().inventory.setDeckSlot(turn.player().player.getInventory().getHeldItemSlot(), null);
+            turn.player().inventory.setDeckSlot(turn.player().player.getInventory().getHeldItemSlot(), null, null);
         } catch (ArrayIndexOutOfBoundsException ignored) {}
 
         turn.apply();
@@ -85,13 +91,14 @@ public abstract class Game {
         history.add(turn);
         turn.player().addTurn();
 
-        EffectUtil.applyEffects(turn);
+        effectManager.applyEffects(turn);
 
         currentPlayer().player.playSound(currentPlayer().player, Sound.BLOCK_NOTE_BLOCK_BELL, 0.5f, 1.0f);
         initialPlayers.forEach(p -> p.sendMessage(Translation.component(p.locale(), "gameplay.info.turn-used",
                 turn.player().player.getName(), Utilities.turnKey(turn.getClass().getSimpleName())).color(Colors.EXTRA)));
 
         arena.resetCurrentBlocks();
+        resetTurnCountdown();
         moveToNextPlayer();
     }
 
@@ -112,6 +119,8 @@ public abstract class Game {
                 timeLeft.decrement();
                 if (timeLeft.get() == 0)
                     draw();
+
+                turnCountdownTick();
             }
         }
     }
@@ -187,6 +196,20 @@ public abstract class Game {
         return timeLeft;
     }
 
+    public final int turnCountdown() {
+        return turnCountdown;
+    }
+
+    public final void turnCountdownTick() {
+        turnCountdown -= 1;
+        if (turnCountdown == 0)
+            turn(new TTimeLimit(new Time(turnCountdown), currentPlayer()));
+    }
+
+    public final void resetTurnCountdown() {
+        turnCountdown = info().turnTimer();
+    }
+
     public final void moveToNextPlayer() {
         turningIndex = (turningIndex + 1) % players.size();
     }
@@ -214,41 +237,16 @@ public abstract class Game {
     }
 
     public void start() {
-        timeLeft = initialTime();
+        timeLeft = new Time(info().totalTime());
+        timeLeft.setAllowNegatives(true);
         startTick = GameEvents.currentTick;
         setStarted(true);
-    }
-
-    public void win(@NotNull NeoPlayer player) {
-        player.showTitle(Title.title(Translation.component(player.locale(), "gameplay.info.ending.win").color(Colors.POSITIVE),
-                Translation.component(player.locale(), "gameplay.info.ending.win-sub").color(Colors.NEUTRAL)));
-
-        player.opponents(false).forEach(p -> p.showTitle(Title.title(Translation.component(p.locale(), "gameplay.info.ending.lose").color(Colors.NEGATIVE),
-                Translation.component(p.locale(), "gameplay.info.ending.lose-sub").color(Colors.NEUTRAL))));
-
-        end();
-        Rating.updateRankings(List.of(player), player.opponents(false));
-    }
-
-    public void draw() {
-        players.forEach(p -> p.showTitle(Title.title(Translation.component(p.locale(), "gameplay.info.ending.draw").color(Colors.NEUTRAL),
-                Translation.component(p.locale(), "gameplay.info.ending.draw-sub").color(Colors.EXTRA))));
-
-        end();
-        Rating.updateRankings(initialPlayers);
-    }
-
-    public void giveUp(@NotNull NeoPlayer player) {
-        players.forEach(p -> p.showTitle(Title.title(Translation.component(p.locale(), "gameplay.info.ending.giveup", player.player.getName()).color(Colors.NEUTRAL),
-                Translation.component(p.locale(), "gameplay.info.ending.giveup-sub", player.player.getName()).color(Colors.EXTRA))));
-
-        end();
-        Rating.updateRankings(player.opponents(false), List.of(player));
     }
 
     public void end() {
         players.forEach(p -> cleanPlayer(p.player));
         GameManager.GAMES.remove(this);
+        effectManager.clearHighlight();
 
         Bukkit.getScheduler().runTaskLater(NeoBB.PLUGIN, () -> players.forEach(p -> p.player.kick(Component.text("Game ended!"))), 100); // 5 Seconds
     }
@@ -257,5 +255,32 @@ public abstract class Game {
         player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
         player.getInventory().clear();
         player.clearActivePotionEffects();
+    }
+
+    public final void win(@NotNull NeoPlayer player) {
+        player.showTitle(Title.title(Translation.component(player.locale(), "gameplay.info.ending.win").color(Colors.POSITIVE),
+                Translation.component(player.locale(), "gameplay.info.ending.win-sub").color(Colors.NEUTRAL)));
+
+        player.opponents(false).forEach(p -> p.showTitle(Title.title(Translation.component(p.locale(), "gameplay.info.ending.lose").color(Colors.NEGATIVE),
+                Translation.component(p.locale(), "gameplay.info.ending.lose-sub").color(Colors.NEUTRAL))));
+
+        end();
+        if (ranked) Rating.updateRankings(List.of(player), player.opponents(false));
+    }
+
+    public final void draw() {
+        players.forEach(p -> p.showTitle(Title.title(Translation.component(p.locale(), "gameplay.info.ending.draw").color(Colors.NEUTRAL),
+                Translation.component(p.locale(), "gameplay.info.ending.draw-sub").color(Colors.EXTRA))));
+
+        end();
+        if (ranked) Rating.updateRankings(initialPlayers);
+    }
+
+    public final void giveUp(@NotNull NeoPlayer player) {
+        players.forEach(p -> p.showTitle(Title.title(Translation.component(p.locale(), "gameplay.info.ending.giveup", player.player.getName()).color(Colors.NEUTRAL),
+                Translation.component(p.locale(), "gameplay.info.ending.giveup-sub", player.player.getName()).color(Colors.EXTRA))));
+
+        end();
+        if (ranked) Rating.updateRankings(player.opponents(false), List.of(player));
     }
 }

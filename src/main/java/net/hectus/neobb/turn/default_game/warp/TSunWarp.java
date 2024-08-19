@@ -1,19 +1,19 @@
 package net.hectus.neobb.turn.default_game.warp;
 
 import com.marcpg.libpg.storing.Pair;
-import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.HotClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.RedstoneClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.SupernaturalClazz;
 import org.bukkit.Material;
+import org.bukkit.World;
 
 import java.util.List;
 
 public class TSunWarp extends Warp {
-    public TSunWarp(NeoPlayer player) { super(player, "sun"); }
-    public TSunWarp(PlacedStructure data, NeoPlayer player) { super(data, player, "sun"); }
+    public TSunWarp(World world) { super(world, "sun"); }
+    public TSunWarp(PlacedStructure data, World world) { super(data, world, "sun"); }
 
     @Override
     public int chance() {

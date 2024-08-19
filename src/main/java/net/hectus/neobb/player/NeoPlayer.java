@@ -2,11 +2,13 @@ package net.hectus.neobb.player;
 
 import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import net.hectus.neobb.NeoBB;
+import net.hectus.neobb.cosmetic.PlaceParticle;
 import net.hectus.neobb.game.BossBarGame;
 import net.hectus.neobb.game.Game;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
@@ -23,6 +25,9 @@ public class NeoPlayer implements Target, ForwardingAudience.Single {
 
     private final Set<String> modifiers = new HashSet<>();
     private int luck = 20;
+
+    private PlaceParticle cosmeticParticle;
+    private NamedTextColor cosmeticOutline;
 
     private int elo;
     private int wins;
@@ -106,11 +111,15 @@ public class NeoPlayer implements Target, ForwardingAudience.Single {
         if (!NeoBB.DATABASE.contains(uuid())) {
             NeoBB.DATABASE.add(Map.of("uuid", uuid()));
         }
+
         elo = (int) NeoBB.DATABASE.get(uuid(), "elo");
         wins = (int) NeoBB.DATABASE.get(uuid(), "wins");
         losses = (int) NeoBB.DATABASE.get(uuid(), "losses");
         draws = (int) NeoBB.DATABASE.get(uuid(), "draws");
         turns = (int) NeoBB.DATABASE.get(uuid(), "turns");
+
+        cosmeticParticle = PlaceParticle.valueOf((String) NeoBB.DATABASE.get(uuid(), "cosmetic_particle"));
+        cosmeticOutline = NamedTextColor.namedColor((Integer) NeoBB.DATABASE.get(uuid(), "cosmetic_outline"));
     }
 
     public void setLuck(int luck) {
@@ -160,4 +169,20 @@ public class NeoPlayer implements Target, ForwardingAudience.Single {
     }
 
     public int gamesPlayed() { return wins + losses + draws; }
+
+    // ====================================
+    // ======== DATABASE COSMETICS ========
+    // ====================================
+
+    public PlaceParticle cosmeticParticle() { return cosmeticParticle; }
+    public void setCosmeticParticle(@NotNull PlaceParticle cosmeticParticle) {
+        this.cosmeticParticle = cosmeticParticle;
+        NeoBB.DATABASE.set(uuid(), "cosmetic_particle", cosmeticParticle.toString());
+    }
+
+    public NamedTextColor cosmeticOutline() { return cosmeticOutline; }
+    public void setCosmeticOutline(@NotNull NamedTextColor cosmeticOutline) {
+        this.cosmeticOutline = cosmeticOutline;
+        NeoBB.DATABASE.set(uuid(), "cosmetic_outline", cosmeticOutline.value());
+    }
 }

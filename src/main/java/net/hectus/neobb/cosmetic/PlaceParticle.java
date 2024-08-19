@@ -1,14 +1,13 @@
 package net.hectus.neobb.cosmetic;
 
 import com.destroystokyo.paper.ParticleBuilder;
-import net.hectus.neobb.game.Game;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 
 import java.awt.*;
 
 public enum PlaceParticle {
-    DEFAULT(Particle.ENCHANT, 75, 0.2, 0.4, null),
+    ENCHANTMENT(Particle.ENCHANT, 75, 0.2, 0.4, null),
     PORTAL(Particle.PORTAL, 75, 0.2, 0.4, null),
     PORTAL_EXTREME(Particle.PORTAL, 250, 0.2, 3.0, null),
     EFFECT(Particle.ENTITY_EFFECT, 15, 0.2, 0, Color.WHITE),
@@ -28,7 +27,7 @@ public enum PlaceParticle {
         this.data = data;
     }
 
-    public void spawn(Location location, Game game) {
+    public void spawn(Location location) {
         ParticleBuilder builder = new ParticleBuilder(particle).count(count).location(location);
 
         if (offset != 0) builder.offset(offset, offset, offset);

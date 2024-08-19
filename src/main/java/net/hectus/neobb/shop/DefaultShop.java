@@ -83,7 +83,7 @@ public class DefaultShop extends Shop {
         typeFilters.addItem(filter(l, Material.FIRE_CHARGE, "usage", "throwable", player, t -> t instanceof ThrowableUsage), 2, 0);
         typeFilters.addItem(filter(l, Material.CREEPER_SPAWN_EGG, "usage", "mob", player, t -> t instanceof MobUsage), 3, 0);
         typeFilters.addItem(filter(l, Material.BAMBOO_BLOCK, "usage", "structure", player, t -> t instanceof StructureUsage), 4, 0);
-        typeFilters.addItem(filter(l, Material.NETHER_PORTAL, "usage", "warp", player, t -> t instanceof WarpFunction), 6, 0);
+        typeFilters.addItem(filter(l, Material.END_PORTAL_FRAME, "usage", "warp", player, t -> t instanceof WarpFunction), 6, 0);
         typeFilters.addItem(filter(l, Material.STRUCTURE_BLOCK, "usage", "other", player, t -> t instanceof OtherUsage<?>), 5, 0);
         gui.addPane(typeFilters);
 
@@ -147,7 +147,7 @@ public class DefaultShop extends Shop {
 
         gui.setOnBottomClick(event -> {
             if (event.getSlotType() == InventoryType.SlotType.QUICKBAR && event.getCurrentItem() != null && !event.getCurrentItem().isEmpty() && event.getCurrentItem().getType() != Material.GRAY_STAINED_GLASS_PANE) {
-                player.inventory.setDeckSlot(event.getSlot(), null);
+                player.inventory.setDeckSlot(event.getSlot(), null, null);
                 player.inventory.addCoins(turn(turnItems, event.getCurrentItem().getType()).cost());
             }
         });
@@ -159,9 +159,10 @@ public class DefaultShop extends Shop {
             if (item == null || item.isEmpty()) return;
             if (player.inventory.removeCoins(cost(turnItems, item.getType()))) {
                 try {
-                    if (!player.inventory.allowItem(turn(turnItems, item.getType()), item.getType()))
+                    Turn<?> turn = turn(turnItems, item.getType());
+                    if (!player.inventory.allowItem(turn, item.getType()))
                         throw new IndexOutOfBoundsException();
-                    player.inventory.addToDeck(item);
+                    player.inventory.addToDeck(item, turn);
                     gui.setTitle(Translation.string(l, "item-lore.cost.value", player.inventory.coins()) + " - Shop - " + category);
                 } catch (IndexOutOfBoundsException e) {
                     player.player.playSound(player.player, Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);

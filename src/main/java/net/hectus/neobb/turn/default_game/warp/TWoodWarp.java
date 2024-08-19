@@ -1,18 +1,18 @@
 package net.hectus.neobb.turn.default_game.warp;
 
 import com.marcpg.libpg.storing.Pair;
-import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NatureClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NeutralClazz;
 import org.bukkit.Material;
+import org.bukkit.World;
 
 import java.util.List;
 
 public class TWoodWarp extends Warp {
-    public TWoodWarp(NeoPlayer player) { super(player, "wood"); }
-    public TWoodWarp(PlacedStructure data, NeoPlayer player) { super(data, player, "wood"); }
+    public TWoodWarp(World world) { super(world, "wood"); }
+    public TWoodWarp(PlacedStructure data, World world) { super(data, world, "wood"); }
 
     @Override
     public int chance() {

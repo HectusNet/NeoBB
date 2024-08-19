@@ -44,6 +44,7 @@ public class TurnEvents implements Listener {
 
         NeoPlayer player = GameManager.player(event.getPlayer(), true);
         if (unusable(event.getPlayer(), player, event, "You cannot place blocks right now!")) return;
+        player.game.resetTurnCountdown();
 
         Block block = event.getBlock();
 
@@ -103,20 +104,20 @@ public class TurnEvents implements Listener {
         Structure structure = StructureManager.match(player.game.arena);
         if (structure == null) return;
         switch (structure.name) {
-            case "amethyst-warp" -> player.game.turn(new TAmethystWarp(new PlacedStructure(structure, block), player));
-            case "cliff-warp" -> player.game.turn(new TCliffWarp(new PlacedStructure(structure, block), player));
-            case "desert-warp" -> player.game.turn(new TDesertWarp(new PlacedStructure(structure, block), player));
-            case "end-warp" -> player.game.turn(new TEndWarp(new PlacedStructure(structure, block), player));
-            case "frozen-warp" -> player.game.turn(new TFrozenWarp(new PlacedStructure(structure, block), player));
-            case "meadow-warp" -> player.game.turn(new TMeadowWarp(new PlacedStructure(structure, block), player));
-            case "mushroom-warp" -> player.game.turn(new TMushroomWarp(new PlacedStructure(structure, block), player));
-            case "nerd-warp" -> player.game.turn(new TNerdWarp(new PlacedStructure(structure, block), player));
-            case "nether-warp" -> player.game.turn(new TNetherWarp(new PlacedStructure(structure, block), player));
-            case "ocean-warp" -> player.game.turn(new TOceanWarp(new PlacedStructure(structure, block), player));
-            case "redstone-warp" -> player.game.turn(new TRedstoneWarp(new PlacedStructure(structure, block), player));
-            case "sun-warp" -> player.game.turn(new TSunWarp(new PlacedStructure(structure, block), player));
-            case "void-warp" -> player.game.turn(new TVoidWarp(new PlacedStructure(structure, block), player));
-            case "wood-warp" -> player.game.turn(new TWoodWarp(new PlacedStructure(structure, block), player));
+            case "amethyst-warp" -> player.game.turn(new TAmethystWarp(new PlacedStructure(structure, block), block.getWorld()));
+            case "cliff-warp" -> player.game.turn(new TCliffWarp(new PlacedStructure(structure, block), block.getWorld()));
+            case "desert-warp" -> player.game.turn(new TDesertWarp(new PlacedStructure(structure, block), block.getWorld()));
+            case "end-warp" -> player.game.turn(new TEndWarp(new PlacedStructure(structure, block), block.getWorld()));
+            case "frozen-warp" -> player.game.turn(new TFrozenWarp(new PlacedStructure(structure, block), block.getWorld()));
+            case "meadow-warp" -> player.game.turn(new TMeadowWarp(new PlacedStructure(structure, block), block.getWorld()));
+            case "mushroom-warp" -> player.game.turn(new TMushroomWarp(new PlacedStructure(structure, block), block.getWorld()));
+            case "nerd-warp" -> player.game.turn(new TNerdWarp(new PlacedStructure(structure, block), block.getWorld()));
+            case "nether-warp" -> player.game.turn(new TNetherWarp(new PlacedStructure(structure, block), block.getWorld()));
+            case "ocean-warp" -> player.game.turn(new TOceanWarp(new PlacedStructure(structure, block), block.getWorld()));
+            case "redstone-warp" -> player.game.turn(new TRedstoneWarp(new PlacedStructure(structure, block), block.getWorld()));
+            case "sun-warp" -> player.game.turn(new TSunWarp(new PlacedStructure(structure, block), block.getWorld()));
+            case "void-warp" -> player.game.turn(new TVoidWarp(new PlacedStructure(structure, block), block.getWorld()));
+            case "wood-warp" -> player.game.turn(new TWoodWarp(new PlacedStructure(structure, block), block.getWorld()));
         }
     }
 

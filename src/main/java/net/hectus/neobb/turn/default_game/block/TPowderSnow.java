@@ -18,7 +18,7 @@ public class TPowderSnow extends Turn<Block> implements BlockUsage, BuffFunction
 
     @Override
     public ItemStack item() {
-        return new ItemStack(Material.POWDER_SNOW);
+        return new ItemStack(Material.POWDER_SNOW_BUCKET);
     }
 
     @Override

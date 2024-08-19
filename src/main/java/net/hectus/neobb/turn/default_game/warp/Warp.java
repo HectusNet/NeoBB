@@ -3,7 +3,6 @@ package net.hectus.neobb.turn.default_game.warp;
 import com.marcpg.libpg.storing.Pair;
 import com.marcpg.libpg.util.Randomizer;
 import net.hectus.neobb.NeoBB;
-import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.BlockInfo;
 import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.structure.Structure;
@@ -15,6 +14,7 @@ import net.hectus.neobb.util.Cord;
 import net.hectus.neobb.util.Utilities;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -23,14 +23,14 @@ public abstract class Warp extends Turn<PlacedStructure> implements StructureUsa
     public final Location center;
     public final String name;
 
-    public Warp(NeoPlayer player, String name) {
-        super(null, Utilities.listToLocation(player.game.world(), NeoBB.CONFIG.getIntegerList("warps." + name)), player);
+    public Warp(World world, String name) {
+        super(null, Utilities.listToLocation(world, NeoBB.CONFIG.getIntegerList("warps." + name)), null);
         this.name = name;
         this.center = location().add(5, 5, 5);
     }
 
-    public Warp(PlacedStructure data, NeoPlayer player, String name) {
-        super(data, Utilities.listToLocation(player.game.world(), NeoBB.CONFIG.getIntegerList("warps." + name)), player);
+    public Warp(PlacedStructure data, World world, String name) {
+        super(data, Utilities.listToLocation(world, NeoBB.CONFIG.getIntegerList("warps." + name)), null);
         this.name = name;
         this.center = location().add(5, 5, 5);
     }

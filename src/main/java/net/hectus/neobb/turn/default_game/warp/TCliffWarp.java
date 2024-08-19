@@ -1,18 +1,18 @@
 package net.hectus.neobb.turn.default_game.warp;
 
 import com.marcpg.libpg.storing.Pair;
-import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NeutralClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.RedstoneClazz;
 import org.bukkit.Material;
+import org.bukkit.World;
 
 import java.util.List;
 
 public class TCliffWarp extends Warp {
-    public TCliffWarp(NeoPlayer player) { super(player, "cliff"); }
-    public TCliffWarp(PlacedStructure data, NeoPlayer player) { super(data, player, "cliff"); }
+    public TCliffWarp(World world) { super(world, "cliff"); }
+    public TCliffWarp(PlacedStructure data, World world) { super(data, world, "cliff"); }
 
     @Override
     public int chance() {

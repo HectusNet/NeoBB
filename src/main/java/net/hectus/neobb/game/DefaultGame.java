@@ -14,6 +14,7 @@ import net.hectus.neobb.turn.default_game.item.TIronShovel;
 import net.hectus.neobb.turn.default_game.mob.*;
 import net.hectus.neobb.turn.default_game.warp.*;
 import net.hectus.neobb.util.Colors;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Sound;
@@ -26,8 +27,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
-public class DefaultGame extends Game {
-    public static final GameInfo INFO = new GameInfo(25, 9, false, List.of(
+public class DefaultGame extends BossBarGame {
+    public static final GameInfo INFO = new GameInfo(25, 9, new Time(3, Time.Unit.MINUTES), 5, List.of(
             TBlackWool.class, TCauldron.class, TCyanCarpet.class, TFire.class, TGoldBlock.class, TGreenCarpet.class,
             TIronTrapdoor.class, TMagentaGlazedTerracotta.class, TMagmaBlock.class, TNetherrack.class, TPurpleWool.class,
             TSculk.class, TSponge.class, TSpruceTrapdoor.class, TStonecutter.class, TChorusFruit.class, TIronShovel.class,
@@ -43,6 +44,17 @@ public class DefaultGame extends Game {
         super(ranked, world, players);
         this.shop = new DefaultShop(this);
         this.players.forEach(player -> shop.open(player));
+    }
+
+    @Override
+    public BossBar initialBossBar() {
+        return BossBar.bossBar(Component.text("Turn Countdown: -"), 0.0f, BossBar.Color.YELLOW, BossBar.Overlay.NOTCHED_10);
+    }
+
+    @Override
+    public void bossBar(@NotNull BossBar bossBar) {
+        bossBar.name(Component.text("Turn Countdown: " + turnCountdown + "s"));
+        bossBar.progress((float) turnCountdown / INFO.turnTimer());
     }
 
     @Override
@@ -91,25 +103,24 @@ public class DefaultGame extends Game {
     }
 
     @Override
-    public Time initialTime() {
-        return new Time(5, Time.Unit.MINUTES);
-    }
-
-    @Override
     public @Nullable List<Component> scoreboard(@NotNull NeoPlayer player) {
         Locale l = player.locale();
-        return List.of(
-                MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"),
-                Translation.component(l, "scoreboard.turning").color(Colors.ACCENT)
-                        .append(Component.text(currentPlayer() == player ? "You" : currentPlayer().player.getName(), Colors.RESET)),
-                Translation.component(l, "scoreboard.time").color(Colors.ACCENT)
-                        .append(Component.text(player.game.timeLeft().getPreciselyFormatted(), Colors.RESET)),
-                Translation.component(l, "scoreboard.luck").color(Colors.ACCENT)
-                        .append(Component.text(player.luck(), Colors.RESET)),
-                Component.empty(),
-                Component.text("NeoBB-" + NeoBB.VERSION + " (d" + Integer.toHexString(LocalDateTime.now().getDayOfYear()) + "h" + LocalDateTime.now().getHour() + ")", Colors.EXTRA),
-                Component.text("mc.hectus.net", Colors.LINK)
-        );
+        try {
+            return List.of(
+                    MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"),
+                    Translation.component(l, "scoreboard.turning").color(Colors.ACCENT)
+                            .append(Component.text(currentPlayer() == player ? "You" : currentPlayer().player.getName(), Colors.RESET)),
+                    Translation.component(l, "scoreboard.time").color(Colors.ACCENT)
+                            .append(Component.text(player.game.timeLeft().getPreciselyFormatted(), Colors.RESET)),
+                    Translation.component(l, "scoreboard.luck").color(Colors.ACCENT)
+                            .append(Component.text(player.luck(), Colors.RESET)),
+                    Component.empty(),
+                    Component.text("NeoBB-" + NeoBB.VERSION + " (d" + Integer.toHexString(LocalDateTime.now().getDayOfYear()) + "h" + LocalDateTime.now().getHour() + ")", Colors.EXTRA),
+                    Component.text("mc.hectus.net", Colors.LINK)
+            );
+        } catch (Exception e) {
+            return List.of(MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"));
+        }
     }
 
     @Override

@@ -4,9 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.util.Arena;
-import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.default_game.warp.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -21,7 +22,7 @@ public class StructureManager {
     private static final List<Structure> STRUCTURES = new ArrayList<>();
     private static final Set<Material> STRUCTURE_MATERIALS = new HashSet<>();
 
-    private static final List<Class<? extends Warp>> WARPS = List.of(
+    public static final List<Class<? extends Warp>> WARPS = List.of(
             TAmethystWarp.class, TCliffWarp.class, TDesertWarp.class, TEndWarp.class, TFrozenWarp.class,
             TMeadowWarp.class, TMushroomWarp.class, TNerdWarp.class, TNetherWarp.class, TOceanWarp.class,
             TRedstoneWarp.class, TSunWarp.class, TVoidWarp.class, TWoodWarp.class
@@ -32,7 +33,7 @@ public class StructureManager {
 
         for (Class<? extends Warp> warp : WARPS) {
             try {
-                addStructure(warp.getConstructor(NeoPlayer.class).newInstance((Object) null).referenceStructure());
+                addStructure(warp.getConstructor(World.class).newInstance(Bukkit.getWorld("world")).referenceStructure());
             } catch (Exception e) {
                 NeoBB.LOG.warn("Couldn't load warp structure!", e);
             }

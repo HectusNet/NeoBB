@@ -1,16 +1,16 @@
 package net.hectus.neobb.turn.default_game.warp;
 
 import com.marcpg.libpg.storing.Pair;
-import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.turn.default_game.attributes.clazz.*;
 import org.bukkit.Material;
+import org.bukkit.World;
 
 import java.util.List;
 
 public class TNerdWarp extends Warp {
-    public TNerdWarp(NeoPlayer player) { super(player, "nerd"); }
-    public TNerdWarp(PlacedStructure data, NeoPlayer player) { super(data, player, "nerd"); }
+    public TNerdWarp(World world) { super(world, "nerd"); }
+    public TNerdWarp(PlacedStructure data, World world) { super(data, world, "nerd"); }
 
     @Override
     public int chance() {

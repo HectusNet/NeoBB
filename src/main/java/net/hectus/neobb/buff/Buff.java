@@ -1,7 +1,6 @@
 package net.hectus.neobb.buff;
 
 import com.marcpg.libpg.lang.Translation;
-import com.marcpg.libpg.text.Formatter;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.player.Target;
 import net.hectus.neobb.player.TargetObj;
@@ -28,7 +27,7 @@ public abstract class Buff {
     public abstract TextColor color();
 
     public Component line(Locale l) {
-        return Component.text("   | " + text(l) + (buffTarget == BuffTarget.YOU ? "" : " " + Translation.string(l, "item-lore.buff." + Formatter.toPascalCase(buffTarget.name()))), color());
+        return Component.text("   | " + text(l) + (buffTarget == BuffTarget.YOU ? "" : " " + Translation.string(l, "item-lore.buff." + buffTarget.name().toLowerCase())), color());
     }
 
     public Target getTarget(NeoPlayer source) {

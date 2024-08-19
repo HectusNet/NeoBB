@@ -21,7 +21,7 @@ public class Arena {
     private final BlockInfo[][][] totalPlacedBlocks = new BlockInfo[9][NeoBB.CONFIG.getInt("max-arena-height")][9];
 
     private final Set<Material> placedMaterials = new HashSet<>();
-    private BlockInfo[][][] placedBlocks;
+    private BlockInfo[][][] placedBlocks = new BlockInfo[9][NeoBB.CONFIG.getInt("max-arena-height")][9];
 
     public Arena(Game game, World world) {
         this.game = game;
@@ -65,7 +65,7 @@ public class Arena {
     }
 
     public void resetCurrentBlocks() {
-        placedBlocks = new BlockInfo[0][totalPlacedBlocks[0].length][0];
+        placedBlocks = new BlockInfo[9][totalPlacedBlocks[0].length][9];
         placedMaterials.clear();
     }
 

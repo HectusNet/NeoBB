@@ -4,8 +4,10 @@ import com.marcpg.libpg.lang.Translation;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.Game;
 import net.hectus.neobb.player.NeoPlayer;
+import net.hectus.neobb.structure.StructureManager;
 import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.util.Colors;
+import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -21,7 +23,11 @@ public abstract class Shop {
 
     public static Turn<?> turn(@NotNull Class<? extends Turn<?>> clazz, NeoPlayer player) {
         try {
-            return clazz.getConstructor(NeoPlayer.class).newInstance(player);
+            if (StructureManager.WARPS.contains(clazz)) {
+                return clazz.getConstructor(World.class).newInstance(player.game.world());
+            } else {
+                return clazz.getConstructor(NeoPlayer.class).newInstance(player);
+            }
         } catch (ReflectiveOperationException e) {
             NeoBB.LOG.warn("Couldn't get turn!", e);
             return Turn.DUMMY;

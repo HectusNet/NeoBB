@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "net.hectus.neobb"
-version = "0.0.3"
+version = "0.0.4"
 description = "A reworked version of NeoBB with some interesting spins."
 
 java.sourceCompatibility = JavaVersion.VERSION_21
@@ -24,7 +24,7 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
     implementation("org.postgresql:postgresql:42.7.3")
-    implementation("com.github.stefvanschie.inventoryframework:IF:0.10.16")
+    implementation("com.github.stefvanschie.inventoryframework:IF:0.10.17")
     implementation("com.marcpg:libpg:0.1.1")
 }
 

@@ -1,16 +1,16 @@
 package net.hectus.neobb.turn.default_game.warp;
 
 import com.marcpg.libpg.storing.Pair;
-import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.turn.default_game.attributes.clazz.*;
 import org.bukkit.Material;
+import org.bukkit.World;
 
 import java.util.List;
 
 public class TAmethystWarp extends Warp {
-    public TAmethystWarp(NeoPlayer player) { super(player, "amethyst"); }
-    public TAmethystWarp(PlacedStructure data, NeoPlayer player) { super(data, player, "amethyst"); }
+    public TAmethystWarp(World world) { super(world, "amethyst"); }
+    public TAmethystWarp(PlacedStructure data, World world) { super(data, world, "amethyst"); }
 
     @Override
     public int chance() {
