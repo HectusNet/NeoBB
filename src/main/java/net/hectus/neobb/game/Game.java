@@ -15,7 +15,7 @@ import net.hectus.neobb.player.TargetObj;
 import net.hectus.neobb.shop.Shop;
 import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
-import net.hectus.neobb.turn.default_game.other.TTimeLimit;
+import net.hectus.neobb.turn.default_game.TTimeLimit;
 import net.hectus.neobb.turn.default_game.warp.TDefaultWarp;
 import net.hectus.neobb.turn.default_game.warp.Warp;
 import net.hectus.neobb.util.Colors;
