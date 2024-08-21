@@ -19,6 +19,11 @@ import java.util.*;
 public class NeoPlayer implements Target, ForwardingAudience.Single {
     private static final ScoreboardManager SCOREBOARD_MANAGER = Bukkit.getScoreboardManager();
 
+    private final static String ELO_COL_NAME = "elo";
+    private final static String RATING_DEVIATION_COL_NAME = "rating_deviation";
+    private final static String VOLATILITY_COL_NAME = "volatility";
+    private final static String LAST_MATCH_TIME_COL_NAME = "last_match_time";
+
     public final Player player;
     public final Game game;
     public final NeoInventory inventory;
@@ -29,7 +34,10 @@ public class NeoPlayer implements Target, ForwardingAudience.Single {
     private PlaceParticle cosmeticParticle;
     private NamedTextColor cosmeticOutline;
 
-    private int elo;
+    private double elo;
+    private double ratingDeviation;
+    private double volatility;
+    private long lastMatchTimeMillis;
     private int wins;
     private int losses;
     private int draws;
@@ -112,7 +120,10 @@ public class NeoPlayer implements Target, ForwardingAudience.Single {
             NeoBB.DATABASE.add(Map.of("uuid", uuid()));
         }
 
-        elo = (int) NeoBB.DATABASE.get(uuid(), "elo");
+        elo = (double) NeoBB.DATABASE.get(uuid(), ELO_COL_NAME);
+        ratingDeviation = (double) NeoBB.DATABASE.get(uuid(), RATING_DEVIATION_COL_NAME);
+        volatility = (double) NeoBB.DATABASE.get(uuid(), VOLATILITY_COL_NAME);
+        lastMatchTimeMillis = (long) NeoBB.DATABASE.get(uuid(), LAST_MATCH_TIME_COL_NAME);
         wins = (int) NeoBB.DATABASE.get(uuid(), "wins");
         losses = (int) NeoBB.DATABASE.get(uuid(), "losses");
         draws = (int) NeoBB.DATABASE.get(uuid(), "draws");
@@ -138,10 +149,28 @@ public class NeoPlayer implements Target, ForwardingAudience.Single {
     // ========== DATABASE STATS ==========
     // ====================================
 
-    public int elo() { return elo; }
-    public void setElo(int elo) {
+    public double elo() { return elo; }
+    public void setElo(double elo) {
         this.elo = elo;
-        NeoBB.DATABASE.set(uuid(), "elo", elo);
+        NeoBB.DATABASE.set(uuid(), ELO_COL_NAME, elo);
+    }
+
+    public double ratingDeviation() { return ratingDeviation; }
+    public void setRatingDeviation(double ratingDeviation) {
+        this.ratingDeviation = ratingDeviation;
+        NeoBB.DATABASE.set(uuid(), RATING_DEVIATION_COL_NAME, ratingDeviation);
+    }
+
+    public double volatility() { return volatility; }
+    public void setVolatility(double volatility) {
+        this.volatility = volatility;
+        NeoBB.DATABASE.set(uuid(), VOLATILITY_COL_NAME, volatility);
+    }
+
+    public long lastMatchTimeMillis() { return lastMatchTimeMillis; }
+    public void setLastMatchTimeMillis(long lastMatchTimeMillis) {
+        this.lastMatchTimeMillis = lastMatchTimeMillis;
+        NeoBB.DATABASE.set(uuid(), LAST_MATCH_TIME_COL_NAME, lastMatchTimeMillis);
     }
 
     public int wins() { return wins; }
