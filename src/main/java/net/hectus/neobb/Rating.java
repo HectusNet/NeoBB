@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class Rating {
+public final class Rating {
     private static final double K = 32.0; // General Factor
 
     private static final double WIN_FACTOR = 1.0;

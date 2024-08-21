@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class Utilities {
+public final class Utilities {
     public static @NotNull String camelToSnake(@NotNull String input) {
         return input.replaceAll("([a-z])([A-Z]+)", "$1_$2").toLowerCase();
     }

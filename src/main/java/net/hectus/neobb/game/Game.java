@@ -14,8 +14,8 @@ import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.player.TargetObj;
 import net.hectus.neobb.shop.Shop;
 import net.hectus.neobb.turn.Turn;
-import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
 import net.hectus.neobb.turn.default_game.TTimeLimit;
+import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
 import net.hectus.neobb.turn.default_game.warp.TDefaultWarp;
 import net.hectus.neobb.turn.default_game.warp.Warp;
 import net.hectus.neobb.util.Colors;
@@ -30,6 +30,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -99,13 +100,12 @@ public abstract class Game {
 
         arena.resetCurrentBlocks();
         resetTurnCountdown();
-        moveToNextPlayer();
-    }
 
-    public Time initialTime() {
-        Time time = new Time(-1);
-        time.setAllowNegatives(true);
-        return time;
+        if (turn.player().hasModifier("extra-turn")) {
+            turn.player().removeModifier("extra-turn");
+        } else {
+            moveToNextPlayer();
+        }
     }
 
     public @Nullable List<Component> scoreboard(NeoPlayer player) { return null; }
@@ -182,14 +182,27 @@ public abstract class Game {
         return shop;
     }
 
-    public Warp warp() {
+    public final Warp warp() {
         return warp;
     }
 
     public void warp(@NotNull Warp warp) {
         this.warp = warp;
-        this.allowedClazzes.clear();
-        this.allowedClazzes.addAll(warp.allows());
+        allowedClazzes.clear();
+        allowedClazzes.addAll(warp.allows());
+        modifiers.removeIf(s -> s.startsWith("warp-prevent."));
+    }
+
+    public boolean allows(Turn<?> turn) {
+        for (Class<? extends Clazz> clazz : allowedClazzes) {
+            if (clazz.isInstance(turn) && !hasModifier("warp-prevent." + Utilities.camelToSnake(Utilities.counterFilterName(clazz.getSimpleName()))))
+                return true;
+        }
+        return false;
+    }
+
+    public @Unmodifiable Set<Class<? extends Clazz>> allowedClazzes() {
+        return allowedClazzes;
     }
 
     public final Time timeLeft() {

@@ -5,6 +5,7 @@ import net.hectus.neobb.buff.Buff;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.shop.Shop;
 import net.hectus.neobb.turn.Turn;
+import net.hectus.neobb.turn.default_game.attributes.clazz.ColdClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.SupernaturalClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.BuffFunction;
 import net.hectus.neobb.turn.default_game.attributes.usage.MobUsage;
@@ -45,7 +46,7 @@ public class TSheep extends Turn<Sheep> implements MobUsage, BuffFunction, Super
                 player.inventory.addToDeck(turn.item(), turn);
             }
             case null, default -> {
-                if (true) // TODO: Check if cold turns are allowed.
+                if (player.game.allowedClazzes().contains(ColdClazz.class))
                     new Buff.ExtraTurn().apply(player);
             }
         }

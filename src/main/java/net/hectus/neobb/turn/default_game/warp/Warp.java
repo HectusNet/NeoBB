@@ -49,7 +49,7 @@ public abstract class Warp extends Turn<PlacedStructure> implements StructureUsa
     }
 
     public Location lowCorner() {
-        return location;
+        return location();
     }
 
     @Override

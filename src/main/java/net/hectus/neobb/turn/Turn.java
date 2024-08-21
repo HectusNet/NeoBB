@@ -47,7 +47,7 @@ public abstract class Turn<T> {
     }
 
     public boolean goodChoice(NeoPlayer player) {
-        if (!canBeUsed()) return false;
+        if (!canBeUsed() || !player.game.allows(this)) return false;
 
         if (player.hasModifier("attacked") && !player.hasModifier("defended"))
             return this instanceof CounterFunction counter && counter.counters().stream().anyMatch(filter -> filter.doCounter(player.game.history().getLast()));

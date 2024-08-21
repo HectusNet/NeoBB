@@ -1,14 +1,20 @@
 package net.hectus.neobb.turn.default_game.mob;
 
+import com.marcpg.libpg.util.Randomizer;
 import net.hectus.neobb.buff.Buff;
 import net.hectus.neobb.player.NeoPlayer;
+import net.hectus.neobb.structure.StructureManager;
 import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.turn.default_game.attributes.clazz.*;
 import net.hectus.neobb.turn.default_game.attributes.function.BuffFunction;
 import net.hectus.neobb.turn.default_game.attributes.usage.MobUsage;
+import net.hectus.neobb.turn.default_game.warp.Warp;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Axolotl;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -48,6 +54,17 @@ public class TAxolotl extends Turn<Axolotl> implements MobUsage, BuffFunction, W
     }
 
     private void randomWarp(Class<? extends Clazz> allows) {
-        // TODO: Warp to a random Warp, which allows the specified item class.
+        player.game.warp(Randomizer.fromCollection(StructureManager.WARPS.stream()
+                .map(this::classToWarp)
+                .filter(w -> w != null && w.allows().contains(allows))
+                .toList()));
+    }
+
+    private @Nullable Warp classToWarp(@NotNull Class<? extends Warp> warpClass) {
+        try {
+            return warpClass.getConstructor(World.class).newInstance(player.game.world());
+        } catch (ReflectiveOperationException ignored) {
+            return null;
+        }
     }
 }

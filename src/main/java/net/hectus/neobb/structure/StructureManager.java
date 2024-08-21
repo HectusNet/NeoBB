@@ -18,7 +18,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.*;
 
-public class StructureManager {
+public final class StructureManager {
     private static final List<Structure> STRUCTURES = new ArrayList<>();
     private static final Set<Material> STRUCTURE_MATERIALS = new HashSet<>();
 

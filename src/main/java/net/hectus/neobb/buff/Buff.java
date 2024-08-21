@@ -52,8 +52,8 @@ public abstract class Buff {
         }
 
         @Override
-        public void apply(NeoPlayer source) {
-            // TODO: Add extra turn.
+        public void apply(@NotNull NeoPlayer source) {
+            source.addModifier("extra-turn");
         }
 
         @Override

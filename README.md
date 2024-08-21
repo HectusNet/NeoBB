@@ -78,6 +78,8 @@ Adding new turns is really simple. All you need to do is create a class which me
 5. Implement the turn's item class, like `NeutralClazz` or `HotClazz`.
 6. Implement all necessary methods, like the `cost()`, `item()`, etc. and additionally also other methods like `apply()`
 7. The `getValue()` method should always just return the `data` object.
+8. Add the turn into the game's `GameInfo` object. It is at the beginning of every game class and shouldn't be hard to find.
+9. Add it to the events in `TurnEvents` or create a new event method in `TurnEvents`.
 
 > You can simplify this process by just copy-pasting the `TExample` class and modifying your values. It has the constructors very compressed for you and everything else, like the `getValue()` method already implemented.  
 > Don't forget to change the `item()` and `cost()` methods please, as they are very important!

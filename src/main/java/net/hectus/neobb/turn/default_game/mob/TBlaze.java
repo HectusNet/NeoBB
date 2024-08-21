@@ -21,7 +21,7 @@ public class TBlaze extends Turn<Blaze> implements MobUsage, AttackFunction, Hot
     @Override
     public void apply() {
         player.game.addModifier("warp-prevent.cold");
-        player.game.addModifier("warp-prevent.water"); // TODO: Remove all warp-prevent.* when warping!
+        player.game.addModifier("warp-prevent.water");
     }
 
     @Override

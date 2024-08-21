@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Locale;
 
 @SuppressWarnings("UnstableApiUsage")
-public class Commands {
+public final class Commands {
     public static LiteralCommandNode<CommandSourceStack> startCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("start")
                 .requires(source -> source.getSender().isOp())

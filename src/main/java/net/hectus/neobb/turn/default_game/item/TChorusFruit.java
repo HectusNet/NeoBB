@@ -9,7 +9,11 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Random;
+
 public class TChorusFruit extends Turn<ItemStack> implements ItemUsage, EventFunction, NeutralClazz {
+    public static Random random = new Random();
+
     public TChorusFruit(NeoPlayer player) { super(null, null, player); }
     public TChorusFruit(ItemStack data, Location location, NeoPlayer player) { super(data, location, player); }
 
@@ -30,6 +34,9 @@ public class TChorusFruit extends Turn<ItemStack> implements ItemUsage, EventFun
 
     @Override
     public void triggerEvent() {
-        // TODO: Implement this!
+        Location loc = player.game.warp().lowCorner().clone().add(random.nextDouble(0.0, 9.0), 0, random.nextDouble(0.0, 9.0));
+        loc.setPitch(random.nextFloat(-90.0f, 90.0f));
+        loc.setYaw(random.nextFloat(0.0f, 360.0f));
+        player.player.teleport(loc);
     }
 }

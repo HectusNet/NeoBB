@@ -3,13 +3,12 @@ package net.hectus.neobb.turn.default_game.block;
 import net.hectus.neobb.buff.Buff;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.Turn;
+import net.hectus.neobb.turn.default_game.CounterFilter;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NeutralClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.SupernaturalClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.WaterClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.CounterbuffFunction;
 import net.hectus.neobb.turn.default_game.attributes.usage.BlockUsage;
-import net.hectus.neobb.turn.default_game.CounterFilter;
-import net.hectus.neobb.turn.default_game.TExample;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -42,7 +41,7 @@ public class TSponge extends Turn<Block> implements BlockUsage, CounterbuffFunct
     @Override
     public void apply() {
         if (player.game.history().isEmpty()) return;
-        if (player.game.history().getLast() instanceof TExample) { // TODO: Check if last turn was Water.
+        if (player.game.history().getLast() instanceof TWater) {
             player.game.world().setStorm(true);
             new Buff.Luck(Buff.BuffTarget.YOU, 10).apply(player);
             new Buff.Effect(Buff.BuffTarget.YOU, PotionEffectType.JUMP_BOOST).apply(player);
