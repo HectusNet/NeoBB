@@ -278,7 +278,7 @@ public abstract class Game {
                 Translation.component(p.locale(), "gameplay.info.ending.lose-sub").color(Colors.NEUTRAL))));
 
         end();
-        if (ranked) Rating.updateRankings(List.of(player), player.opponents(false));
+        if (ranked) Rating.updateRankingsWin(player, player.opponents(false).getFirst());
     }
 
     public final void draw() {
@@ -286,7 +286,7 @@ public abstract class Game {
                 Translation.component(p.locale(), "gameplay.info.ending.draw-sub").color(Colors.EXTRA))));
 
         end();
-        if (ranked) Rating.updateRankings(initialPlayers);
+        if (ranked) Rating.updateRankingsDraw(initialPlayers.get(0), initialPlayers.get(1));
     }
 
     public final void giveUp(@NotNull NeoPlayer player) {
@@ -294,6 +294,6 @@ public abstract class Game {
                 Translation.component(p.locale(), "gameplay.info.ending.giveup-sub", player.player.getName()).color(Colors.EXTRA))));
 
         end();
-        if (ranked) Rating.updateRankings(player.opponents(false), List.of(player));
+        if (ranked) Rating.updateRankingsWin(player.opponents(false).getFirst(), player);
     }
 }
