@@ -5,6 +5,7 @@ import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.default_game.attributes.clazz.WaterClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.BuffFunction;
 import org.bukkit.entity.PufferFish;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
 
@@ -19,11 +20,14 @@ public class TPufferfish extends MobTurn<PufferFish> implements BuffFunction, Wa
 
     @Override
     public void apply() {
-        // TODO: Make player poisoned for 2 turns and kill him afterwards, if not healed.
+        player.game.turnScheduler.runTaskLater("poison", () -> {
+            if (player.nextPlayer().player.hasPotionEffect(PotionEffectType.POISON))
+                player.game.eliminatePlayer(player.nextPlayer());
+        }, 2);
     }
 
     @Override
     public List<Buff> buffs() {
-        return List.of();
+        return List.of(new Buff.Effect(Buff.BuffTarget.NEXT, PotionEffectType.POISON));
     }
 }

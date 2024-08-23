@@ -3,7 +3,6 @@ package net.hectus.neobb.turn.default_game.block;
 import net.hectus.neobb.buff.Buff;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.default_game.CounterFilter;
-import net.hectus.neobb.turn.default_game.TExample;
 import net.hectus.neobb.turn.default_game.attributes.clazz.ColdClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.HotClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NeutralClazz;
@@ -27,7 +26,7 @@ public class TCampfire extends BlockTurn implements CounterattackFunction, HotCl
     @Override
     public void apply() {
         if (player.game.history().isEmpty()) return;
-        if (player.game.history().getLast() instanceof TExample) { // TODO: Check if last turn was Bee Nest.
+        if (player.game.history().getLast() instanceof TBeeNest) {
             new Buff.Luck(Buff.BuffTarget.YOU, 10).apply(player);
             new Buff.ExtraTurn().apply(player);
         }

@@ -7,10 +7,7 @@ import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.Rating;
 import net.hectus.neobb.event.GameEvents;
 import net.hectus.neobb.event.custom.CancellableImpl;
-import net.hectus.neobb.game.util.Arena;
-import net.hectus.neobb.game.util.EffectManager;
-import net.hectus.neobb.game.util.GameInfo;
-import net.hectus.neobb.game.util.GameManager;
+import net.hectus.neobb.game.util.*;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.player.TargetObj;
 import net.hectus.neobb.shop.Shop;
@@ -24,10 +21,7 @@ import net.hectus.neobb.util.Cord;
 import net.hectus.neobb.util.Utilities;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -44,6 +38,7 @@ public abstract class Game {
     public final String id = Randomizer.generateRandomString(10, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
     public final Arena arena;
     public final EffectManager effectManager = new EffectManager();
+    public final TurnScheduler turnScheduler = new TurnScheduler();
     public final boolean ranked;
 
     protected final List<NeoPlayer> initialPlayers = new ArrayList<>();
@@ -95,6 +90,8 @@ public abstract class Game {
 
         history.add(turn);
         turn.player().addTurn();
+
+        turnScheduler.tick();
 
         effectManager.applyEffects(turn);
 
@@ -151,6 +148,11 @@ public abstract class Game {
     }
 
     public final void eliminatePlayer(NeoPlayer player) {
+        if (player.hasModifier("revive")) {
+            player.player.playEffect(EntityEffect.TOTEM_RESURRECT);
+            player.sendMessage(Translation.component(player.locale(), "gameplay.info.revive.use").color(Colors.POSITIVE));
+        }
+
         players.remove(player);
         player.player.setHealth(0.0);
 
@@ -208,6 +210,13 @@ public abstract class Game {
         allowedClazzes.clear();
         allowedClazzes.addAll(warp.allows());
         modifiers.removeIf(s -> s.startsWith("warp-prevent."));
+
+        players.forEach(p -> {
+            if (warp.temperature() == WarpTurn.Temperature.COLD) {
+                p.player.setFireTicks(0);
+                turnScheduler.removeTask("burn");
+            }
+        });
     }
 
     public boolean allows(Turn<?> turn) {

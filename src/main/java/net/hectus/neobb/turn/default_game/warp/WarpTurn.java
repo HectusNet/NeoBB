@@ -49,6 +49,15 @@ public abstract class WarpTurn extends StructureTurn implements WarpFunction {
         return List.of(new ItemStack(materials().left(), 4), new ItemStack(materials().right()));
     }
 
+    public enum Temperature { COLD, NORMAL, HOT }
+    public Temperature temperature() {
+        return switch (allows().getFirst().getSimpleName()) {
+            case "ColdClazz" -> Temperature.COLD;
+            case "HotClazz" -> Temperature.HOT;
+            default -> Temperature.NORMAL;
+        };
+    }
+
     public Location lowCorner() {
         return location();
     }

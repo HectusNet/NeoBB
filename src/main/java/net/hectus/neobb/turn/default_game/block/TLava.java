@@ -29,7 +29,8 @@ public class TLava extends BlockTurn implements BuffFunction, HotClazz {
 
     @Override
     public void apply() {
-        // TODO: Make player burn for 3 turns and kill him afterwards, if not countered by cold warp.
+        player.nextPlayer().player.setFireTicks(6000); // 5 Minutes Max
+        player.game.turnScheduler.runTaskLater("burn", () -> player.game.eliminatePlayer(player.nextPlayer()), 3);
     }
 
     @Override

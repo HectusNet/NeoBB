@@ -26,7 +26,8 @@ public class TPowderSnow extends BlockTurn implements BuffFunction, ColdClazz {
 
     @Override
     public void apply() {
-        // TODO: Make player freeze for 3 turns and kill him afterwards, if not countered.
+        player.nextPlayer().player.setFreezeTicks(6000); // 5 Minutes Max
+        player.game.turnScheduler.runTaskLater("freeze", () -> player.game.eliminatePlayer(player.nextPlayer()), 3);
     }
 
     @Override

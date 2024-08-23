@@ -16,6 +16,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -24,6 +25,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 
 public class GameEvents implements Listener {
     public static int currentTick;
@@ -74,6 +77,14 @@ public class GameEvents implements Listener {
     public void onEntityTargetLivingEntity(@NotNull EntityTargetLivingEntityEvent event) {
         event.setCancelled(true); // Cancel any hostile mob activity.
     }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityDamage(@NotNull EntityDamageEvent event) {
+        if (List.of(FIRE_TICK, FREEZE, POISON).contains(event.getCause())) {
+            event.setCancelled(true);
+        }
+    }
+
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerJoin(@NotNull PlayerJoinEvent event) {

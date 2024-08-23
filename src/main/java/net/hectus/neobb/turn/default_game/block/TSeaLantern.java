@@ -1,9 +1,11 @@
 package net.hectus.neobb.turn.default_game.block;
 
+import com.marcpg.libpg.lang.Translation;
 import net.hectus.neobb.buff.Buff;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.default_game.attributes.clazz.WaterClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.BuffFunction;
+import net.hectus.neobb.util.Colors;
 import org.bukkit.block.Block;
 
 import java.util.List;
@@ -19,7 +21,12 @@ public class TSeaLantern extends BlockTurn implements BuffFunction, WaterClazz {
 
     @Override
     public void apply() {
-        // TODO: Give revive for next 3 turns.
+        player.addModifier("revive");
+        player.sendMessage(Translation.component(player.locale(), "gameplay.info.revive.start").color(Colors.POSITIVE));
+        player.game.turnScheduler.runTaskLater("revive", () -> {
+            player.removeModifier("revive");
+            player.sendMessage(Translation.component(player.locale(), "gameplay.info.revive.end").color(Colors.NEGATIVE));
+        }, 3);
     }
 
     @Override
