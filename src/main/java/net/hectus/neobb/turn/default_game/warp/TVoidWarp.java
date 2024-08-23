@@ -8,7 +8,7 @@ import org.bukkit.World;
 
 import java.util.List;
 
-public class TVoidWarp extends Warp {
+public class TVoidWarp extends WarpTurn {
     public TVoidWarp(World world) { super(world, "void"); }
     public TVoidWarp(PlacedStructure data, World world) { super(data, world, "void"); }
 

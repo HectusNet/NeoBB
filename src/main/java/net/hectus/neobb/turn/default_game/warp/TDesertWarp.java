@@ -10,7 +10,7 @@ import org.bukkit.World;
 
 import java.util.List;
 
-public class TDesertWarp extends Warp {
+public class TDesertWarp extends WarpTurn {
     public TDesertWarp(World world) { super(world, "desert"); }
     public TDesertWarp(PlacedStructure data, World world) { super(data, world, "desert"); }
 

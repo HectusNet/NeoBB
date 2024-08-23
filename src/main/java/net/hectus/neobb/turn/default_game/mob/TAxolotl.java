@@ -4,37 +4,23 @@ import com.marcpg.libpg.util.Randomizer;
 import net.hectus.neobb.buff.Buff;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.StructureManager;
-import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.turn.default_game.attributes.clazz.*;
 import net.hectus.neobb.turn.default_game.attributes.function.BuffFunction;
-import net.hectus.neobb.turn.default_game.attributes.usage.MobUsage;
-import net.hectus.neobb.turn.default_game.warp.Warp;
-import org.bukkit.Material;
+import net.hectus.neobb.turn.default_game.warp.WarpTurn;
 import org.bukkit.World;
 import org.bukkit.entity.Axolotl;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class TAxolotl extends Turn<Axolotl> implements MobUsage, BuffFunction, WaterClazz {
-    public TAxolotl(NeoPlayer player) { super(null, null, player); }
-    public TAxolotl(Axolotl data, NeoPlayer player) { super(data, data.getLocation(), player); }
-
-    @Override
-    public ItemStack item() {
-        return new ItemStack(Material.AXOLOTL_SPAWN_EGG);
-    }
+public class TAxolotl extends MobTurn<Axolotl> implements BuffFunction, WaterClazz {
+    public TAxolotl(NeoPlayer player) { super(player); }
+    public TAxolotl(Axolotl data, NeoPlayer player) { super(data, player); }
 
     @Override
     public int cost() {
         return 4;
-    }
-
-    @Override
-    public Axolotl getValue() {
-        return data;
     }
 
     @Override
@@ -60,7 +46,7 @@ public class TAxolotl extends Turn<Axolotl> implements MobUsage, BuffFunction, W
                 .toList()));
     }
 
-    private @Nullable Warp classToWarp(@NotNull Class<? extends Warp> warpClass) {
+    private @Nullable WarpTurn classToWarp(@NotNull Class<? extends WarpTurn> warpClass) {
         try {
             return warpClass.getConstructor(World.class).newInstance(player.game.world());
         } catch (ReflectiveOperationException ignored) {

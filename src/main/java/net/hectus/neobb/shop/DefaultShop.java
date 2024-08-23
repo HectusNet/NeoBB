@@ -14,7 +14,12 @@ import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.turn.default_game.attributes.clazz.*;
 import net.hectus.neobb.turn.default_game.attributes.function.*;
-import net.hectus.neobb.turn.default_game.attributes.usage.*;
+import net.hectus.neobb.turn.default_game.block.BlockTurn;
+import net.hectus.neobb.turn.default_game.item.ItemTurn;
+import net.hectus.neobb.turn.default_game.mob.MobTurn;
+import net.hectus.neobb.turn.default_game.net.hectus.neobb.turn.default_game.throwable.ThrowableTurn;
+import net.hectus.neobb.turn.default_game.other.OtherTurn;
+import net.hectus.neobb.turn.default_game.structure.StructureTurn;
 import net.hectus.neobb.util.Colors;
 import net.hectus.neobb.util.ItemBuilder;
 import net.hectus.neobb.util.ItemLoreBuilder;
@@ -78,13 +83,13 @@ public class DefaultShop extends Shop {
         gui.addPane(filters);
 
         StaticPane typeFilters = new StaticPane(2, 0, 7, 1);
-        typeFilters.addItem(filter(l, Material.BLUE_CONCRETE, "usage", "block", player, t -> t instanceof BlockUsage), 0, 0);
-        typeFilters.addItem(filter(l, Material.RED_DYE, "usage", "item", player, t -> t instanceof ItemUsage), 1, 0);
-        typeFilters.addItem(filter(l, Material.FIRE_CHARGE, "usage", "throwable", player, t -> t instanceof ThrowableUsage), 2, 0);
-        typeFilters.addItem(filter(l, Material.CREEPER_SPAWN_EGG, "usage", "mob", player, t -> t instanceof MobUsage), 3, 0);
-        typeFilters.addItem(filter(l, Material.BAMBOO_BLOCK, "usage", "structure", player, t -> t instanceof StructureUsage), 4, 0);
+        typeFilters.addItem(filter(l, Material.BLUE_CONCRETE, "usage", "block", player, t -> t instanceof BlockTurn), 0, 0);
+        typeFilters.addItem(filter(l, Material.RED_DYE, "usage", "item", player, t -> t instanceof ItemTurn), 1, 0);
+        typeFilters.addItem(filter(l, Material.FIRE_CHARGE, "usage", "throwable", player, t -> t instanceof ThrowableTurn), 2, 0);
+        typeFilters.addItem(filter(l, Material.CREEPER_SPAWN_EGG, "usage", "mob", player, t -> t instanceof MobTurn<?>), 3, 0);
+        typeFilters.addItem(filter(l, Material.BAMBOO_BLOCK, "usage", "structure", player, t -> t instanceof StructureTurn), 4, 0);
         typeFilters.addItem(filter(l, Material.END_PORTAL_FRAME, "usage", "warp", player, t -> t instanceof WarpFunction), 6, 0);
-        typeFilters.addItem(filter(l, Material.STRUCTURE_BLOCK, "usage", "other", player, t -> t instanceof OtherUsage<?>), 5, 0);
+        typeFilters.addItem(filter(l, Material.STRUCTURE_BLOCK, "usage", "other", player, t -> t instanceof OtherTurn<?>), 5, 0);
         gui.addPane(typeFilters);
 
         StaticPane functionFilters = new StaticPane(2, 2, 7, 1);
@@ -135,7 +140,8 @@ public class DefaultShop extends Shop {
         Map<ItemStack, Turn<?>> turnItems = turns.stream()
                 .map(clazz -> turn(clazz, player))
                 .filter(categoryFilter)
-                .map(turn -> Pair.of(new ItemBuilder(turn.item()).lore(new ItemLoreBuilder(turn).build(l)).build(), turn))
+                .flatMap(turn -> turn.items().stream()
+                        .map(item -> Pair.of(new ItemBuilder(item).lore(new ItemLoreBuilder(turn).build(l)).build(), turn)))
                 .collect(Collectors.toMap(Pair::left, Pair::right));
 
         ChestGui gui = new ChestGui(6, Translation.string(l, "item-lore.cost.value", player.inventory.coins()) + " - Shop - " + category);

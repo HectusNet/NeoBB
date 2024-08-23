@@ -15,7 +15,7 @@ public class RandomizedShop extends Shop {
     public void open(NeoPlayer player) {
         for (int i = 0; i < game.info().deckSize(); i++) {
             Turn<?> turn = turn(Randomizer.fromCollection(turns), player);
-            player.inventory.addToDeck(turn.item(), turn);
+            turn.items().forEach(item -> player.inventory.addToDeck(item, turn));
         }
         done(player);
     }

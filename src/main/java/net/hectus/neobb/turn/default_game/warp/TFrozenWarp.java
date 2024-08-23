@@ -10,7 +10,7 @@ import org.bukkit.World;
 
 import java.util.List;
 
-public class TFrozenWarp extends Warp {
+public class TFrozenWarp extends WarpTurn {
     public TFrozenWarp(World world) { super(world, "frozen"); }
     public TFrozenWarp(PlacedStructure data, World world) { super(data, world, "frozen"); }
 

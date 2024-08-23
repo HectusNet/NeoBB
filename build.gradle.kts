@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "net.hectus.neobb"
-version = "0.0.4"
+version = "0.0.5"
 description = "A reworked version of NeoBB with some interesting spins."
 
 java.sourceCompatibility = JavaVersion.VERSION_21
@@ -18,7 +18,6 @@ repositories {
     maven("https://marcpg.com/repo/")
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
     maven("https://repo.papermc.io/repository/maven-public/")
-    maven("https://maven.enginehub.org/repo")
 }
 
 dependencies {

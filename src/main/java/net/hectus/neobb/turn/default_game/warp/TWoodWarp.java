@@ -10,7 +10,7 @@ import org.bukkit.World;
 
 import java.util.List;
 
-public class TWoodWarp extends Warp {
+public class TWoodWarp extends WarpTurn {
     public TWoodWarp(World world) { super(world, "wood"); }
     public TWoodWarp(PlacedStructure data, World world) { super(data, world, "wood"); }
 

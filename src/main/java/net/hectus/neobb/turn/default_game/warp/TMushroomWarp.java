@@ -11,7 +11,7 @@ import org.bukkit.World;
 
 import java.util.List;
 
-public class TMushroomWarp extends Warp {
+public class TMushroomWarp extends WarpTurn {
     public TMushroomWarp(World world) { super(world, "mushroom"); }
     public TMushroomWarp(PlacedStructure data, World world) { super(data, world, "mushroom"); }
 

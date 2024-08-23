@@ -63,10 +63,6 @@ public class NeoInventory {
         return coins;
     }
 
-    public synchronized void setCoins(int coins) {
-        this.coins = coins;
-    }
-
     public synchronized boolean removeCoins(int coins) {
         if (this.coins < coins) return false;
         this.coins -= coins;

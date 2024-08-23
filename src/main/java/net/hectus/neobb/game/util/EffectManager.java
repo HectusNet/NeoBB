@@ -1,11 +1,10 @@
 package net.hectus.neobb.game.util;
 
-import net.hectus.neobb.game.Game;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.Turn;
-import net.hectus.neobb.turn.default_game.attributes.usage.BlockUsage;
-import net.hectus.neobb.turn.default_game.attributes.usage.MobUsage;
-import net.hectus.neobb.turn.default_game.attributes.usage.StructureUsage;
+import net.hectus.neobb.turn.default_game.block.BlockTurn;
+import net.hectus.neobb.turn.default_game.mob.MobTurn;
+import net.hectus.neobb.turn.default_game.structure.StructureTurn;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -18,19 +17,14 @@ import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
 public class EffectManager {
-    private final Game game;
     private LivingEntity highlight;
-
-    public EffectManager(Game game) {
-        this.game = game;
-    }
 
     public void applyEffects(@NotNull Turn<?> turn) {
         NamedTextColor outlineColor = turn.player().cosmeticOutline();
 
-        if (turn instanceof BlockUsage blockUsage) highlightBlock(blockUsage.getValue(), outlineColor);
-        if (turn instanceof StructureUsage structureUsage) highlightBlock(structureUsage.getValue().lastBlock(), outlineColor);
-        if (turn instanceof MobUsage mobUsage) applyHighlight(mobUsage.getValue(), outlineColor);
+        if (turn instanceof BlockTurn blockTurn) highlightBlock(blockTurn.data(), outlineColor);
+        if (turn instanceof StructureTurn structureTurn) highlightBlock(structureTurn.data().lastBlock(), outlineColor);
+        if (turn instanceof MobTurn<?> mobTurn) applyHighlight(mobTurn.data(), outlineColor);
 
         spawnParticle(turn.location(), turn.player());
     }

@@ -4,9 +4,12 @@ import com.marcpg.libpg.lang.Translation;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.player.Target;
 import net.hectus.neobb.player.TargetObj;
+import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.util.Colors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
@@ -169,6 +172,39 @@ public abstract class Buff {
         @Override
         public TextColor color() {
             return Colors.GREEN;
+        }
+    }
+
+    public static class Give extends Buff {
+        protected final Turn<?> turn;
+
+        public Give(BuffTarget buffTarget, Turn<?> turn) {
+            super(buffTarget);
+            this.turn = turn;
+        }
+
+        @Override
+        public void apply(NeoPlayer source) {
+            Target target = getTarget(source);
+            if (target instanceof NeoPlayer player) {
+                turn.items().forEach(i -> player.inventory.addToDeck(i, turn));
+            } else if (target instanceof TargetObj targetObj) {
+                turn.items().forEach(i -> targetObj.players().forEach(p -> p.inventory.addToDeck(i, turn)));
+            }
+        }
+
+        @Override
+        public String text(Locale l) {
+            return Translation.string(l, "item-lore.buff.give", turn.items().stream().mapToInt(ItemStack::getAmount).sum(), PlainTextComponentSerializer.plainText().serialize(turn.items().getFirst().displayName()));
+        }
+
+        @Override
+        public TextColor color() {
+            return switch (buffTarget) {
+                case YOU -> Colors.POSITIVE;
+                case ALL -> Colors.NEUTRAL;
+                case NEXT, OPPONENTS -> Colors.NEGATIVE;
+            };
         }
     }
 }

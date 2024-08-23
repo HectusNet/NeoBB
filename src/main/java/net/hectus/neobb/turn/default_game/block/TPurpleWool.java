@@ -4,16 +4,13 @@ import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NeutralClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.AttackFunction;
-import net.hectus.neobb.turn.default_game.attributes.usage.BlockUsage;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public class TPurpleWool extends Turn<Block> implements BlockUsage, AttackFunction, NeutralClazz {
-    public TPurpleWool(NeoPlayer player) { super(null, null, player); }
-    public TPurpleWool(Block data, NeoPlayer player) { super(data, data.getLocation(), player); }
+public class TPurpleWool extends BlockTurn implements AttackFunction, NeutralClazz {
+    public TPurpleWool(NeoPlayer player) { super(player); }
+    public TPurpleWool(Block data, NeoPlayer player) { super(data, player); }
 
     @Override
     public boolean canBeUsed() {
@@ -30,17 +27,7 @@ public class TPurpleWool extends Turn<Block> implements BlockUsage, AttackFuncti
     }
 
     @Override
-    public ItemStack item() {
-        return new ItemStack(Material.PURPLE_WOOL);
-    }
-
-    @Override
     public int cost() {
         return 4;
-    }
-
-    @Override
-    public Block getValue() {
-        return data;
     }
 }

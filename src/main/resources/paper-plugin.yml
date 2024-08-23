@@ -22,9 +22,3 @@ website: https://hectus.net/blockbattles
 
 ### Logging Prefix ###
 prefix: NBB
-
-dependencies:
-  server:
-    WorldEdit:
-      load: BEFORE
-      required: true

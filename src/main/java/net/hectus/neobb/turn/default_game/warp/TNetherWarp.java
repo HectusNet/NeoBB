@@ -10,7 +10,7 @@ import org.bukkit.World;
 
 import java.util.List;
 
-public class TNetherWarp extends Warp {
+public class TNetherWarp extends WarpTurn {
     public TNetherWarp(World world) { super(world, "nether"); }
     public TNetherWarp(PlacedStructure data, World world) { super(data, world, "nether"); }
 

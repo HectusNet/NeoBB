@@ -10,7 +10,7 @@ import org.bukkit.World;
 
 import java.util.List;
 
-public class TOceanWarp extends Warp {
+public class TOceanWarp extends WarpTurn {
     public TOceanWarp(World world) { super(world, "ocean"); }
     public TOceanWarp(PlacedStructure data, World world) { super(data, world, "ocean"); }
 

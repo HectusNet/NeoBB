@@ -22,7 +22,7 @@ public final class StructureManager {
     private static final List<Structure> STRUCTURES = new ArrayList<>();
     private static final Set<Material> STRUCTURE_MATERIALS = new HashSet<>();
 
-    public static final List<Class<? extends Warp>> WARPS = List.of(
+    public static final List<Class<? extends WarpTurn>> WARPS = List.of(
             TAmethystWarp.class, TCliffWarp.class, TDesertWarp.class, TEndWarp.class, TFrozenWarp.class,
             TMeadowWarp.class, TMushroomWarp.class, TNerdWarp.class, TNetherWarp.class, TOceanWarp.class,
             TRedstoneWarp.class, TSunWarp.class, TVoidWarp.class, TWoodWarp.class
@@ -31,7 +31,7 @@ public final class StructureManager {
     public static void load() {
         getStructures().forEach(StructureManager::addStructure);
 
-        for (Class<? extends Warp> warp : WARPS) {
+        for (Class<? extends WarpTurn> warp : WARPS) {
             try {
                 addStructure(warp.getConstructor(World.class).newInstance(Bukkit.getWorld("world")).referenceStructure());
             } catch (Exception e) {

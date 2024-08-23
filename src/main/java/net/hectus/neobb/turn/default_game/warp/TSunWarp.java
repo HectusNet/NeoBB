@@ -11,7 +11,7 @@ import org.bukkit.World;
 
 import java.util.List;
 
-public class TSunWarp extends Warp {
+public class TSunWarp extends WarpTurn {
     public TSunWarp(World world) { super(world, "sun"); }
     public TSunWarp(PlacedStructure data, World world) { super(data, world, "sun"); }
 

@@ -11,7 +11,7 @@ import org.bukkit.World;
 
 import java.util.List;
 
-public class TMeadowWarp extends Warp {
+public class TMeadowWarp extends WarpTurn {
     public TMeadowWarp(World world) { super(world, "meadow"); }
     public TMeadowWarp(PlacedStructure data, World world) { super(data, world, "meadow"); }
 

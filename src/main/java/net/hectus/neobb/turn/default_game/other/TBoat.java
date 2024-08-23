@@ -2,17 +2,15 @@ package net.hectus.neobb.turn.default_game.other;
 
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.player.NeoPlayer;
-import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.turn.default_game.attributes.clazz.WaterClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.EventFunction;
-import net.hectus.neobb.turn.default_game.attributes.usage.OtherUsage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Boat;
 import org.bukkit.inventory.ItemStack;
 
-public class TBoat extends Turn<Boat> implements OtherUsage<Boat>, EventFunction, WaterClazz {
-    public TBoat(NeoPlayer player) { super(null, null, player); }
+public class TBoat extends OtherTurn<Boat> implements EventFunction, WaterClazz {
+    public TBoat(NeoPlayer player) { super(player); }
     public TBoat(Boat data, NeoPlayer player) { super(data, data.getLocation(), player); }
 
     @Override
@@ -26,11 +24,6 @@ public class TBoat extends Turn<Boat> implements OtherUsage<Boat>, EventFunction
     @Override
     public int cost() {
         return 3;
-    }
-
-    @Override
-    public Boat getValue() {
-        return data;
     }
 
     @Override

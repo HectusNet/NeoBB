@@ -8,30 +8,17 @@ import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.turn.default_game.attributes.clazz.ColdClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.SupernaturalClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.BuffFunction;
-import net.hectus.neobb.turn.default_game.attributes.usage.MobUsage;
-import org.bukkit.Material;
 import org.bukkit.entity.Sheep;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public class TSheep extends Turn<Sheep> implements MobUsage, BuffFunction, SupernaturalClazz {
-    public TSheep(NeoPlayer player) { super(null, null, player); }
-    public TSheep(Sheep data, NeoPlayer player) { super(data, data.getLocation(), player); }
-
-    @Override
-    public ItemStack item() {
-        return new ItemStack(Material.SHEEP_SPAWN_EGG);
-    }
+public class TSheep extends MobTurn<Sheep> implements BuffFunction, SupernaturalClazz {
+    public TSheep(NeoPlayer player) { super(player); }
+    public TSheep(Sheep data, NeoPlayer player) { super(data, player); }
 
     @Override
     public int cost() {
         return 4;
-    }
-
-    @Override
-    public Sheep getValue() {
-        return data;
     }
 
     @Override
@@ -43,7 +30,7 @@ public class TSheep extends Turn<Sheep> implements MobUsage, BuffFunction, Super
             case BLACK -> new Buff.Luck(Buff.BuffTarget.OPPONENTS, -15).apply(player);
             case BROWN -> {
                 Turn<?> turn = Shop.turn(Randomizer.fromCollection(player.game.shop().turns), player);
-                player.inventory.addToDeck(turn.item(), turn);
+                turn.items().forEach(item -> player.inventory.addToDeck(item, turn));
             }
             case null, default -> {
                 if (player.game.allowedClazzes().contains(ColdClazz.class))

@@ -12,6 +12,7 @@ import net.hectus.neobb.turn.default_game.block.*;
 import net.hectus.neobb.turn.default_game.item.TChorusFruit;
 import net.hectus.neobb.turn.default_game.item.TIronShovel;
 import net.hectus.neobb.turn.default_game.mob.*;
+import net.hectus.neobb.turn.default_game.other.TBoat;
 import net.hectus.neobb.turn.default_game.warp.*;
 import net.hectus.neobb.util.Colors;
 import net.kyori.adventure.bossbar.BossBar;
@@ -20,6 +21,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,15 +31,18 @@ import java.util.Locale;
 
 public class DefaultGame extends BossBarGame {
     public static final GameInfo INFO = new GameInfo(25, 9, new Time(3, Time.Unit.MINUTES), 5, List.of(
-            TBlackWool.class, TCauldron.class, TCyanCarpet.class, TFire.class, TGoldBlock.class, TGreenCarpet.class,
-            TIronTrapdoor.class, TMagentaGlazedTerracotta.class, TMagmaBlock.class, TNetherrack.class, TPurpleWool.class,
-            TSculk.class, TSponge.class, TSpruceTrapdoor.class, TStonecutter.class, TChorusFruit.class, TIronShovel.class,
-            TBlueIce.class, TBrainCoralBlock.class, TCampfire.class, TFireCoral.class, TFireCoralFan.class, THornCoral.class,
-            TLava.class, TLightBlueWool.class, TOrangeWool.class, TPackedIce.class, TPowderSnow.class, TRespawnAnchor.class,
-            TSpruceLeaves.class, TWhiteWool.class, TAxolotl.class, TBee.class, TBlaze.class, TEvoker.class, TPhantom.class,
-            TPiglin.class, TPolarBear.class, TPufferfish.class, TSheep.class, TAmethystWarp.class, TCliffWarp.class,
-            TDesertWarp.class, TEndWarp.class, TFrozenWarp.class, TMeadowWarp.class, TMushroomWarp.class, TNerdWarp.class,
-            TNetherWarp.class, TOceanWarp.class, TRedstoneWarp.class, TSunWarp.class, TVoidWarp.class, TWoodWarp.class
+            TIronTrapdoor.class, TCampfire.class, TCauldron.class, TPackedIce.class, TLever.class, TOakStairs.class, TBlueBed.class,
+            TPiston.class, TSponge.class, THayBlock.class, TDriedKelpBlock.class, TRepeater.class, TRedCarpet.class, TGreenWool.class,
+            TFire.class, TStonecutter.class, TLava.class, TPurpleWool.class, TGreenBed.class, TRedBed.class, TCyanCarpet.class,
+            TSeaLantern.class, TFireCoral.class, TFenceGate.class, TBeeNest.class, TVerdantFroglight.class, TWhiteWool.class,
+            TMagmaBlock.class, TSpruceLeaves.class, TBlueIce.class, TLightningRod.class, THoneyBlock.class, TSpruceTrapdoor.class,
+            TGoldBlock.class, TSculk.class, TOrangeWool.class, TPinkBed.class, THornCoral.class, TMangroveRoots.class, TComposter.class,
+            TSoulSand.class, TBlackWool.class, TNetherrack.class, TPowderSnow.class, TMagentaGlazedTerracotta.class, TRespawnAnchor.class,
+            TWater.class, TLightBlueWool.class, TBrainCoralBlock.class, TFireCoralFan.class, TGreenCarpet.class, TDragonHead.class,
+            TSunWarp.class, TDefaultWarp.class, TFrozenWarp.class, TCliffWarp.class, TDesertWarp.class, TOceanWarp.class, TWoodWarp.class,
+            TMeadowWarp.class, TRedstoneWarp.class, TVoidWarp.class, TMushroomWarp.class, TNetherWarp.class, TNerdWarp.class,
+            TAmethystWarp.class, TEndWarp.class, TBoat.class, TChorusFruit.class, TIronShovel.class, TPiglin.class, TPhantom.class,
+            TSheep.class, TBee.class, TAxolotl.class, TEvoker.class, TPufferfish.class, TPolarBear.class, TBlaze.class
     ));
 
     public DefaultGame(boolean ranked, World world, @NotNull List<Player> players) {
@@ -63,12 +68,14 @@ public class DefaultGame extends BossBarGame {
     }
 
     @Override
-    public void turn(@NotNull Turn<?> turn) {
+    public void turn(@NotNull Turn<?> turn, Cancellable event) {
+        if (verify(turn, event)) return;
+
         if (!turn.canBeUsed()) {
-            super.turn(turn);
+            super.turn(turn, event);
             turn.player().sendMessage(Component.text("That is not quite how to use this turn...", Colors.NEGATIVE));
             turn.player().player.playSound(turn.player().player, Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
-            if (turn.player().hasModifier("attacked"))
+            if (turn.player().hasModifier("attacked") && !turn.player().hasModifier("defended"))
                 eliminatePlayer(turn.player());
             return;
         }
@@ -79,10 +86,10 @@ public class DefaultGame extends BossBarGame {
             if (counter.counters().stream().anyMatch(filter -> filter.doCounter(last))) {
                 counter.counter(turn.player());
             } else {
-                super.turn(turn);
+                super.turn(turn, event);
                 turn.player().sendMessage(Translation.component(turn.player().locale(), "gameplay.info.wrong_counter").color(Colors.NEGATIVE));
                 turn.player().player.playSound(turn.player().player, Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
-                if (turn.player().hasModifier("attacked"))
+                if (turn.player().hasModifier("attacked") && !turn.player().hasModifier("defended"))
                     eliminatePlayer(turn.player());
                 return;
             }
@@ -93,12 +100,12 @@ public class DefaultGame extends BossBarGame {
                 getNextPlayer().addModifier("attacked");
         }
 
-        if (turn instanceof BuffFunction buff) buff.buffs().forEach(b -> b.apply(turn.player()));
-        if (turn instanceof DefenseFunction defense) defense.applyDefense();
-        if (turn instanceof EventFunction event) event.triggerEvent();
+        if (turn instanceof BuffFunction buffFunction) buffFunction.buffs().forEach(b -> b.apply(turn.player()));
+        if (turn instanceof DefenseFunction defenseFunction) defenseFunction.applyDefense();
+        if (turn instanceof EventFunction eventFunction) eventFunction.triggerEvent();
 
-        super.turn(turn);
-        if (turn.player().hasModifier("attacked"))
+        super.turn(turn, event);
+        if (turn.player().hasModifier("attacked") && !turn.player().hasModifier("defended"))
             eliminatePlayer(turn.player());
     }
 

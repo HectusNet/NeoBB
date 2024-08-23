@@ -4,13 +4,13 @@ import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.default_game.attributes.function.AttackFunction;
 import net.hectus.neobb.turn.default_game.attributes.function.CounterFunction;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public abstract class Turn<T> {
     protected final T data;
-    protected final Location location;
+    protected Location location;
     protected final NeoPlayer player;
 
     /** Used to create a dummy turn for usage in the shop. */
@@ -26,20 +26,20 @@ public abstract class Turn<T> {
     public boolean canBeUsed() { return true; }
     public int maxAmount() { return 2; }
     public void apply() {}
+    public ItemStack item() { return ItemStack.empty(); }
 
-    public abstract ItemStack item();
     public abstract int cost();
+
+    public List<ItemStack> items() {
+        return List.of(item());
+    }
 
     public T data() {
         return data;
     }
 
     public Location location() {
-        if (data instanceof Block) {
-            return location.clone().add(0.5, 0.5, 0.5);
-        } else {
-            return location.clone();
-        }
+        return location.clone();
     }
 
     public NeoPlayer player() {
@@ -56,7 +56,6 @@ public abstract class Turn<T> {
     }
 
     public static final Turn<Void> DUMMY = new Turn<>(null) {
-        @Override public @NotNull ItemStack item() { return ItemStack.empty(); }
         @Override public int cost() { return 0; }
         @Override public boolean goodChoice(NeoPlayer player) { return false; }
     };

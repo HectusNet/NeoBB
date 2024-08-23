@@ -3,17 +3,15 @@ package net.hectus.neobb.turn.default_game;
 import com.marcpg.libpg.data.time.Time;
 import com.marcpg.libpg.lang.Translation;
 import net.hectus.neobb.player.NeoPlayer;
-import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NeutralClazz;
-import net.hectus.neobb.turn.default_game.attributes.usage.OtherUsage;
+import net.hectus.neobb.turn.default_game.other.OtherTurn;
 import net.hectus.neobb.util.Colors;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-public class TTimeLimit extends Turn<Time> implements OtherUsage<Time>, NeutralClazz {
-    public TTimeLimit(NeoPlayer player) { super(null, null, player); }
+public class TTimeLimit extends OtherTurn<Time> implements NeutralClazz {
+    public TTimeLimit(NeoPlayer player) { super(player); }
     public TTimeLimit(Time data, NeoPlayer player) { super(data, player.player.getLocation(), player); }
-
 
     @Override
     public void apply() {
@@ -29,10 +27,5 @@ public class TTimeLimit extends Turn<Time> implements OtherUsage<Time>, NeutralC
     @Override
     public int cost() {
         return 0;
-    }
-
-    @Override
-    public Time getValue() {
-        return data;
     }
 }

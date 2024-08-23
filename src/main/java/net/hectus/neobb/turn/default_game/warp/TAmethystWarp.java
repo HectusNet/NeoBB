@@ -8,7 +8,7 @@ import org.bukkit.World;
 
 import java.util.List;
 
-public class TAmethystWarp extends Warp {
+public class TAmethystWarp extends WarpTurn {
     public TAmethystWarp(World world) { super(world, "amethyst"); }
     public TAmethystWarp(PlacedStructure data, World world) { super(data, world, "amethyst"); }
 

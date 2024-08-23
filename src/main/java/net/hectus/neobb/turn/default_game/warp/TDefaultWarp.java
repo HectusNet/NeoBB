@@ -11,7 +11,7 @@ import org.bukkit.World;
 
 import java.util.List;
 
-public class TDefaultWarp extends Warp {
+public class TDefaultWarp extends WarpTurn {
     public TDefaultWarp(World world) { super(world, "default"); }
     public TDefaultWarp(PlacedStructure data, World world) { super(data, world, "default"); }
 

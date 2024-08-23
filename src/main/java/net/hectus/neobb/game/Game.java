@@ -6,6 +6,7 @@ import com.marcpg.libpg.util.Randomizer;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.Rating;
 import net.hectus.neobb.event.GameEvents;
+import net.hectus.neobb.event.custom.CancellableImpl;
 import net.hectus.neobb.game.util.Arena;
 import net.hectus.neobb.game.util.EffectManager;
 import net.hectus.neobb.game.util.GameInfo;
@@ -17,8 +18,9 @@ import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.turn.default_game.TTimeLimit;
 import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
 import net.hectus.neobb.turn.default_game.warp.TDefaultWarp;
-import net.hectus.neobb.turn.default_game.warp.Warp;
+import net.hectus.neobb.turn.default_game.warp.WarpTurn;
 import net.hectus.neobb.util.Colors;
+import net.hectus.neobb.util.Cord;
 import net.hectus.neobb.util.Utilities;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
@@ -27,6 +29,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,7 +43,7 @@ import java.util.Set;
 public abstract class Game {
     public final String id = Randomizer.generateRandomString(10, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
     public final Arena arena;
-    public final EffectManager effectManager;
+    public final EffectManager effectManager = new EffectManager();
     public final boolean ranked;
 
     protected final List<NeoPlayer> initialPlayers = new ArrayList<>();
@@ -52,8 +55,8 @@ public abstract class Game {
     protected int turningIndex = 0;
     protected Shop shop;
 
-    protected Warp warp;
-    protected Set<Class<? extends Clazz>> allowedClazzes;
+    protected WarpTurn warp;
+    protected Set<Class<? extends Clazz>> allowedClazzes = new HashSet<>();
 
     protected long startTick;
     protected Time timeLeft;
@@ -62,7 +65,6 @@ public abstract class Game {
     public Game(boolean ranked, World world, @NotNull List<Player> players) {
         this.ranked = ranked;
         this.arena = new Arena(this, world);
-        this.effectManager = new EffectManager(this);
 
         players.stream()
                 .map(player -> new NeoPlayer(player, this))
@@ -76,13 +78,15 @@ public abstract class Game {
             p.setGameMode(GameMode.SURVIVAL);
         });
 
-        warp = new TDefaultWarp(world);
+        warp(new TDefaultWarp(world));
     }
 
     public abstract GameInfo info();
 
     @MustBeInvokedByOverriders
-    public void turn(@NotNull Turn<?> turn) {
+    public void turn(@NotNull Turn<?> turn, Cancellable event) {
+        if (verify(turn, event)) return;
+
         try {
             turn.player().inventory.setDeckSlot(turn.player().player.getInventory().getHeldItemSlot(), null, null);
         } catch (ArrayIndexOutOfBoundsException ignored) {}
@@ -106,6 +110,19 @@ public abstract class Game {
         } else {
             moveToNextPlayer();
         }
+    }
+
+    /**
+     * Verifies if the turn can be used and will return true if it is cancelled and the turn method can exit safely, due to being outside of the arena for example.
+     * @return {@code true} if the turn method should abort, {@code false} if it can continue.
+     */
+    public boolean verify(@NotNull Turn<?> turn, Cancellable event) {
+        Cord relativeCord = Cord.ofLocation(turn.location().clone().subtract(warp.location()));
+        if (relativeCord.inBounds(0, 8, 0, arena.currentPlacedBlocks()[0].length - 1, 0, 8)) {
+            event.setCancelled(true);
+            return true;
+        }
+        return false;
     }
 
     public @Nullable List<Component> scoreboard(NeoPlayer player) { return null; }
@@ -182,11 +199,11 @@ public abstract class Game {
         return shop;
     }
 
-    public final Warp warp() {
+    public final WarpTurn warp() {
         return warp;
     }
 
-    public void warp(@NotNull Warp warp) {
+    public void warp(@NotNull WarpTurn warp) {
         this.warp = warp;
         allowedClazzes.clear();
         allowedClazzes.addAll(warp.allows());
@@ -216,7 +233,7 @@ public abstract class Game {
     public final void turnCountdownTick() {
         turnCountdown -= 1;
         if (turnCountdown == 0)
-            turn(new TTimeLimit(new Time(turnCountdown), currentPlayer()));
+            turn(new TTimeLimit(new Time(turnCountdown), currentPlayer()), new CancellableImpl());
     }
 
     public final void resetTurnCountdown() {

@@ -8,7 +8,7 @@ import org.bukkit.World;
 
 import java.util.List;
 
-public class TNerdWarp extends Warp {
+public class TNerdWarp extends WarpTurn {
     public TNerdWarp(World world) { super(world, "nerd"); }
     public TNerdWarp(PlacedStructure data, World world) { super(data, world, "nerd"); }
 

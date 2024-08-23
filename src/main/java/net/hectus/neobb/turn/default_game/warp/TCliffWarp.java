@@ -10,7 +10,7 @@ import org.bukkit.World;
 
 import java.util.List;
 
-public class TCliffWarp extends Warp {
+public class TCliffWarp extends WarpTurn {
     public TCliffWarp(World world) { super(world, "cliff"); }
     public TCliffWarp(PlacedStructure data, World world) { super(data, world, "cliff"); }
 

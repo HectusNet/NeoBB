@@ -6,10 +6,9 @@ import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.structure.BlockInfo;
 import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.structure.Structure;
-import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
 import net.hectus.neobb.turn.default_game.attributes.function.WarpFunction;
-import net.hectus.neobb.turn.default_game.attributes.usage.StructureUsage;
+import net.hectus.neobb.turn.default_game.structure.StructureTurn;
 import net.hectus.neobb.util.Cord;
 import net.hectus.neobb.util.Utilities;
 import org.bukkit.Location;
@@ -19,18 +18,20 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public abstract class Warp extends Turn<PlacedStructure> implements StructureUsage, WarpFunction {
+public abstract class WarpTurn extends StructureTurn implements WarpFunction {
     public final Location center;
     public final String name;
 
-    public Warp(World world, String name) {
-        super(null, Utilities.listToLocation(world, NeoBB.CONFIG.getIntegerList("warps." + name)), null);
+    public WarpTurn(World world, String name) {
+        super(null);
+        this.location = Utilities.listToLocation(world, NeoBB.CONFIG.getIntegerList("warps." + name));
         this.name = name;
         this.center = location().add(5, 5, 5);
     }
 
-    public Warp(PlacedStructure data, World world, String name) {
-        super(data, Utilities.listToLocation(world, NeoBB.CONFIG.getIntegerList("warps." + name)), null);
+    public WarpTurn(PlacedStructure data, World world, String name) {
+        super(data, null);
+        this.location = Utilities.listToLocation(world, NeoBB.CONFIG.getIntegerList("warps." + name));
         this.name = name;
         this.center = location().add(5, 5, 5);
     }
@@ -44,8 +45,8 @@ public abstract class Warp extends Turn<PlacedStructure> implements StructureUsa
     public abstract Pair<Material, Material> materials();
 
     @Override
-    public ItemStack item() {
-        return new ItemStack(materials().left(), 4); // TODO: Add the second item!
+    public List<ItemStack> items() {
+        return List.of(new ItemStack(materials().left(), 4), new ItemStack(materials().right()));
     }
 
     public Location lowCorner() {
@@ -65,15 +66,10 @@ public abstract class Warp extends Turn<PlacedStructure> implements StructureUsa
     @Override
     public void apply() {
         if (Randomizer.boolByChance(chance())) {
-            Warp oldWarp = player.game.warp();
+            WarpTurn oldWarp = player.game.warp();
             player.game.players().forEach(p ->p.player.teleport(p.player.getLocation().clone().subtract(oldWarp.lowCorner()).add(lowCorner())));
             player.game.warp(this);
         }
-    }
-
-    @Override
-    public PlacedStructure getValue() {
-        return data;
     }
 
     @Override

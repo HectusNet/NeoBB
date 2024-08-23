@@ -44,6 +44,10 @@ public record Cord(double x, double y, double z) implements Serializable {
         return new Cord(x + cord.x, y + cord.y, z + cord.z);
     }
 
+    public boolean inBounds(double lowX, double highX, double lowY, double highY, double lowZ, double highZ) {
+        return x >= lowX && x <= highX && y >= lowY && y <= highY && z >= lowZ && z <= highZ;
+    }
+
     /**
      * Converts a {@link Location org.bukkit.Location} to a simple {@link Cord}.
      * @param location The Location to convert.

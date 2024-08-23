@@ -1,15 +1,7 @@
 package net.hectus.neobb;
 
 import net.hectus.neobb.player.NeoPlayer;
-import net.hectus.neobb.util.Colors;
-import net.hectus.neobb.util.Utilities;
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 // Glicko-2 rating system -> http://www.glicko.net/glicko/glicko2.pdf
 public final class Rating {
@@ -39,22 +31,11 @@ public final class Rating {
         apply(player2, rating2);
     }
 
-    private static void apply(NeoPlayer player, Rating rating) {
+    private static void apply(@NotNull NeoPlayer player, @NotNull Rating rating) {
         player.setElo(rating.getRating());
         player.setRatingDeviation(rating.getRatingDeviation());
         player.setVolatility(rating.getVolatility());
         player.setLastMatchTimeMillis(System.currentTimeMillis());
-    }
-
-    public static void sendInfo(Audience receiver, @NotNull UUID player) {
-        if (NeoBB.DATABASE.contains(player))
-            NeoBB.DATABASE.add(Map.of("uuid", player));
-
-        Map<String, Object> data = NeoBB.DATABASE.getRowMap(player);
-        for (Map.Entry<String, Object> entry : data.entrySet()) {
-            if (entry.getKey().equals("uuid")) continue;
-            receiver.sendMessage(Component.text(Utilities.capitalizeFirstLetter(entry.getKey()) + ": ", Colors.BLUE).append(Component.text(entry.getValue().toString())));
-        }
     }
 
     private static final int MILLIS_IN_A_DAY = 86400000;
@@ -95,7 +76,7 @@ public final class Rating {
         return volatility;
     }
 
-    public void updateRating(Rating opponent, double score) {
+    public void updateRating(@NotNull Rating opponent, double score) {
         double gOpponent = opponent.g();
         double E = E(opponent.rating, gOpponent);
         double v = 1 / (gOpponent * gOpponent * E * (1 - E));

@@ -5,7 +5,11 @@ import com.marcpg.libpg.text.Formatter;
 import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.turn.default_game.attributes.clazz.*;
 import net.hectus.neobb.turn.default_game.attributes.function.*;
-import net.hectus.neobb.turn.default_game.attributes.usage.*;
+import net.hectus.neobb.turn.default_game.block.BlockTurn;
+import net.hectus.neobb.turn.default_game.item.ItemTurn;
+import net.hectus.neobb.turn.default_game.mob.MobTurn;
+import net.hectus.neobb.turn.default_game.net.hectus.neobb.turn.default_game.throwable.ThrowableTurn;
+import net.hectus.neobb.turn.default_game.structure.StructureTurn;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.jetbrains.annotations.NotNull;
@@ -60,7 +64,7 @@ public final class ItemLoreBuilder {
     }
 
     private @NotNull List<? extends Component> longText(Locale l, String type) {
-        String text = Translation.string(l, type + "." + turn.item().getType().name().toLowerCase());
+        String text = Translation.string(l, type + "." + Utilities.camelToSnake(Utilities.counterFilterName(turn.getClass().getSimpleName())));
         return Formatter.lineWrap(text, 50).stream()
                 .map(s -> Component.text("   | " + s, Colors.BLUE)
                         .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE))
@@ -90,11 +94,11 @@ public final class ItemLoreBuilder {
     }
 
     private @NotNull String usage() {
-        if (turn instanceof BlockUsage) return "block";
-        if (turn instanceof ItemUsage) return "item";
-        if (turn instanceof MobUsage) return "mob";
-        if (turn instanceof StructureUsage) return "structure";
-        if (turn instanceof ThrowableUsage) return "throwable";
+        if (turn instanceof BlockTurn) return "block";
+        if (turn instanceof ItemTurn) return "item";
+        if (turn instanceof MobTurn<?>) return "mob";
+        if (turn instanceof StructureTurn) return "structure";
+        if (turn instanceof ThrowableTurn) return "throwable";
         return "other";
     }
 }
