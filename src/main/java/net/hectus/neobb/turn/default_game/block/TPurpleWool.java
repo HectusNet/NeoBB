@@ -14,6 +14,8 @@ public class TPurpleWool extends BlockTurn implements AttackFunction, NeutralCla
 
     @Override
     public boolean canBeUsed() {
+        if (isDummy()) return false;
+
         List<Turn<?>> history = player.game.history();
         if (history.size() < 5) return false;
 

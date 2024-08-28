@@ -13,7 +13,7 @@ import java.util.List;
 
 public class TDefaultWarp extends WarpTurn {
     public TDefaultWarp(World world) { super(world, "default"); }
-    public TDefaultWarp(PlacedStructure data, World world) { super(data, world, "default"); }
+    public TDefaultWarp(PlacedStructure data, World world) { super(data, world, null, "default"); }
 
     @Override
     public int chance() {

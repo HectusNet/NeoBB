@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "net.hectus.neobb"
-version = "0.0.5"
+version = "0.0.6"
 description = "A reworked version of NeoBB with some interesting spins."
 
 java.sourceCompatibility = JavaVersion.VERSION_21

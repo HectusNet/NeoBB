@@ -8,7 +8,9 @@ import com.marcpg.libpg.lang.Translation;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.hectus.neobb.event.GameEvents;
 import net.hectus.neobb.event.TurnEvents;
+import net.hectus.neobb.game.util.GameManager;
 import net.hectus.neobb.structure.StructureManager;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
@@ -29,7 +31,7 @@ import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class NeoBB extends JavaPlugin {
-    public static final String VERSION = "0.0.5";
+    public static final String VERSION = "0.0.6";
 
     public static NeoBB PLUGIN;
     public static Logger LOG;
@@ -37,6 +39,7 @@ public final class NeoBB extends JavaPlugin {
     public static FileConfiguration CONFIG;
     public static AutoCatchingSQLConnection<UUID> DATABASE;
     public static Path STRUCTURE_DIR;
+    public static boolean PRODUCTION;
 
     @Override
     public void onEnable() {
@@ -58,6 +61,8 @@ public final class NeoBB extends JavaPlugin {
             throw new RuntimeException(e);
         }
 
+        PRODUCTION = CONFIG.getBoolean("production");
+
         try {
             translations();
         } catch (Exception e) {
@@ -73,12 +78,12 @@ public final class NeoBB extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new TurnEvents(), this);
         getServer().getPluginManager().registerEvents(new GameEvents(), this);
-
-        getServer().getMessenger().registerOutgoingPluginChannel(this, "pooper:joining");
     }
 
     @Override
     public void onDisable() {
+        GameManager.GAMES.forEach(game -> game.draw(true));
+        Bukkit.unloadWorld("world", false); // Prevent saving of the world!
         if (DATABASE != null) DATABASE.closeConnection();
     }
 

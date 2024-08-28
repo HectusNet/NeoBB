@@ -28,6 +28,13 @@ structure-mode: server
 max-arena-height: 9
 
 
+## Production Mode ##
+# If this is set to true, the plugin will be loaded in production mode.
+# Production mode will start a game based on the "starting-players" and restart the
+# server once the current game ends. This is only useful for full scale servers.
+production: false
+
+
 ## At how many players a game will start. ##
 # This will only count players which are in adventure mode and have an empty inventory.
 # Default: 2
@@ -57,6 +64,7 @@ database:
   # The database login credentials.
   user: username
   passwd: password
+
 
 ## The warp location on the map. ##
 # The default values assume the Hectus edition of the map

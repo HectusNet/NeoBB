@@ -3,6 +3,7 @@ package net.hectus.neobb.game.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BooleanSupplier;
 
 public class TurnScheduler {
     private final List<Task> tasks = new ArrayList<>();
@@ -26,6 +27,15 @@ public class TurnScheduler {
 
     public void runTaskLater(String uniqueId, Runnable runnable, int turns) {
         tasks.add(new Task(uniqueId, runnable, new AtomicInteger(turns)));
+    }
+
+    public void runTaskTimer(String uniqueId, Runnable runnable, BooleanSupplier predicate, int interval) {
+        tasks.add(new Task(uniqueId, () -> {
+            runnable.run();
+            if (predicate.getAsBoolean()) {
+                runTaskTimer(uniqueId, runnable, predicate, interval);
+            }
+        }, new AtomicInteger(interval)));
     }
 
     /**

@@ -1,6 +1,7 @@
 package net.hectus.neobb.turn.default_game.warp;
 
 import com.marcpg.libpg.storing.Pair;
+import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NatureClazz;
@@ -12,7 +13,7 @@ import java.util.List;
 
 public class TWoodWarp extends WarpTurn {
     public TWoodWarp(World world) { super(world, "wood"); }
-    public TWoodWarp(PlacedStructure data, World world) { super(data, world, "wood"); }
+    public TWoodWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "wood"); }
 
     @Override
     public int chance() {

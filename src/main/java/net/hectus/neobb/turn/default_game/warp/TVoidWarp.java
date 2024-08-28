@@ -1,6 +1,7 @@
 package net.hectus.neobb.turn.default_game.warp;
 
 import com.marcpg.libpg.storing.Pair;
+import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.turn.default_game.attributes.clazz.*;
 import org.bukkit.Material;
@@ -10,7 +11,7 @@ import java.util.List;
 
 public class TVoidWarp extends WarpTurn {
     public TVoidWarp(World world) { super(world, "void"); }
-    public TVoidWarp(PlacedStructure data, World world) { super(data, world, "void"); }
+    public TVoidWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "void"); }
 
     @Override
     public int chance() {

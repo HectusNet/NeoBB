@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class NeoInventory {
-    private final NeoPlayer player;
+    private NeoPlayer player;
     private final ItemStack[] deck;
     private final Turn<?>[] dummyTurnDeck;
     private int coins;
@@ -25,6 +25,17 @@ public class NeoInventory {
 
     public NeoPlayer player() {
         return player;
+    }
+
+    public void switchOwner(NeoPlayer player) {
+        this.player = player;
+    }
+
+    public boolean isEmpty() {
+        for (ItemStack i : deck) {
+            if (i != null) return false;
+        }
+        return true;
     }
 
     public ItemStack[] deck() {

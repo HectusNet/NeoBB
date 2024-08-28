@@ -17,7 +17,7 @@ public abstract class BossBarGame extends Game {
     public abstract BossBar initialBossBar();
     public abstract void bossBar(BossBar bossBar);
 
-    public BossBar bossBar() {
+    public final BossBar bossBar() {
         return bossBar;
     }
 
@@ -29,8 +29,8 @@ public abstract class BossBarGame extends Game {
     }
 
     @Override
-    public void end() {
+    public void end(boolean force) {
         bossBar.removeViewer(gameTarget(false));
-        super.end();
+        super.end(force);
     }
 }

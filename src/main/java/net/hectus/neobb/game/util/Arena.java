@@ -4,15 +4,18 @@ import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.Game;
 import net.hectus.neobb.structure.BlockInfo;
 import net.hectus.neobb.util.Cord;
+import net.hectus.neobb.util.Utilities;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Arena {
     public final Game game;
@@ -28,6 +31,14 @@ public class Arena {
         this.world = world;
     }
 
+    public void cleanUp() {
+        Utilities.loop(totalPlacedBlocks, false, b -> game.warp().lowCorner().add(b.cord().toLocation(world)).getBlock().setType(Material.AIR));
+        game.history().forEach(t -> {
+            if (t.data() instanceof Entity entity)
+                entity.remove();
+        });
+    }
+
     public BlockInfo getBlock(@Range(from = 0, to = 8) int x, int y, @Range(from = 0, to = 8) int z) {
         return totalPlacedBlocks[x][y][z];
     }
@@ -36,17 +47,10 @@ public class Arena {
         return placedBlocks[x][y][z];
     }
 
-    public int currentPlacedBlocksAmount() { // TODO: Improve this!
-        int blocks = 0;
-        for (int x = 0; x < 9; x++) {
-            for (int y = 0; y < 9; y++) {
-                for (int z = 0; z < 9; z++) {
-                    if (placedBlocks[x][y][z] != null)
-                        blocks++;
-                }
-            }
-        }
-        return blocks;
+    public int currentPlacedBlocksAmount() {
+        AtomicInteger blocks = new AtomicInteger();
+        Utilities.loop(placedBlocks, false, block -> blocks.incrementAndGet());
+        return blocks.get();
     }
 
     /**

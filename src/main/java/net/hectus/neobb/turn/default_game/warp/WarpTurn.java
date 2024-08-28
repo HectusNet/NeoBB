@@ -3,6 +3,7 @@ package net.hectus.neobb.turn.default_game.warp;
 import com.marcpg.libpg.storing.Pair;
 import com.marcpg.libpg.util.Randomizer;
 import net.hectus.neobb.NeoBB;
+import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.BlockInfo;
 import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.structure.Structure;
@@ -29,8 +30,8 @@ public abstract class WarpTurn extends StructureTurn implements WarpFunction {
         this.center = location().add(5, 5, 5);
     }
 
-    public WarpTurn(PlacedStructure data, World world, String name) {
-        super(data, null);
+    public WarpTurn(PlacedStructure data, World world, NeoPlayer player, String name) {
+        super(data, player);
         this.location = Utilities.listToLocation(world, NeoBB.CONFIG.getIntegerList("warps." + name));
         this.name = name;
         this.center = location().add(5, 5, 5);
@@ -74,9 +75,10 @@ public abstract class WarpTurn extends StructureTurn implements WarpFunction {
 
     @Override
     public void apply() {
-        if (Randomizer.boolByChance(chance())) {
+        if (player.hasModifier("next_warp_100%") || Randomizer.boolByChance(chance())) {
+            player.removeModifier("next_warp_100%");
             WarpTurn oldWarp = player.game.warp();
-            player.game.players().forEach(p ->p.player.teleport(p.player.getLocation().clone().subtract(oldWarp.lowCorner()).add(lowCorner())));
+            player.game.players().forEach(p -> p.player.teleport(p.player.getLocation().clone().subtract(oldWarp.lowCorner()).add(lowCorner())));
             player.game.warp(this);
         }
     }

@@ -1,6 +1,7 @@
 package net.hectus.neobb.event;
 
 import net.hectus.neobb.NeoBB;
+import net.hectus.neobb.event.custom.CancellableImpl;
 import net.hectus.neobb.game.Game;
 import net.hectus.neobb.game.util.GameManager;
 import net.hectus.neobb.player.NeoPlayer;
@@ -12,6 +13,7 @@ import net.hectus.neobb.turn.default_game.item.TChorusFruit;
 import net.hectus.neobb.turn.default_game.item.TIronShovel;
 import net.hectus.neobb.turn.default_game.mob.*;
 import net.hectus.neobb.turn.default_game.other.TBoat;
+import net.hectus.neobb.turn.default_game.throwable.*;
 import net.hectus.neobb.turn.default_game.warp.*;
 import net.hectus.neobb.util.Colors;
 import net.kyori.adventure.text.Component;
@@ -28,9 +30,13 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -126,20 +132,20 @@ public class TurnEvents implements Listener {
         Structure structure = StructureManager.match(player.game.arena);
         if (structure == null) return;
         switch (structure.name) {
-            case "amethyst-warp" -> player.game.turn(new TAmethystWarp(new PlacedStructure(structure, block), block.getWorld()), event);
-            case "cliff-warp" -> player.game.turn(new TCliffWarp(new PlacedStructure(structure, block), block.getWorld()), event);
-            case "desert-warp" -> player.game.turn(new TDesertWarp(new PlacedStructure(structure, block), block.getWorld()), event);
-            case "end-warp" -> player.game.turn(new TEndWarp(new PlacedStructure(structure, block), block.getWorld()), event);
-            case "frozen-warp" -> player.game.turn(new TFrozenWarp(new PlacedStructure(structure, block), block.getWorld()), event);
-            case "meadow-warp" -> player.game.turn(new TMeadowWarp(new PlacedStructure(structure, block), block.getWorld()), event);
-            case "mushroom-warp" -> player.game.turn(new TMushroomWarp(new PlacedStructure(structure, block), block.getWorld()), event);
-            case "nerd-warp" -> player.game.turn(new TNerdWarp(new PlacedStructure(structure, block), block.getWorld()), event);
-            case "nether-warp" -> player.game.turn(new TNetherWarp(new PlacedStructure(structure, block), block.getWorld()), event);
-            case "ocean-warp" -> player.game.turn(new TOceanWarp(new PlacedStructure(structure, block), block.getWorld()), event);
-            case "redstone-warp" -> player.game.turn(new TRedstoneWarp(new PlacedStructure(structure, block), block.getWorld()), event);
-            case "sun-warp" -> player.game.turn(new TSunWarp(new PlacedStructure(structure, block), block.getWorld()), event);
-            case "void-warp" -> player.game.turn(new TVoidWarp(new PlacedStructure(structure, block), block.getWorld()), event);
-            case "wood-warp" -> player.game.turn(new TWoodWarp(new PlacedStructure(structure, block), block.getWorld()), event);
+            case "amethyst-warp" -> player.game.turn(new TAmethystWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+            case "cliff-warp" -> player.game.turn(new TCliffWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+            case "desert-warp" -> player.game.turn(new TDesertWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+            case "end-warp" -> player.game.turn(new TEndWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+            case "frozen-warp" -> player.game.turn(new TFrozenWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+            case "meadow-warp" -> player.game.turn(new TMeadowWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+            case "mushroom-warp" -> player.game.turn(new TMushroomWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+            case "nerd-warp" -> player.game.turn(new TNerdWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+            case "nether-warp" -> player.game.turn(new TNetherWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+            case "ocean-warp" -> player.game.turn(new TOceanWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+            case "redstone-warp" -> player.game.turn(new TRedstoneWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+            case "sun-warp" -> player.game.turn(new TSunWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+            case "void-warp" -> player.game.turn(new TVoidWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+            case "wood-warp" -> player.game.turn(new TWoodWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
         }
     }
 
@@ -192,6 +198,38 @@ public class TurnEvents implements Listener {
             if (game == null) return;
             NeoPlayer player = game.currentPlayer();
             new TPiglin(game.currentPlayer()).buffs().forEach(b -> b.apply(player));
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPotionSplash(@NotNull PotionSplashEvent event) {
+        if (event.getPotion().getShooter() instanceof Player p) {
+            NeoPlayer player = GameManager.player(p, true);
+            if (unusable(p, player, new CancellableImpl(), "You cannot use potions right now!")) return;
+
+            PotionMeta meta = event.getPotion().getPotionMeta();
+            if (meta.hasBasePotionType()) {
+                switch (meta.getBasePotionType()) {
+                    case WATER -> player.game.turn(new TSplashWaterBottle(event.getPotion(), event.getPotion().getLocation(), player), event);
+                    case STRONG_LEAPING -> player.game.turn(new TSplashJumpBoostPotion(event.getPotion(), event.getPotion().getLocation(), player), event);
+                }
+            } else if (meta.hasCustomEffect(PotionEffectType.LEVITATION)) {
+                player.game.turn(new TSplashLevitationPotion(event.getPotion(), event.getPotion().getLocation(), player), event);
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onProjectileHit(@NotNull ProjectileHitEvent event) {
+        if (event.getEntity().getShooter() instanceof Player p) {
+            NeoPlayer player = GameManager.player(p, true);
+            if (unusable(p, player, new CancellableImpl(), "You cannot throw things right now!")) return;
+
+            if (event.getEntity() instanceof Snowball snowball) {
+                player.game.turn(new TSnowball(snowball, snowball.getLocation(), player), event);
+            } else if (event.getEntity() instanceof EnderPearl enderPearl) {
+                player.game.turn(new TEnderPearl(enderPearl, enderPearl.getLocation(), player), event);
+            }
         }
     }
 

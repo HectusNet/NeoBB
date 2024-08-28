@@ -55,6 +55,10 @@ public abstract class Turn<T> {
         return !(this instanceof AttackFunction) || !player.nextPlayer().hasModifier("defended");
     }
 
+    public final boolean isDummy() {
+        return this == DUMMY || data == null;
+    }
+
     public static final Turn<Void> DUMMY = new Turn<>(null) {
         @Override public int cost() { return 0; }
         @Override public boolean goodChoice(NeoPlayer player) { return false; }

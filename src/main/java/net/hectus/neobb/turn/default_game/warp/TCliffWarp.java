@@ -1,6 +1,7 @@
 package net.hectus.neobb.turn.default_game.warp;
 
 import com.marcpg.libpg.storing.Pair;
+import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NeutralClazz;
@@ -12,7 +13,7 @@ import java.util.List;
 
 public class TCliffWarp extends WarpTurn {
     public TCliffWarp(World world) { super(world, "cliff"); }
-    public TCliffWarp(PlacedStructure data, World world) { super(data, world, "cliff"); }
+    public TCliffWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "cliff"); }
 
     @Override
     public int chance() {

@@ -1,6 +1,7 @@
 package net.hectus.neobb.turn.default_game.warp;
 
 import com.marcpg.libpg.storing.Pair;
+import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NeutralClazz;
@@ -12,7 +13,7 @@ import java.util.List;
 
 public class TOceanWarp extends WarpTurn {
     public TOceanWarp(World world) { super(world, "ocean"); }
-    public TOceanWarp(PlacedStructure data, World world) { super(data, world, "ocean"); }
+    public TOceanWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "ocean"); }
 
     @Override
     public int chance() {

@@ -26,7 +26,7 @@ public class NeoPlayer implements Target, ForwardingAudience.Single {
 
     public final Player player;
     public final Game game;
-    public final NeoInventory inventory;
+    public NeoInventory inventory;
 
     private final Set<String> modifiers = new HashSet<>();
     private int luck = 20;
@@ -53,17 +53,26 @@ public class NeoPlayer implements Target, ForwardingAudience.Single {
     public void tick() {
         List<Component> scoreboard = game.scoreboard(this);
         if (scoreboard != null && !scoreboard.isEmpty()) {
-            Scoreboard sb = SCOREBOARD_MANAGER.getNewScoreboard();
+            Objective objective;
 
-            Objective objective = sb.registerNewObjective("neobb", Criteria.DUMMY, scoreboard.getFirst());
-            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+            if (player.getScoreboard() == SCOREBOARD_MANAGER.getMainScoreboard()) {
+                Scoreboard sb = SCOREBOARD_MANAGER.getNewScoreboard();
+                objective = sb.registerNewObjective("neobb", Criteria.DUMMY, scoreboard.getFirst());
+                objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+                player.setScoreboard(sb);
+            } else {
+                objective = player.getScoreboard().getObjective("neobb");
+                if (objective == null)
+                    objective = player.getScoreboard().registerNewObjective("neobb", Criteria.DUMMY, scoreboard.getFirst());
+            }
+
             for (int i = scoreboard.size() - 1; i > 0; i--) {
                 Score score = objective.getScore("score-" + i);
                 score.numberFormat(NumberFormat.blank());
-                score.customName(scoreboard.get(i));
                 score.setScore(scoreboard.size() - i);
+
+                score.customName(scoreboard.get(i));
             }
-            player.setScoreboard(sb);
         }
 
         Component actionbar = game.actionbar(this);

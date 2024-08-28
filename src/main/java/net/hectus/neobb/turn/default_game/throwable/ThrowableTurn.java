@@ -1,4 +1,4 @@
-package net.hectus.neobb.turn.default_game.net.hectus.neobb.turn.default_game.throwable;
+package net.hectus.neobb.turn.default_game.throwable;
 
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.Turn;

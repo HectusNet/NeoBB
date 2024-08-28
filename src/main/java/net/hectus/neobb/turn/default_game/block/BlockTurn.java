@@ -9,7 +9,7 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 public abstract class BlockTurn extends Turn<Block> {
-    public BlockTurn(NeoPlayer player) { super(null, null, player); }
+    public BlockTurn(NeoPlayer player) { super(player); }
     public BlockTurn(Block data, NeoPlayer player) { super(data, data.getLocation(), player); }
 
     @Override

@@ -7,6 +7,7 @@ import net.hectus.neobb.game.DefaultGame;
 import net.hectus.neobb.game.Game;
 import net.hectus.neobb.game.util.GameManager;
 import net.hectus.neobb.player.NeoPlayer;
+import net.hectus.neobb.turn.default_game.warp.TDefaultWarp;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -46,9 +47,13 @@ public class GameEvents implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerMove(@NotNull PlayerMoveEvent event) {
-        if (event.getTo().clone().subtract(0, 1, 0).getBlock().getType() == Material.MAGMA_BLOCK) {
-            NeoPlayer player = GameManager.player(event.getPlayer(), true);
-            if (player != null) player.game.eliminatePlayer(player);
+        NeoPlayer player = GameManager.player(event.getPlayer(), true);
+        if (player != null) {
+            if (player.hasModifier("no_move") && event.hasChangedPosition()) {
+                event.setCancelled(true);
+            } else if (event.getTo().clone().subtract(0, 1, 0).getBlock().getType() == Material.MAGMA_BLOCK) {
+                player.game.eliminatePlayer(player);
+            }
         }
     }
 
@@ -90,8 +95,10 @@ public class GameEvents implements Listener {
     public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
         Player player = event.getPlayer();
         List<Player> available = availablePlayers();
-        if (available.size() >= NeoBB.CONFIG.getInt("starting-players")) {
+        if (NeoBB.PRODUCTION && available.size() >= NeoBB.CONFIG.getInt("starting-players")) {
             new DefaultGame(true, player.getWorld(), available);
+        } else {
+            player.teleport(new TDefaultWarp(player.getWorld()).location().clone());
         }
     }
 

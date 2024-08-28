@@ -1,6 +1,7 @@
 package net.hectus.neobb.turn.default_game.warp;
 
 import com.marcpg.libpg.storing.Pair;
+import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NatureClazz;
@@ -13,7 +14,7 @@ import java.util.List;
 
 public class TMushroomWarp extends WarpTurn {
     public TMushroomWarp(World world) { super(world, "mushroom"); }
-    public TMushroomWarp(PlacedStructure data, World world) { super(data, world, "mushroom"); }
+    public TMushroomWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "mushroom"); }
 
     @Override
     public int chance() {

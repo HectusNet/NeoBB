@@ -27,7 +27,6 @@ import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -74,33 +73,38 @@ public abstract class Game {
         });
 
         warp(new TDefaultWarp(world));
+
+        // TODO: Support multiple players and make it a circle:
+        players.getFirst().teleport(new Location(warp.center.getWorld(), warp.center.x() + 2.5, warp.center.y(), warp.center.z(), 90, 0));
+        players.getLast().teleport(new Location(warp.center.getWorld(), warp.center.x() - 2.5, warp.center.y(), warp.center.z(), -90, 0));
     }
 
     public abstract GameInfo info();
 
     @MustBeInvokedByOverriders
     public void turn(@NotNull Turn<?> turn, Cancellable event) {
-        if (verify(turn, event)) return;
+        if (outOfBounds(turn, event)) return;
 
         try {
-            turn.player().inventory.setDeckSlot(turn.player().player.getInventory().getHeldItemSlot(), null, null);
+            if (!(turn instanceof TTimeLimit)) {
+                turn.player().inventory.setDeckSlot(turn.player().player.getInventory().getHeldItemSlot(), null, null);
+            }
         } catch (ArrayIndexOutOfBoundsException ignored) {}
 
         turn.apply();
 
         history.add(turn);
         turn.player().addTurn();
-
         turnScheduler.tick();
 
         effectManager.applyEffects(turn);
-
         currentPlayer().player.playSound(currentPlayer().player, Sound.BLOCK_NOTE_BLOCK_BELL, 0.5f, 1.0f);
         initialPlayers.forEach(p -> p.sendMessage(Translation.component(p.locale(), "gameplay.info.turn-used",
                 turn.player().player.getName(), Utilities.turnKey(turn.getClass().getSimpleName())).color(Colors.EXTRA)));
 
         arena.resetCurrentBlocks();
         resetTurnCountdown();
+        players.forEach(p -> p.inventory.sync());
 
         if (turn.player().hasModifier("extra-turn")) {
             turn.player().removeModifier("extra-turn");
@@ -111,11 +115,10 @@ public abstract class Game {
 
     /**
      * Verifies if the turn can be used and will return true if it is cancelled and the turn method can exit safely, due to being outside of the arena for example.
-     * @return {@code true} if the turn method should abort, {@code false} if it can continue.
+     * @return {@code false} if the turn method should abort, {@code true} if it can continue.
      */
-    public boolean verify(@NotNull Turn<?> turn, Cancellable event) {
-        Cord relativeCord = Cord.ofLocation(turn.location().clone().subtract(warp.location()));
-        if (relativeCord.inBounds(0, 8, 0, arena.currentPlacedBlocks()[0].length - 1, 0, 8)) {
+    public boolean outOfBounds(@NotNull Turn<?> turn, Cancellable event) {
+        if (!Cord.ofLocation(turn.location().clone().subtract(warp.location())).inBounds(0, 8, 0, arena.currentPlacedBlocks()[0].length - 1, 0, 8)) {
             event.setCancelled(true);
             return true;
         }
@@ -128,12 +131,10 @@ public abstract class Game {
     public void gameTick() {
         if (started) {
             players.forEach(NeoPlayer::tick);
-
             if (GameEvents.currentTick - startTick % 20 == 0) {
                 timeLeft.decrement();
                 if (timeLeft.get() == 0)
-                    draw();
-
+                    draw(false);
                 turnCountdownTick();
             }
         }
@@ -227,7 +228,7 @@ public abstract class Game {
         return false;
     }
 
-    public @Unmodifiable Set<Class<? extends Clazz>> allowedClazzes() {
+    public Set<Class<? extends Clazz>> allowedClazzes() {
         return allowedClazzes;
     }
 
@@ -240,7 +241,7 @@ public abstract class Game {
     }
 
     public final void turnCountdownTick() {
-        turnCountdown -= 1;
+        turnCountdown--;
         if (turnCountdown == 0)
             turn(new TTimeLimit(new Time(turnCountdown), currentPlayer()), new CancellableImpl());
     }
@@ -282,12 +283,20 @@ public abstract class Game {
         setStarted(true);
     }
 
-    public void end() {
-        players.forEach(p -> cleanPlayer(p.player));
+    public void end(boolean force) {
+        initialPlayers.forEach(p -> cleanPlayer(p.player));
         GameManager.GAMES.remove(this);
         effectManager.clearHighlight();
 
-        Bukkit.getScheduler().runTaskLater(NeoBB.PLUGIN, () -> players.forEach(p -> p.player.kick(Component.text("Game ended!"))), 100); // 5 Seconds
+        if (force) return;
+        Bukkit.getScheduler().runTaskLater(NeoBB.PLUGIN, () -> {
+            initialPlayers.forEach(p -> p.player.kick(Component.text("Game ended!")));
+            if (NeoBB.PRODUCTION) {
+                Bukkit.getServer().shutdown();
+            } else {
+                arena.cleanUp();
+            }
+        }, 100); // 5 Seconds
     }
 
     private static void cleanPlayer(@NotNull Player player) {
@@ -303,15 +312,15 @@ public abstract class Game {
         player.opponents(false).forEach(p -> p.showTitle(Title.title(Translation.component(p.locale(), "gameplay.info.ending.lose").color(Colors.NEGATIVE),
                 Translation.component(p.locale(), "gameplay.info.ending.lose-sub").color(Colors.NEUTRAL))));
 
-        end();
+        end(false);
         if (ranked) Rating.updateRankingsWin(player, player.opponents(false).getFirst());
     }
 
-    public final void draw() {
+    public final void draw(boolean force) {
         players.forEach(p -> p.showTitle(Title.title(Translation.component(p.locale(), "gameplay.info.ending.draw").color(Colors.NEUTRAL),
                 Translation.component(p.locale(), "gameplay.info.ending.draw-sub").color(Colors.EXTRA))));
 
-        end();
+        end(force);
         if (ranked) Rating.updateRankingsDraw(initialPlayers.get(0), initialPlayers.get(1));
     }
 
@@ -319,7 +328,7 @@ public abstract class Game {
         players.forEach(p -> p.showTitle(Title.title(Translation.component(p.locale(), "gameplay.info.ending.giveup", player.player.getName()).color(Colors.NEUTRAL),
                 Translation.component(p.locale(), "gameplay.info.ending.giveup-sub", player.player.getName()).color(Colors.EXTRA))));
 
-        end();
+        end(false);
         if (ranked) Rating.updateRankingsWin(player.opponents(false).getFirst(), player);
     }
 }

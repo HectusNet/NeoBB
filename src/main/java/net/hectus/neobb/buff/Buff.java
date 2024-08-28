@@ -103,7 +103,7 @@ public abstract class Buff {
     }
 
     public static class Effect extends Buff {
-        protected final PotionEffect effect;
+        public final PotionEffect effect;
 
         public Effect(BuffTarget buffTarget, PotionEffectType type, int amplifier) {
             super(buffTarget);
