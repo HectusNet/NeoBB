@@ -18,10 +18,6 @@ public class TargetObj implements Target {
         return players;
     }
 
-    public void addPlayer(NeoPlayer player) {
-        players.add(player);
-    }
-
     @Override
     public @NotNull Iterable<? extends Audience> audiences() {
         return players;

@@ -5,31 +5,31 @@ import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.cosmetic.PlaceParticle;
 import net.hectus.neobb.game.BossBarGame;
 import net.hectus.neobb.game.Game;
+import net.hectus.neobb.util.Modifiers;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 
-public class NeoPlayer implements Target, ForwardingAudience.Single {
+public class NeoPlayer extends Modifiers.Modifiable implements Target, ForwardingAudience.Single {
     private static final ScoreboardManager SCOREBOARD_MANAGER = Bukkit.getScoreboardManager();
-
-    private final static String ELO_COL_NAME = "elo";
-    private final static String RATING_DEVIATION_COL_NAME = "rating_deviation";
-    private final static String VOLATILITY_COL_NAME = "volatility";
-    private final static String LAST_MATCH_TIME_COL_NAME = "last_match_time";
 
     public final Player player;
     public final Game game;
     public NeoInventory inventory;
 
-    private final Set<String> modifiers = new HashSet<>();
     private int luck = 20;
+    private double health = 50;
 
     private PlaceParticle cosmeticParticle;
     private NamedTextColor cosmeticOutline;
@@ -100,20 +100,29 @@ public class NeoPlayer implements Target, ForwardingAudience.Single {
         return players.get((players.indexOf(this) + 1) % players.size());
     }
 
-    public final void addModifier(String modifier) {
-        modifiers.add(modifier);
-    }
-
-    public final void removeModifier(String modifier) {
-        modifiers.remove(modifier);
-    }
-
-    public final boolean hasModifier(String modifier) {
-        return modifiers.contains(modifier);
-    }
-
     public int luck() {
         return luck;
+    }
+
+    public void addLuck(int luck) {
+        this.luck += luck;
+    }
+
+    public double health() {
+        return health;
+    }
+
+    public void damage(double damage) {
+        health(health - damage);
+        if (damage > 0.0) // Ensure that it's actually damage and not just weird healing.
+            player.playSound(player, Sound.ENTITY_PLAYER_HURT, 0.5f, 1.0f);
+    }
+
+    public void health(double health) {
+        this.health = Math.max(0.0, health);
+        player.setHealth(Math.max(0.5, health / 5)); // "health / 5" is effectively the same as "health / 100 * 20".
+
+        if (health <= 0.0) game.eliminatePlayer(this);
     }
 
     public Locale locale() {
@@ -129,10 +138,10 @@ public class NeoPlayer implements Target, ForwardingAudience.Single {
             NeoBB.DATABASE.add(Map.of("uuid", uuid()));
         }
 
-        elo = (double) NeoBB.DATABASE.get(uuid(), ELO_COL_NAME);
-        ratingDeviation = (double) NeoBB.DATABASE.get(uuid(), RATING_DEVIATION_COL_NAME);
-        volatility = (double) NeoBB.DATABASE.get(uuid(), VOLATILITY_COL_NAME);
-        lastMatchTimeMillis = (long) NeoBB.DATABASE.get(uuid(), LAST_MATCH_TIME_COL_NAME);
+        elo = (double) NeoBB.DATABASE.get(uuid(), "elo");
+        ratingDeviation = (double) NeoBB.DATABASE.get(uuid(), "rating_deviation");
+        volatility = (double) NeoBB.DATABASE.get(uuid(), "volatility");
+        lastMatchTimeMillis = (long) NeoBB.DATABASE.get(uuid(), "last_match_time");
         wins = (int) NeoBB.DATABASE.get(uuid(), "wins");
         losses = (int) NeoBB.DATABASE.get(uuid(), "losses");
         draws = (int) NeoBB.DATABASE.get(uuid(), "draws");
@@ -142,18 +151,6 @@ public class NeoPlayer implements Target, ForwardingAudience.Single {
         cosmeticOutline = NamedTextColor.namedColor((Integer) NeoBB.DATABASE.get(uuid(), "cosmetic_outline"));
     }
 
-    public void setLuck(int luck) {
-        this.luck = luck;
-    }
-
-    public void addLuck(int luck) {
-        this.luck += luck;
-    }
-
-    public void removeLuck(int luck) {
-        this.luck -= luck;
-    }
-
     // ====================================
     // ========== DATABASE STATS ==========
     // ====================================
@@ -161,66 +158,51 @@ public class NeoPlayer implements Target, ForwardingAudience.Single {
     public double elo() { return elo; }
     public void setElo(double elo) {
         this.elo = elo;
-        NeoBB.DATABASE.set(uuid(), ELO_COL_NAME, elo);
+        NeoBB.DATABASE.set(uuid(), "elo", elo);
     }
 
     public double ratingDeviation() { return ratingDeviation; }
     public void setRatingDeviation(double ratingDeviation) {
         this.ratingDeviation = ratingDeviation;
-        NeoBB.DATABASE.set(uuid(), RATING_DEVIATION_COL_NAME, ratingDeviation);
+        NeoBB.DATABASE.set(uuid(), "rating_deviation", ratingDeviation);
     }
 
     public double volatility() { return volatility; }
     public void setVolatility(double volatility) {
         this.volatility = volatility;
-        NeoBB.DATABASE.set(uuid(), VOLATILITY_COL_NAME, volatility);
+        NeoBB.DATABASE.set(uuid(), "volatility", volatility);
     }
 
     public long lastMatchTimeMillis() { return lastMatchTimeMillis; }
     public void setLastMatchTimeMillis(long lastMatchTimeMillis) {
         this.lastMatchTimeMillis = lastMatchTimeMillis;
-        NeoBB.DATABASE.set(uuid(), LAST_MATCH_TIME_COL_NAME, lastMatchTimeMillis);
+        NeoBB.DATABASE.set(uuid(), "last_match_time", lastMatchTimeMillis);
     }
 
-    public int wins() { return wins; }
     public void addWin() {
         wins++;
         NeoBB.DATABASE.set(uuid(), "wins", wins);
     }
 
-    public int losses() { return losses; }
     public void addLoss() {
         losses++;
         NeoBB.DATABASE.set(uuid(), "losses", losses);
     }
 
-    public int draws() { return draws; }
     public void addDraw() {
         draws++;
         NeoBB.DATABASE.set(uuid(), "draws", draws);
     }
 
-    public int turns() { return draws; }
     public void addTurn() {
         turns++;
         NeoBB.DATABASE.set(uuid(), "turns", turns);
     }
-
-    public int gamesPlayed() { return wins + losses + draws; }
 
     // ====================================
     // ======== DATABASE COSMETICS ========
     // ====================================
 
     public PlaceParticle cosmeticParticle() { return cosmeticParticle; }
-    public void setCosmeticParticle(@NotNull PlaceParticle cosmeticParticle) {
-        this.cosmeticParticle = cosmeticParticle;
-        NeoBB.DATABASE.set(uuid(), "cosmetic_particle", cosmeticParticle.toString());
-    }
-
     public NamedTextColor cosmeticOutline() { return cosmeticOutline; }
-    public void setCosmeticOutline(@NotNull NamedTextColor cosmeticOutline) {
-        this.cosmeticOutline = cosmeticOutline;
-        NeoBB.DATABASE.set(uuid(), "cosmetic_outline", cosmeticOutline.value());
-    }
 }

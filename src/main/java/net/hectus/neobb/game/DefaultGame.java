@@ -4,6 +4,7 @@ import com.marcpg.libpg.data.time.Time;
 import com.marcpg.libpg.lang.Translation;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.util.GameInfo;
+import net.hectus.neobb.lore.DefaultItemLoreBuilder;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.shop.DefaultShop;
 import net.hectus.neobb.turn.Turn;
@@ -19,6 +20,7 @@ import net.hectus.neobb.turn.default_game.structure.glass_wall.*;
 import net.hectus.neobb.turn.default_game.throwable.*;
 import net.hectus.neobb.turn.default_game.warp.*;
 import net.hectus.neobb.util.Colors;
+import net.hectus.neobb.util.Modifiers;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -56,19 +58,8 @@ public class DefaultGame extends BossBarGame {
 
     public DefaultGame(boolean ranked, World world, @NotNull List<Player> players) {
         super(ranked, world, players);
-        this.shop = new DefaultShop(this);
+        this.shop = new DefaultShop(this, new DefaultItemLoreBuilder());
         this.players.forEach(player -> shop.open(player));
-    }
-
-    @Override
-    public BossBar initialBossBar() {
-        return BossBar.bossBar(Component.text("Turn Countdown: -"), 0.0f, BossBar.Color.YELLOW, BossBar.Overlay.NOTCHED_10);
-    }
-
-    @Override
-    public void bossBar(@NotNull BossBar bossBar) {
-        bossBar.name(Component.text("Turn Countdown: " + turnCountdown + "s"));
-        bossBar.progress((float) turnCountdown / INFO.turnTimer());
     }
 
     @Override
@@ -78,13 +69,13 @@ public class DefaultGame extends BossBarGame {
 
     @Override
     public void turn(@NotNull Turn<?> turn, Cancellable event) {
-        if (outOfBounds(turn, event)) return;
+        if (outOfBounds(turn.location(), event)) return;
 
-        if (!turn.canBeUsed()) {
+        if (turn.unusable()) {
             super.turn(turn, event);
             turn.player().sendMessage(Component.text("That is not quite how to use this turn...", Colors.NEGATIVE));
             turn.player().player.playSound(turn.player().player, Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
-            if (turn.player().hasModifier("attacked") && !turn.player().hasModifier("defended"))
+            if (turn.player().hasModifier(Modifiers.P_DEFAULT_ATTACKED) && !turn.player().hasModifier(Modifiers.P_DEFAULT_DEFENDED))
                 eliminatePlayer(turn.player());
             return;
         }
@@ -98,15 +89,15 @@ public class DefaultGame extends BossBarGame {
                 super.turn(turn, event);
                 turn.player().sendMessage(Translation.component(turn.player().locale(), "gameplay.info.wrong_counter").color(Colors.NEGATIVE));
                 turn.player().player.playSound(turn.player().player, Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
-                if (turn.player().hasModifier("attacked") && !turn.player().hasModifier("defended"))
+                if (turn.player().hasModifier(Modifiers.P_DEFAULT_ATTACKED) && !turn.player().hasModifier(Modifiers.P_DEFAULT_DEFENDED))
                     eliminatePlayer(turn.player());
                 return;
             }
         }
 
         if (turn instanceof AttackFunction) {
-            if (!(getNextPlayer().hasModifier("defended") || turn instanceof TPhantom))
-                getNextPlayer().addModifier("attacked");
+            if (!(getNextPlayer().hasModifier(Modifiers.P_DEFAULT_DEFENDED) || turn instanceof TPhantom))
+                getNextPlayer().addModifier(Modifiers.P_DEFAULT_ATTACKED);
         }
 
         if (turn instanceof BuffFunction buffFunction) buffFunction.buffs().forEach(b -> b.apply(turn.player()));
@@ -114,8 +105,19 @@ public class DefaultGame extends BossBarGame {
         if (turn instanceof EventFunction eventFunction) eventFunction.triggerEvent();
 
         super.turn(turn, event);
-        if (turn.player().hasModifier("attacked") && !turn.player().hasModifier("defended"))
+        if (turn.player().hasModifier(Modifiers.P_DEFAULT_ATTACKED) && !turn.player().hasModifier(Modifiers.P_DEFAULT_DEFENDED))
             eliminatePlayer(turn.player());
+    }
+
+    @Override
+    public BossBar initialBossBar() {
+        return BossBar.bossBar(Component.text("Turn Countdown: -"), 0.0f, BossBar.Color.YELLOW, BossBar.Overlay.NOTCHED_10);
+    }
+
+    @Override
+    public void bossBar(@NotNull BossBar bossBar) {
+        bossBar.name(Component.text("Turn Countdown: " + turnCountdown + "s"));
+        bossBar.progress(Math.clamp((float) turnCountdown / INFO.turnTimer(), 0.0f, 1.0f));
     }
 
     @Override
@@ -143,8 +145,8 @@ public class DefaultGame extends BossBarGame {
     public @Nullable Component actionbar(@NotNull NeoPlayer player) {
         Locale l = player.locale();
         if (currentPlayer() == player) {
-            if (player.hasModifier("attacked")) {
-                if (player.hasModifier("defended")) {
+            if (player.hasModifier(Modifiers.P_DEFAULT_ATTACKED)) {
+                if (player.hasModifier(Modifiers.P_DEFAULT_DEFENDED)) {
                     return Translation.component(l, "actionbar.defended_attack").color(Colors.NEUTRAL);
                 } else {
                     return Translation.component(l, "actionbar.attacked").color(Colors.NEGATIVE);

@@ -1,5 +1,7 @@
 package net.hectus.neobb.player;
 
+import com.marcpg.libpg.util.Randomizer;
+import net.hectus.neobb.shop.Shop;
 import net.hectus.neobb.turn.Turn;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -23,10 +25,6 @@ public class NeoInventory {
         sync();
     }
 
-    public NeoPlayer player() {
-        return player;
-    }
-
     public void switchOwner(NeoPlayer player) {
         this.player = player;
     }
@@ -40,10 +38,6 @@ public class NeoInventory {
 
     public ItemStack[] deck() {
         return deck;
-    }
-
-    public Turn<?>[] dummyTurnDeck() {
-        return dummyTurnDeck;
     }
 
     public void setDeckSlot(int slot, @Nullable ItemStack item, Turn<?> turn) {
@@ -62,6 +56,15 @@ public class NeoInventory {
         throw new ArrayIndexOutOfBoundsException("Deck is already full!");
     }
 
+    public void fillInRandomly() {
+        for (int i = 0; i < deck.length; i++) {
+            if (deck[i] == null) {
+                Turn<?> turn = Shop.turn(Randomizer.fromCollection(player.game.shop().turns), player);
+                setDeckSlot(i, turn.items().getFirst(), turn);
+            }
+        }
+    }
+
     public boolean allowItem(Turn<?> turn, Material material) {
         int count = 0;
         for (ItemStack item : deck) {
@@ -70,18 +73,16 @@ public class NeoInventory {
         return count < turn.maxAmount();
     }
 
-    public int coins() {
-        return coins;
-    }
-
     public synchronized boolean removeCoins(int coins) {
         if (this.coins < coins) return false;
         this.coins -= coins;
+        player.inventory.sync();
         return true;
     }
 
     public synchronized void addCoins(int coins) {
         this.coins += coins;
+        player.inventory.sync();
     }
 
     public boolean shopDone() {
@@ -104,5 +105,6 @@ public class NeoInventory {
 
             inv.setItem(i, item);
         }
+        inv.setItem(13, new ItemStack(Material.GOLD_INGOT, Math.min(coins, 64)));
     }
 }

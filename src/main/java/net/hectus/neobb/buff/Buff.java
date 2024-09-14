@@ -6,6 +6,7 @@ import net.hectus.neobb.player.Target;
 import net.hectus.neobb.player.TargetObj;
 import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.util.Colors;
+import net.hectus.neobb.util.Modifiers;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -56,7 +57,7 @@ public abstract class Buff {
 
         @Override
         public void apply(@NotNull NeoPlayer source) {
-            source.addModifier("extra-turn");
+            source.addModifier(Modifiers.P_EXTRA_TURN);
         }
 
         @Override

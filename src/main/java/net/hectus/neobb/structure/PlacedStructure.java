@@ -4,7 +4,7 @@ import org.bukkit.block.Block;
 import org.jetbrains.annotations.NotNull;
 
 public class PlacedStructure extends Structure {
-    protected Block lastBlock;
+    protected final Block lastBlock;
 
     public PlacedStructure(String name, BlockInfo @NotNull [][][] blocks, Block lastBlock) {
         super(name, blocks);
@@ -17,9 +17,5 @@ public class PlacedStructure extends Structure {
 
     public Block lastBlock() {
         return lastBlock;
-    }
-
-    public void setLastBlock(Block lastBlock) {
-        this.lastBlock = lastBlock;
     }
 }

@@ -4,6 +4,7 @@ import net.hectus.neobb.buff.Buff;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.default_game.attributes.clazz.ColdClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.BuffFunction;
+import net.hectus.neobb.util.Modifiers;
 import org.bukkit.entity.PolarBear;
 import org.bukkit.potion.PotionEffectType;
 
@@ -20,7 +21,7 @@ public class TPolarBear extends MobTurn<PolarBear> implements BuffFunction, Cold
 
     @Override
     public void apply() {
-        player.addModifier("no_jump");
+        player.addModifier(Modifiers.P_NO_JUMP);
     }
 
     @Override

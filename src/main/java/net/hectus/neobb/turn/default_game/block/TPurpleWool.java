@@ -13,14 +13,13 @@ public class TPurpleWool extends BlockTurn implements AttackFunction, NeutralCla
     public TPurpleWool(Block data, NeoPlayer player) { super(data, player); }
 
     @Override
-    public boolean canBeUsed() {
-        if (isDummy()) return false;
+    public boolean unusable() {
+        if (isDummy()) return true;
 
         List<Turn<?>> history = player.game.history();
-        if (history.size() < 5) return false;
+        if (history.size() < 5) return true;
 
-        return history.subList(history.size() - 5, history.size()).stream()
-                .noneMatch(turn -> turn instanceof AttackFunction);
+        return history.subList(history.size() - 5, history.size()).stream().anyMatch(turn -> turn instanceof AttackFunction);
     }
 
     @Override

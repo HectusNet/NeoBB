@@ -10,6 +10,7 @@ import net.hectus.neobb.turn.default_game.attributes.clazz.NeutralClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.RedstoneClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.CounterFunction;
 import net.hectus.neobb.turn.default_game.attributes.function.DefenseFunction;
+import net.hectus.neobb.util.Modifiers;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -36,13 +37,13 @@ public class TOakDoorTurtling extends StructureTurn implements DefenseFunction, 
 
     @Override
     public void applyDefense() {
-        player.addModifier("defended");
+        player.addModifier(Modifiers.P_DEFAULT_DEFENDED);
         player.game.turnScheduler.runTaskTimer("oak_door_turtling", () -> {
             if (player.game.history().getLast() instanceof CounterFunction &&
                     CounterFilter.clazz(HotClazz.class).doCounter(player.game.history().getLast()) ||
                     CounterFilter.clazz(RedstoneClazz.class).doCounter(player.game.history().getLast())) {
-                player.removeModifier("defended");
+                player.removeModifier(Modifiers.P_DEFAULT_DEFENDED);
             }
-        }, () -> !player.hasModifier("defended"), 1);
+        }, () -> !player.hasModifier(Modifiers.P_DEFAULT_DEFENDED), 1);
     }
 }

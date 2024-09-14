@@ -3,7 +3,6 @@ package net.hectus.neobb.turn.default_game.throwable;
 import net.hectus.neobb.buff.Buff;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.default_game.CounterFilter;
-import net.hectus.neobb.turn.default_game.TExample;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NeutralClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.CounterFunction;
 import org.bukkit.Location;
@@ -29,6 +28,6 @@ public class TEnderPearl extends ThrowableTurn implements CounterFunction, Neutr
 
     @Override
     public List<CounterFilter> counters() {
-        return List.of(CounterFilter.of(t -> t instanceof TExample, "levitation"), CounterFilter.of(turn -> turn.getClass().getSimpleName().endsWith("Wall"), "walls")); // TODO: Change TExample to TSplashLevitationPotion
+        return List.of(CounterFilter.of(t -> t instanceof TSplashLevitationPotion, "levitation"), CounterFilter.of(turn -> turn.getClass().getSimpleName().endsWith("Wall"), "walls"));
     }
 }

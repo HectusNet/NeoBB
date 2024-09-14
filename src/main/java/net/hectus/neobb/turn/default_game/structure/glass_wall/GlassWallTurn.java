@@ -9,6 +9,7 @@ import net.hectus.neobb.structure.StructureManager;
 import net.hectus.neobb.turn.default_game.attributes.function.BuffFunction;
 import net.hectus.neobb.turn.default_game.attributes.function.DefenseFunction;
 import net.hectus.neobb.turn.default_game.structure.StructureTurn;
+import net.hectus.neobb.util.Modifiers;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -44,10 +45,10 @@ public abstract class GlassWallTurn extends StructureTurn implements DefenseFunc
 
     @Override
     public void applyDefense() {
-        player.addModifier("defended");
+        player.addModifier(Modifiers.P_DEFAULT_DEFENDED);
         player.game.turnScheduler.runTaskTimer("glass_wall_defense", () -> {
             stay = Randomizer.boolByChance(40);
-            if (stay) player.addModifier("defended");
+            if (stay) player.addModifier(Modifiers.P_DEFAULT_DEFENDED);
         }, () -> stay, 1);
     }
 }

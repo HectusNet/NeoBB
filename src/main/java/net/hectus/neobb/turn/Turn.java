@@ -3,6 +3,7 @@ package net.hectus.neobb.turn;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.default_game.attributes.function.AttackFunction;
 import net.hectus.neobb.turn.default_game.attributes.function.CounterFunction;
+import net.hectus.neobb.util.Modifiers;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,7 +24,7 @@ public abstract class Turn<T> {
     }
 
     public boolean requiresUsageGuide() { return false; }
-    public boolean canBeUsed() { return true; }
+    public boolean unusable() { return false; }
     public int maxAmount() { return 2; }
     public void apply() {}
     public ItemStack item() { return ItemStack.empty(); }
@@ -47,12 +48,12 @@ public abstract class Turn<T> {
     }
 
     public boolean goodChoice(NeoPlayer player) {
-        if (!canBeUsed() || !player.game.allows(this)) return false;
+        if (unusable() || !player.game.allows(this)) return false;
 
-        if ((player.hasModifier("attacked") || player.game.turnScheduler.hasTask("freeze")) && !player.hasModifier("defended"))
+        if ((player.hasModifier(Modifiers.P_DEFAULT_ATTACKED) || player.game.turnScheduler.hasTask("freeze")) && !player.hasModifier(Modifiers.P_DEFAULT_DEFENDED))
             return this instanceof CounterFunction counter && counter.counters().stream().anyMatch(filter -> filter.doCounter(player.game.history().getLast()));
 
-        return !(this instanceof AttackFunction) || !player.nextPlayer().hasModifier("defended");
+        return !(this instanceof AttackFunction) || !player.nextPlayer().hasModifier(Modifiers.P_DEFAULT_DEFENDED);
     }
 
     public final boolean isDummy() {
@@ -60,7 +61,7 @@ public abstract class Turn<T> {
     }
 
     public static final Turn<Void> DUMMY = new Turn<>(null) {
-        @Override public int cost() { return 0; }
+        @Override public int cost() { return 10; }
         @Override public boolean goodChoice(NeoPlayer player) { return false; }
     };
 }

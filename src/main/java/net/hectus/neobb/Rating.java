@@ -42,8 +42,7 @@ public final class Rating {
 
     private static final int RATING_PERIOD_DAYS = 30;
     private static final int INITIAL_ELO = 1500;
-    private static final int MAX_RATING_DEVIATION = 350;
-    private static final double SCALE_CONVERSION_MULT = 173.7178;
+    private static final double SCALE_CONVERSION_MULTIPLIER = 173.7178;
     private static final double TAU = 0.2;
     private static final double EPSILON = 1e-6;
 
@@ -56,8 +55,8 @@ public final class Rating {
     private double volatility;
 
     public Rating(double rating, double ratingDeviation, double volatility, long lastMatchTimeMillis) {
-        this.rating = (rating - INITIAL_ELO) / SCALE_CONVERSION_MULT;
-        this.ratingDeviation = ratingDeviation / SCALE_CONVERSION_MULT;
+        this.rating = (rating - INITIAL_ELO) / SCALE_CONVERSION_MULTIPLIER;
+        this.ratingDeviation = ratingDeviation / SCALE_CONVERSION_MULTIPLIER;
         this.volatility = volatility;
 
         if (lastMatchTimeMillis != -1)
@@ -65,11 +64,11 @@ public final class Rating {
     }
 
     public double getRating() {
-        return rating * SCALE_CONVERSION_MULT + INITIAL_ELO;
+        return rating * SCALE_CONVERSION_MULTIPLIER + INITIAL_ELO;
     }
 
     public double getRatingDeviation() {
-        return ratingDeviation * SCALE_CONVERSION_MULT;
+        return ratingDeviation * SCALE_CONVERSION_MULTIPLIER;
     }
 
     public double getVolatility() {

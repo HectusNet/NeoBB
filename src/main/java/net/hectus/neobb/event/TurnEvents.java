@@ -2,7 +2,9 @@ package net.hectus.neobb.event;
 
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.event.custom.CancellableImpl;
+import net.hectus.neobb.game.DefaultGame;
 import net.hectus.neobb.game.Game;
+import net.hectus.neobb.game.HereGame;
 import net.hectus.neobb.game.util.GameManager;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.PlacedStructure;
@@ -15,6 +17,7 @@ import net.hectus.neobb.turn.default_game.mob.*;
 import net.hectus.neobb.turn.default_game.other.TBoat;
 import net.hectus.neobb.turn.default_game.throwable.*;
 import net.hectus.neobb.turn.default_game.warp.*;
+import net.hectus.neobb.turn.here_game.*;
 import net.hectus.neobb.util.Colors;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -49,125 +52,154 @@ public class TurnEvents implements Listener {
             event.setCancelled(true);
 
         NeoPlayer player = GameManager.player(event.getPlayer(), true);
-        if (unusable(event.getPlayer(), player, event, "You cannot place blocks right now!")) return;
-        player.game.resetTurnCountdown();
+        if (unusable(event.getPlayer(), player, true, event, "You cannot place blocks right now!")) return;
 
         Block block = event.getBlock();
 
+        player.game.resetTurnCountdown();
         if (StructureManager.isStructureMaterial(block.getType())) {
             if (player.game.arena.currentPlacedBlocksAmount() == 0) {
                 Bukkit.getScheduler().runTaskLater(NeoBB.PLUGIN, () -> {
                     if (player.game.arena.currentPlacedBlocksAmount() > 1) {
-                        handleStructure(player, block, event);
+                        handleStructure(event, block, player);
                     } else {
                         blockTurn(event, block, player);
                     }
                 }, 30);
             } else {
-                handleStructure(player, block, event);
+                handleStructure(event, block, player);
             }
         } else {
             blockTurn(event, block, player);
         }
     }
 
-    private void blockTurn(BlockPlaceEvent event, @NotNull Block block, NeoPlayer player) {
-        switch (block.getType()) {
-            case BEE_NEST -> player.game.turn(new TBeeNest(block, player), event);
-            case BLACK_WOOL -> player.game.turn(new TBlackWool(block, player), event);
-            case BLUE_BED -> player.game.turn(new TBlueBed(block, player), event);
-            case BLUE_ICE -> player.game.turn(new TBlueIce(block, player), event);
-            case BRAIN_CORAL_BLOCK -> player.game.turn(new TBrainCoralBlock(block, player), event);
-            case CAMPFIRE -> player.game.turn(new TCampfire(block, player), event);
-            case CAULDRON -> player.game.turn(new TCauldron(block, player), event);
-            case COMPOSTER -> player.game.turn(new TComposter(block, player), event);
-            case CYAN_CARPET -> player.game.turn(new TCyanCarpet(block, player), event);
-            case DRAGON_HEAD -> player.game.turn(new TDragonHead(block, player), event);
-            case DRIED_KELP_BLOCK -> player.game.turn(new TDriedKelpBlock(block, player), event);
-            case FIRE -> player.game.turn(new TFire(block, player), event);
-            case FIRE_CORAL -> player.game.turn(new TFireCoral(block, player), event);
-            case FIRE_CORAL_FAN -> player.game.turn(new TFireCoralFan(block, player), event);
-            case GOLD_BLOCK -> player.game.turn(new TGoldBlock(block, player), event);
-            case GREEN_BED -> player.game.turn(new TGreenBed(block, player), event);
-            case GREEN_CARPET -> player.game.turn(new TGreenCarpet(block, player), event);
-            case GREEN_WOOL -> player.game.turn(new TGreenWool(block, player), event);
-            case HAY_BLOCK -> player.game.turn(new THayBlock(block, player), event);
-            case HONEY_BLOCK -> player.game.turn(new THoneyBlock(block, player), event);
-            case HORN_CORAL -> player.game.turn(new THornCoral(block, player), event);
-            case IRON_TRAPDOOR -> player.game.turn(new TIronTrapdoor(block, player), event);
-            case LAVA -> player.game.turn(new TLava(block, player), event);
-            case LEVER -> player.game.turn(new TLever(block, player), event);
-            case LIGHTNING_ROD -> player.game.turn(new TLightningRod(block, player), event);
-            case LIGHT_BLUE_WOOL -> player.game.turn(new TLightBlueWool(block, player), event);
-            case MAGENTA_GLAZED_TERRACOTTA -> player.game.turn(new TMagentaGlazedTerracotta(block, player), event);
-            case MAGMA_BLOCK -> player.game.turn(new TMagmaBlock(block, player), event);
-            case MANGROVE_ROOTS -> player.game.turn(new TMangroveRoots(block, player), event);
-            case NETHERRACK -> player.game.turn(new TNetherrack(block, player), event);
-            case OAK_FENCE_GATE -> player.game.turn(new TFenceGate(block, player), event);
-            case OAK_STAIRS -> player.game.turn(new TOakStairs(block, player), event);
-            case ORANGE_WOOL -> player.game.turn(new TOrangeWool(block, player), event);
-            case PACKED_ICE -> player.game.turn(new TPackedIce(block, player), event);
-            case PINK_BED -> player.game.turn(new TPinkBed(block, player), event);
-            case POWDER_SNOW -> player.game.turn(new TPowderSnow(block, player), event);
-            case PURPLE_WOOL -> player.game.turn(new TPurpleWool(block, player), event);
-            case RED_BED -> player.game.turn(new TRedBed(block, player), event);
-            case RED_CARPET -> player.game.turn(new TRedCarpet(block, player), event);
-            case REPEATER -> player.game.turn(new TRepeater(block, player), event);
-            case RESPAWN_ANCHOR -> player.game.turn(new TRespawnAnchor(block, player), event);
-            case SCULK -> player.game.turn(new TSculk(block, player), event);
-            case SEA_LANTERN -> player.game.turn(new TSeaLantern(block, player), event);
-            case SOUL_SAND -> player.game.turn(new TSoulSand(block, player), event);
-            case SPONGE -> player.game.turn(new TSponge(block, player), event);
-            case SPRUCE_LEAVES -> player.game.turn(new TSpruceLeaves(block, player), event);
-            case SPRUCE_TRAPDOOR -> player.game.turn(new TSpruceTrapdoor(block, player), event);
-            case STONECUTTER -> player.game.turn(new TStonecutter(block, player), event);
-            case VERDANT_FROGLIGHT -> player.game.turn(new TVerdantFroglight(block, player), event);
-            case WATER -> player.game.turn(new TWater(block, player), event);
-            case WHITE_WOOL -> player.game.turn(new TWhiteWool(block, player), event);
-            default -> event.setCancelled(true);
+    private void blockTurn(BlockPlaceEvent event, Block block, @NotNull NeoPlayer player) {
+        if (player.game instanceof HereGame) {
+            switch (block.getType()) {
+                case CHEST -> player.game.turn(new HTChest(block, player), event);
+                case DAYLIGHT_DETECTOR -> player.game.turn(new HTDaylightDetector(block, player), event);
+                case FLOWER_POT -> player.game.turn(new HTFlowerPot(block, player), event);
+                case JACK_O_LANTERN -> player.game.turn(new HTJackOLantern(block, player), event);
+                case OAK_DOOR -> player.game.turn(new HTOakDoor(block, player), event);
+                case OAK_FENCE_GATE -> player.game.turn(new HTOakFenceGate(block, player), event);
+                case OAK_TRAPDOOR -> player.game.turn(new HTOakTrapdoor(block, player), event);
+                case POINTED_DRIPSTONE -> player.game.turn(new HTPointedDripstone(block, player), event);
+                case REDSTONE_LAMP -> player.game.turn(new HTRedstoneLamp(block, player), event);
+                case TORCH -> player.game.turn(new HTTorch(block, player), event);
+                case WAXED_EXPOSED_CUT_COPPER_STAIRS -> player.game.turn(new HTWaxedExposedCutCopperStairs(block, player), event);
+                default -> event.setCancelled(true);
+            }
+        } else if (player.game instanceof DefaultGame) {
+            switch (block.getType()) {
+                case BEE_NEST -> player.game.turn(new TBeeNest(block, player), event);
+                case BLACK_WOOL -> player.game.turn(new TBlackWool(block, player), event);
+                case BLUE_BED -> player.game.turn(new TBlueBed(block, player), event);
+                case BLUE_ICE -> player.game.turn(new TBlueIce(block, player), event);
+                case BRAIN_CORAL_BLOCK -> player.game.turn(new TBrainCoralBlock(block, player), event);
+                case CAMPFIRE -> player.game.turn(new TCampfire(block, player), event);
+                case CAULDRON -> player.game.turn(new TCauldron(block, player), event);
+                case COMPOSTER -> player.game.turn(new TComposter(block, player), event);
+                case CYAN_CARPET -> player.game.turn(new TCyanCarpet(block, player), event);
+                case DRAGON_HEAD -> player.game.turn(new TDragonHead(block, player), event);
+                case DRIED_KELP_BLOCK -> player.game.turn(new TDriedKelpBlock(block, player), event);
+                case FIRE -> player.game.turn(new TFire(block, player), event);
+                case FIRE_CORAL -> player.game.turn(new TFireCoral(block, player), event);
+                case FIRE_CORAL_FAN -> player.game.turn(new TFireCoralFan(block, player), event);
+                case GOLD_BLOCK -> player.game.turn(new TGoldBlock(block, player), event);
+                case GREEN_BED -> player.game.turn(new TGreenBed(block, player), event);
+                case GREEN_CARPET -> player.game.turn(new TGreenCarpet(block, player), event);
+                case GREEN_WOOL -> player.game.turn(new TGreenWool(block, player), event);
+                case HAY_BLOCK -> player.game.turn(new THayBlock(block, player), event);
+                case HONEY_BLOCK -> player.game.turn(new THoneyBlock(block, player), event);
+                case HORN_CORAL -> player.game.turn(new THornCoral(block, player), event);
+                case IRON_TRAPDOOR -> player.game.turn(new TIronTrapdoor(block, player), event);
+                case LAVA -> player.game.turn(new TLava(block, player), event);
+                case LEVER -> player.game.turn(new TLever(block, player), event);
+                case LIGHTNING_ROD -> player.game.turn(new TLightningRod(block, player), event);
+                case LIGHT_BLUE_WOOL -> player.game.turn(new TLightBlueWool(block, player), event);
+                case MAGENTA_GLAZED_TERRACOTTA -> player.game.turn(new TMagentaGlazedTerracotta(block, player), event);
+                case MAGMA_BLOCK -> player.game.turn(new TMagmaBlock(block, player), event);
+                case MANGROVE_ROOTS -> player.game.turn(new TMangroveRoots(block, player), event);
+                case NETHERRACK -> player.game.turn(new TNetherrack(block, player), event);
+                case OAK_FENCE_GATE -> player.game.turn(new TFenceGate(block, player), event);
+                case OAK_STAIRS -> player.game.turn(new TOakStairs(block, player), event);
+                case ORANGE_WOOL -> player.game.turn(new TOrangeWool(block, player), event);
+                case PACKED_ICE -> player.game.turn(new TPackedIce(block, player), event);
+                case PINK_BED -> player.game.turn(new TPinkBed(block, player), event);
+                case POWDER_SNOW -> player.game.turn(new TPowderSnow(block, player), event);
+                case PURPLE_WOOL -> player.game.turn(new TPurpleWool(block, player), event);
+                case RED_BED -> player.game.turn(new TRedBed(block, player), event);
+                case RED_CARPET -> player.game.turn(new TRedCarpet(block, player), event);
+                case REPEATER -> player.game.turn(new TRepeater(block, player), event);
+                case RESPAWN_ANCHOR -> player.game.turn(new TRespawnAnchor(block, player), event);
+                case SCULK -> player.game.turn(new TSculk(block, player), event);
+                case SEA_LANTERN -> player.game.turn(new TSeaLantern(block, player), event);
+                case SOUL_SAND -> player.game.turn(new TSoulSand(block, player), event);
+                case SPONGE -> player.game.turn(new TSponge(block, player), event);
+                case SPRUCE_LEAVES -> player.game.turn(new TSpruceLeaves(block, player), event);
+                case SPRUCE_TRAPDOOR -> player.game.turn(new TSpruceTrapdoor(block, player), event);
+                case STONECUTTER -> player.game.turn(new TStonecutter(block, player), event);
+                case VERDANT_FROGLIGHT -> player.game.turn(new TVerdantFroglight(block, player), event);
+                case WATER -> player.game.turn(new TWater(block, player), event);
+                case WHITE_WOOL -> player.game.turn(new TWhiteWool(block, player), event);
+                default -> event.setCancelled(true);
+            }
         }
     }
 
-    private void handleStructure(@NotNull NeoPlayer player, Block block, BlockPlaceEvent event) {
+    private void handleStructure(BlockPlaceEvent event, Block block, @NotNull NeoPlayer player) {
         Structure structure = StructureManager.match(player.game.arena);
         if (structure == null) return;
-        switch (structure.name) {
-            case "amethyst-warp" -> player.game.turn(new TAmethystWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-            case "cliff-warp" -> player.game.turn(new TCliffWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-            case "desert-warp" -> player.game.turn(new TDesertWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-            case "end-warp" -> player.game.turn(new TEndWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-            case "frozen-warp" -> player.game.turn(new TFrozenWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-            case "meadow-warp" -> player.game.turn(new TMeadowWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-            case "mushroom-warp" -> player.game.turn(new TMushroomWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-            case "nerd-warp" -> player.game.turn(new TNerdWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-            case "nether-warp" -> player.game.turn(new TNetherWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-            case "ocean-warp" -> player.game.turn(new TOceanWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-            case "redstone-warp" -> player.game.turn(new TRedstoneWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-            case "sun-warp" -> player.game.turn(new TSunWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-            case "void-warp" -> player.game.turn(new TVoidWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-            case "wood-warp" -> player.game.turn(new TWoodWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+        if (player.game instanceof DefaultGame) {
+            switch (structure.name) {
+                case "amethyst-warp" -> player.game.turn(new TAmethystWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+                case "cliff-warp" -> player.game.turn(new TCliffWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+                case "desert-warp" -> player.game.turn(new TDesertWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+                case "end-warp" -> player.game.turn(new TEndWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+                case "frozen-warp" -> player.game.turn(new TFrozenWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+                case "meadow-warp" -> player.game.turn(new TMeadowWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+                case "mushroom-warp" -> player.game.turn(new TMushroomWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+                case "nerd-warp" -> player.game.turn(new TNerdWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+                case "nether-warp" -> player.game.turn(new TNetherWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+                case "ocean-warp" -> player.game.turn(new TOceanWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+                case "redstone-warp" -> player.game.turn(new TRedstoneWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+                case "sun-warp" -> player.game.turn(new TSunWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+                case "void-warp" -> player.game.turn(new TVoidWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+                case "wood-warp" -> player.game.turn(new TWoodWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+            }
         }
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteract(@NotNull PlayerInteractEvent event) {
-        if (event.getAction() == Action.LEFT_CLICK_BLOCK && event.getMaterial().name().endsWith("_SPAWN_EGG")) {
-            NeoPlayer player = GameManager.player(event.getPlayer(), true);
-            if (unusable(event.getPlayer(), player, event, "You cannot spawn mobs right now!")) return;
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
-            Location loc = Objects.requireNonNull(event.getInteractionPoint());
-            switch (event.getMaterial()) {
-                case AXOLOTL_SPAWN_EGG -> player.game.turn(new TAxolotl(loc.getWorld().spawn(loc, Axolotl.class), player), event);
-                case BEE_SPAWN_EGG -> player.game.turn(new TBee(loc.getWorld().spawn(loc, Bee.class), player), event);
-                case BLAZE_SPAWN_EGG -> player.game.turn(new TBlaze(loc.getWorld().spawn(loc, Blaze.class), player), event);
-                case EVOKER_SPAWN_EGG -> player.game.turn(new TEvoker(loc.getWorld().spawn(loc, Evoker.class), player), event);
-                case PHANTOM_SPAWN_EGG -> player.game.turn(new TPhantom(loc.getWorld().spawn(loc, Phantom.class), player), event);
-                case PIGLIN_SPAWN_EGG -> player.game.turn(new TPiglin(loc.getWorld().spawn(loc, Piglin.class), player), event);
-                case POLAR_BEAR_SPAWN_EGG -> player.game.turn(new TPolarBear(loc.getWorld().spawn(loc, PolarBear.class), player), event);
-                case PUFFERFISH_SPAWN_EGG -> player.game.turn(new TPufferfish(loc.getWorld().spawn(loc, PufferFish.class), player), event);
-                case SHEEP_SPAWN_EGG -> player.game.turn(new TSheep(loc.getWorld().spawn(loc, Sheep.class), player), event);
+        NeoPlayer player = GameManager.player(event.getPlayer(), true);
+        if (unusable(event.getPlayer(), player, false, event, "You cannot interact right now!")) return;
+
+        if (player.game instanceof DefaultGame) {
+            if (unusable(event.getPlayer(), player, true, event, "You cannot interact right now!")) return;
+            if (event.getMaterial().name().endsWith("_SPAWN_EGG")) {
+                Location loc = Objects.requireNonNull(event.getInteractionPoint());
+                switch (event.getMaterial()) {
+                    case AXOLOTL_SPAWN_EGG -> player.game.turn(new TAxolotl(loc.getWorld().spawn(loc, Axolotl.class), player), event);
+                    case BEE_SPAWN_EGG -> player.game.turn(new TBee(loc.getWorld().spawn(loc, Bee.class), player), event);
+                    case BLAZE_SPAWN_EGG -> player.game.turn(new TBlaze(loc.getWorld().spawn(loc, Blaze.class), player), event);
+                    case EVOKER_SPAWN_EGG -> player.game.turn(new TEvoker(loc.getWorld().spawn(loc, Evoker.class), player), event);
+                    case PHANTOM_SPAWN_EGG -> player.game.turn(new TPhantom(loc.getWorld().spawn(loc, Phantom.class), player), event);
+                    case PIGLIN_SPAWN_EGG -> player.game.turn(new TPiglin(loc.getWorld().spawn(loc, Piglin.class), player), event);
+                    case POLAR_BEAR_SPAWN_EGG -> player.game.turn(new TPolarBear(loc.getWorld().spawn(loc, PolarBear.class), player), event);
+                    case PUFFERFISH_SPAWN_EGG -> player.game.turn(new TPufferfish(loc.getWorld().spawn(loc, PufferFish.class), player), event);
+                    case SHEEP_SPAWN_EGG -> player.game.turn(new TSheep(loc.getWorld().spawn(loc, Sheep.class), player), event);
+                }
             }
-            event.setCancelled(true);
+        } else if (player.game instanceof HereGame) {
+            if (player.game.history().isEmpty()) return;
+            if (player.game.history().getLast() instanceof InteractableHereTurn interactable &&
+                    player == interactable.player() && interactable.data().getLocation().equals(event.getClickedBlock().getLocation())) {
+                interactable.interact();
+            }
         }
     }
 
@@ -175,9 +207,10 @@ public class TurnEvents implements Listener {
     public void onEntityPlace(@NotNull EntityPlaceEvent event) {
         if (event.getEntity() instanceof Boat boat) {
             NeoPlayer player = GameManager.player(event.getPlayer(), true);
-            if (unusable(event.getPlayer(), player, event, "You cannot place boats right now!")) return;
+            if (unusable(event.getPlayer(), player, true, event, "You cannot place boats right now!")) return;
 
-            player.game.turn(new TBoat(boat, player), event);
+            if (player.game instanceof DefaultGame)
+                player.game.turn(new TBoat(boat, player), event);
         }
     }
 
@@ -185,9 +218,10 @@ public class TurnEvents implements Listener {
     public void onPlayerItemConsume(@NotNull PlayerItemConsumeEvent event) {
         if (event.getItem().getType() == Material.CHORUS_FRUIT) {
             NeoPlayer player = GameManager.player(event.getPlayer(), true);
-            if (unusable(event.getPlayer(), player, event, "You cannot consume chorus fruits right now!")) return;
+            if (unusable(event.getPlayer(), player, true, event, "You cannot consume chorus fruits right now!")) return;
 
-            player.game.turn(new TChorusFruit(event.getItem(), event.getPlayer().getLocation(), player), event);
+            if (player.game instanceof DefaultGame)
+                player.game.turn(new TChorusFruit(event.getItem(), event.getPlayer().getLocation(), player), event);
         }
     }
 
@@ -195,9 +229,10 @@ public class TurnEvents implements Listener {
     public void onEntityTransform(@NotNull EntityTransformEvent event) {
         if (event.getTransformReason() == EntityTransformEvent.TransformReason.PIGLIN_ZOMBIFIED) {
             Game game = GameManager.game(event.getEntity().getScoreboardTags());
-            if (game == null) return;
-            NeoPlayer player = game.currentPlayer();
-            new TPiglin(game.currentPlayer()).buffs().forEach(b -> b.apply(player));
+            if (game instanceof DefaultGame) {
+                NeoPlayer player = game.currentPlayer();
+                new TPiglin(game.currentPlayer()).buffs().forEach(b -> b.apply(player));
+            }
         }
     }
 
@@ -205,16 +240,18 @@ public class TurnEvents implements Listener {
     public void onPotionSplash(@NotNull PotionSplashEvent event) {
         if (event.getPotion().getShooter() instanceof Player p) {
             NeoPlayer player = GameManager.player(p, true);
-            if (unusable(p, player, new CancellableImpl(), "You cannot use potions right now!")) return;
+            if (unusable(p, player, true, new CancellableImpl(), "You cannot use potions right now!")) return;
 
-            PotionMeta meta = event.getPotion().getPotionMeta();
-            if (meta.hasBasePotionType()) {
-                switch (meta.getBasePotionType()) {
-                    case WATER -> player.game.turn(new TSplashWaterBottle(event.getPotion(), event.getPotion().getLocation(), player), event);
-                    case STRONG_LEAPING -> player.game.turn(new TSplashJumpBoostPotion(event.getPotion(), event.getPotion().getLocation(), player), event);
+            if (player.game instanceof DefaultGame) {
+                PotionMeta meta = event.getPotion().getPotionMeta();
+                if (meta.hasBasePotionType()) {
+                    switch (meta.getBasePotionType()) {
+                        case WATER -> player.game.turn(new TSplashWaterBottle(event.getPotion(), event.getPotion().getLocation(), player), event);
+                        case STRONG_LEAPING -> player.game.turn(new TSplashJumpBoostPotion(event.getPotion(), event.getPotion().getLocation(), player), event);
+                    }
+                } else if (meta.hasCustomEffect(PotionEffectType.LEVITATION)) {
+                    player.game.turn(new TSplashLevitationPotion(event.getPotion(), event.getPotion().getLocation(), player), event);
                 }
-            } else if (meta.hasCustomEffect(PotionEffectType.LEVITATION)) {
-                player.game.turn(new TSplashLevitationPotion(event.getPotion(), event.getPotion().getLocation(), player), event);
             }
         }
     }
@@ -223,12 +260,14 @@ public class TurnEvents implements Listener {
     public void onProjectileHit(@NotNull ProjectileHitEvent event) {
         if (event.getEntity().getShooter() instanceof Player p) {
             NeoPlayer player = GameManager.player(p, true);
-            if (unusable(p, player, new CancellableImpl(), "You cannot throw things right now!")) return;
+            if (unusable(p, player, true, new CancellableImpl(), "You cannot throw things right now!")) return;
 
-            if (event.getEntity() instanceof Snowball snowball) {
-                player.game.turn(new TSnowball(snowball, snowball.getLocation(), player), event);
-            } else if (event.getEntity() instanceof EnderPearl enderPearl) {
-                player.game.turn(new TEnderPearl(enderPearl, enderPearl.getLocation(), player), event);
+            if (player.game instanceof DefaultGame) {
+                if (event.getEntity() instanceof Snowball snowball) {
+                    player.game.turn(new TSnowball(snowball, snowball.getLocation(), player), event);
+                } else if (event.getEntity() instanceof EnderPearl enderPearl) {
+                    player.game.turn(new TEnderPearl(enderPearl, enderPearl.getLocation(), player), event);
+                }
             }
         }
     }
@@ -236,21 +275,20 @@ public class TurnEvents implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDropItem(@NotNull PlayerDropItemEvent event) {
         NeoPlayer player = GameManager.player(event.getPlayer(), true);
-        if (unusable(event.getPlayer(), player, event, "You cannot drop items right now!")) return;
+        if (unusable(event.getPlayer(), player, true, event, "You cannot drop items right now!")) return;
 
-        if (event.getItemDrop().getItemStack().getType() == Material.IRON_SHOVEL) {
+        if (player.game instanceof DefaultGame && event.getItemDrop().getItemStack().getType() == Material.IRON_SHOVEL)
             player.game.turn(new TIronShovel(event.getItemDrop().getItemStack(), event.getItemDrop().getLocation(), player), event);
-        }
     }
 
-    private boolean unusable(Player fallbackPlayer, NeoPlayer player, Cancellable event, String message) {
+    private boolean unusable(Player fallbackPlayer, NeoPlayer player, boolean requireTurning, Cancellable event, String message) {
         if (player == null) {
             if (fallbackPlayer.getGameMode() != GameMode.CREATIVE) // Allow builders and admins to do this.
                 event.setCancelled(true);
             return true;
         }
 
-        if (!player.game.started() || player.game.currentPlayer() != player) {
+        if (!player.game.started() || (requireTurning && player.game.currentPlayer() != player)) {
             player.sendMessage(Component.text(message, Colors.NEGATIVE));
             event.setCancelled(true);
             return true;

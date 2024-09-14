@@ -22,12 +22,12 @@ public class TMagentaGlazedTerracotta extends BlockTurn implements Counterattack
     }
 
     @Override
-    public boolean canBeUsed() {
-        if (isDummy()) return false;
+    public boolean unusable() {
+        if (isDummy()) return true;
         if (!player.game.history().isEmpty() && player.game.history().getLast() instanceof BlockTurn blockTurn) {
-            return data.getRelative(((Directional) data.getBlockData()).getFacing()).equals(blockTurn.data());
+            return !data.getRelative(((Directional) data.getBlockData()).getFacing()).equals(blockTurn.data());
         } else {
-            return false;
+            return true;
         }
     }
 

@@ -11,6 +11,7 @@ import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
 import net.hectus.neobb.turn.default_game.attributes.function.WarpFunction;
 import net.hectus.neobb.turn.default_game.structure.StructureTurn;
 import net.hectus.neobb.util.Cord;
+import net.hectus.neobb.util.Modifiers;
 import net.hectus.neobb.util.Utilities;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,14 +28,14 @@ public abstract class WarpTurn extends StructureTurn implements WarpFunction {
         super(null);
         this.location = Utilities.listToLocation(world, NeoBB.CONFIG.getIntegerList("warps." + name));
         this.name = name;
-        this.center = location().add(5, 5, 5);
+        this.center = location().add(5, 0, 5);
     }
 
     public WarpTurn(PlacedStructure data, World world, NeoPlayer player, String name) {
         super(data, player);
         this.location = Utilities.listToLocation(world, NeoBB.CONFIG.getIntegerList("warps." + name));
         this.name = name;
-        this.center = location().add(5, 5, 5);
+        this.center = location().add(5, 0, 5);
     }
 
     public abstract int chance();
@@ -59,8 +60,12 @@ public abstract class WarpTurn extends StructureTurn implements WarpFunction {
         };
     }
 
-    public Location lowCorner() {
-        return location();
+    public Cord lowCorner() {
+        return Cord.ofLocation(location());
+    }
+
+    public Cord highCorner() {
+        return lowCorner().add(new Cord(9, NeoBB.CONFIG.getInt("max-arena-height"), 9));
     }
 
     @Override
@@ -75,10 +80,10 @@ public abstract class WarpTurn extends StructureTurn implements WarpFunction {
 
     @Override
     public void apply() {
-        if (player.hasModifier("next_warp_100%") || Randomizer.boolByChance(chance())) {
-            player.removeModifier("next_warp_100%");
+        if (player.hasModifier(Modifiers.P_DEFAULT_100P_WARP) || Randomizer.boolByChance(chance())) {
+            player.removeModifier(Modifiers.P_DEFAULT_100P_WARP);
             WarpTurn oldWarp = player.game.warp();
-            player.game.players().forEach(p -> p.player.teleport(p.player.getLocation().clone().subtract(oldWarp.lowCorner()).add(lowCorner())));
+            player.game.players().forEach(p -> p.player.teleport(p.player.getLocation().clone().subtract(oldWarp.location()).add(location())));
             player.game.warp(this);
         }
     }

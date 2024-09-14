@@ -1,8 +1,6 @@
-package net.hectus.neobb.util;
+package net.hectus.neobb.lore;
 
 import com.marcpg.libpg.lang.Translation;
-import com.marcpg.libpg.text.Formatter;
-import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.turn.default_game.attributes.clazz.*;
 import net.hectus.neobb.turn.default_game.attributes.function.*;
 import net.hectus.neobb.turn.default_game.block.BlockTurn;
@@ -11,22 +9,13 @@ import net.hectus.neobb.turn.default_game.mob.MobTurn;
 import net.hectus.neobb.turn.default_game.structure.StructureTurn;
 import net.hectus.neobb.turn.default_game.throwable.ThrowableTurn;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public final class ItemLoreBuilder {
-    private static final Component SEPARATOR = Component.text("                    ", Colors.EXTRA);
-
-    private final Turn<?> turn;
-
-    public ItemLoreBuilder(Turn<?> turn) {
-        this.turn = turn;
-    }
-
+public class DefaultItemLoreBuilder extends ItemLoreBuilder {
     public @NotNull List<Component> build(Locale l) {
         List<Component> lore = new ArrayList<>();
 
@@ -56,19 +45,6 @@ public final class ItemLoreBuilder {
         }
 
         return lore;
-    }
-
-    private @NotNull Component key(Locale l, String key, String icon) {
-        return Component.text(icon + " ").append(Translation.component(l, key)).append(Component.text(": "))
-                .color(Colors.NEUTRAL).decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE);
-    }
-
-    private @NotNull List<? extends Component> longText(Locale l, String type) {
-        String text = Translation.string(l, type + "." + Utilities.camelToSnake(Utilities.counterFilterName(turn.getClass().getSimpleName())));
-        return Formatter.lineWrap(text, 50).stream()
-                .map(s -> Component.text("   | " + s, Colors.BLUE)
-                        .decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE))
-                .toList();
     }
 
     private @NotNull String clazz() {

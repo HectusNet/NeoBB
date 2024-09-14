@@ -4,11 +4,12 @@ import com.marcpg.libpg.util.Randomizer;
 import net.hectus.neobb.game.Game;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.Turn;
+import net.hectus.neobb.lore.ItemLoreBuilder;
 import org.jetbrains.annotations.NotNull;
 
 public class RandomizedShop extends Shop {
-    public RandomizedShop(@NotNull Game game) {
-        super(game);
+    public RandomizedShop(@NotNull Game game, ItemLoreBuilder loreBuilder) {
+        super(game, loreBuilder);
     }
 
     @Override

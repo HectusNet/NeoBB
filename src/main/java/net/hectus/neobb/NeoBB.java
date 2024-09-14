@@ -7,6 +7,7 @@ import com.marcpg.libpg.data.database.sql.SQLConnection;
 import com.marcpg.libpg.lang.Translation;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.hectus.neobb.event.GameEvents;
+import net.hectus.neobb.event.PlayerEvents;
 import net.hectus.neobb.event.TurnEvents;
 import net.hectus.neobb.game.util.GameManager;
 import net.hectus.neobb.structure.StructureManager;
@@ -31,7 +32,7 @@ import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class NeoBB extends JavaPlugin {
-    public static final String VERSION = "0.0.6";
+    public static final String VERSION = "0.0.7";
 
     public static NeoBB PLUGIN;
     public static Logger LOG;
@@ -76,8 +77,9 @@ public final class NeoBB extends JavaPlugin {
             event.registrar().register(Commands.giveupCommand());
         });
 
-        getServer().getPluginManager().registerEvents(new TurnEvents(), this);
         getServer().getPluginManager().registerEvents(new GameEvents(), this);
+        getServer().getPluginManager().registerEvents(new PlayerEvents(), this);
+        getServer().getPluginManager().registerEvents(new TurnEvents(), this);
     }
 
     @Override

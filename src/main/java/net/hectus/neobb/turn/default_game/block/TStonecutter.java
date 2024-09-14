@@ -4,6 +4,7 @@ import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.default_game.CounterFilter;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NeutralClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.CounterFunction;
+import net.hectus.neobb.util.Modifiers;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,6 +26,6 @@ public class TStonecutter extends BlockTurn implements CounterFunction, NeutralC
 
     @Override
     public void counter(@NotNull NeoPlayer source) {
-        source.opponents(true).forEach(p -> p.removeModifier("defended"));
+        source.opponents(true).forEach(p -> p.removeModifier(Modifiers.P_DEFAULT_DEFENDED));
     }
 }

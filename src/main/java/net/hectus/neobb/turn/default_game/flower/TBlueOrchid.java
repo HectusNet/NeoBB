@@ -1,6 +1,7 @@
 package net.hectus.neobb.turn.default_game.flower;
 
 import net.hectus.neobb.player.NeoPlayer;
+import net.hectus.neobb.util.Modifiers;
 import org.bukkit.block.Block;
 
 public class TBlueOrchid extends FlowerTurn {
@@ -14,6 +15,6 @@ public class TBlueOrchid extends FlowerTurn {
 
     @Override
     public void apply() {
-        player.addModifier("next_warp_100%");
+        player.addModifier(Modifiers.P_DEFAULT_100P_WARP);
     }
 }

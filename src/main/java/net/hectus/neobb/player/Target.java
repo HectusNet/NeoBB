@@ -1,6 +1,3 @@
 package net.hectus.neobb.player;
 
-import net.kyori.adventure.audience.ForwardingAudience;
-
-public interface Target extends ForwardingAudience {
-}
+public interface Target extends net.kyori.adventure.audience.ForwardingAudience {}

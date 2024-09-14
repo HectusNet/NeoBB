@@ -11,6 +11,7 @@ import net.hectus.neobb.turn.default_game.attributes.clazz.RedstoneClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.SupernaturalClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.BuffFunction;
 import net.hectus.neobb.turn.default_game.attributes.function.CounterFunction;
+import net.hectus.neobb.util.Modifiers;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -44,17 +45,17 @@ public class TIronBarJail extends StructureTurn implements BuffFunction, Neutral
     public void apply() {
         if (trapped == null) return;
 
-        trapped.addModifier("no_move");
-        trapped.addModifier("no_attack");
+        trapped.addModifier(Modifiers.P_NO_MOVE);
+        trapped.addModifier(Modifiers.P_DEFAULT_NO_ATTACK);
 
         player.game.turnScheduler.runTaskTimer("iron_bar_jail", () -> {
             if (player.game.history().getLast() instanceof CounterFunction &&
                     CounterFilter.clazz(RedstoneClazz.class).doCounter(player.game.history().getLast()) ||
                     CounterFilter.clazz(SupernaturalClazz.class).doCounter(player.game.history().getLast())) {
-                trapped.removeModifier("no_move");
-                trapped.removeModifier("no_attack");
+                trapped.removeModifier(Modifiers.P_NO_MOVE);
+                trapped.removeModifier(Modifiers.P_DEFAULT_NO_ATTACK);
             }
-        }, () -> !trapped.hasModifier("no_move") || !trapped.hasModifier("no_attack"), 1);
+        }, () -> !trapped.hasModifier(Modifiers.P_NO_MOVE) || !trapped.hasModifier(Modifiers.P_DEFAULT_NO_ATTACK), 1);
     }
 
     @Override

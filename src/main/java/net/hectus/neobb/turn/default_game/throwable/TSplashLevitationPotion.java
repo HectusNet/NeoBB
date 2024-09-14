@@ -5,6 +5,7 @@ import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.default_game.attributes.clazz.SupernaturalClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.BuffFunction;
 import net.hectus.neobb.util.ItemBuilder;
+import net.hectus.neobb.util.Modifiers;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -36,7 +37,7 @@ public class TSplashLevitationPotion extends ThrowableTurn implements BuffFuncti
     @Override
     public void apply() {
         if (player.player.hasPotionEffect(PotionEffectType.LEVITATION))
-            player.removeModifier("extra-turn");
+            player.removeModifier(Modifiers.P_EXTRA_TURN);
 
         player.game.turnScheduler.runTaskLater("levitation", () -> player.opponents(true).forEach(p -> {
             if (p.player.hasPotionEffect(PotionEffectType.LEVITATION))

@@ -16,9 +16,9 @@ public class TAzureBluet extends FlowerTurn {
     }
 
     @Override
-    public boolean canBeUsed() {
-        if (isDummy()) return false;
-        return player.game.history().stream().anyMatch(t -> t instanceof TAzureBluet);
+    public boolean unusable() {
+        if (isDummy()) return true;
+        return player.game.history().stream().noneMatch(t -> t instanceof TAzureBluet);
     }
 
     @Override

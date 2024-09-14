@@ -1,75 +1,88 @@
 package net.hectus.neobb.event;
 
-import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import com.destroystokyo.paper.event.server.ServerTickEndEvent;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.DefaultGame;
-import net.hectus.neobb.game.Game;
 import net.hectus.neobb.game.util.GameManager;
-import net.hectus.neobb.player.NeoPlayer;
-import net.hectus.neobb.turn.default_game.warp.TDefaultWarp;
-import org.bukkit.Bukkit;
+import net.hectus.neobb.util.Modifiers;
+import net.hectus.neobb.util.Utilities;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 
 public class GameEvents implements Listener {
-    public static int currentTick;
+    private static final List<EntityDamageEvent.DamageCause> DISABLED_DAMAGE = List.of(FIRE_TICK, FREEZE, POISON);
+
+    // ========== SERVER EVENTS ==========
 
     @EventHandler
     public void onServerTickEnd(@NotNull ServerTickEndEvent event) {
-        currentTick = event.getTickNumber();
-        GameManager.GAMES.forEach(Game::gameTick);
+        GameManager.GAMES.forEach(game -> game.gameTick(event.getTickNumber()));
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onBlockPlace(@NotNull BlockPlaceEvent event) {
-        NeoPlayer player = GameManager.player(event.getPlayer(), true);
-        if (player != null)
-            player.game.arena.addBlock(event.getBlock());
-    }
+    // ========== PLAYER EVENTS ==========
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerMove(@NotNull PlayerMoveEvent event) {
-        NeoPlayer player = GameManager.player(event.getPlayer(), true);
-        if (player != null) {
-            if (player.hasModifier("no_move") && event.hasChangedPosition()) {
-                event.setCancelled(true);
-            } else if (event.getTo().clone().subtract(0, 1, 0).getBlock().getType() == Material.MAGMA_BLOCK) {
-                player.game.eliminatePlayer(player);
-            }
-        }
-    }
+        Utilities.playerEventAction(event.getPlayer(), true, p -> true, p -> {
+            // TODO: Re-add this and make it properly kill players when moving out of the arena, instead of just all the time.
+//            if (event.hasChangedBlock()) {
+//                if (!Cord.ofLocation(p.player.getLocation()).inBounds(Cord.ofLocation(p.game.warp().lowCorner()), Cord.ofLocation(p.game.warp().highCorner())))
+//                    p.game.eliminatePlayer(p);
+//            }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerJump(@NotNull PlayerJumpEvent event) {
-        NeoPlayer player = GameManager.player(event.getPlayer(), true);
-        if (player != null && player.hasModifier("no_jump"))
-            event.setCancelled(true);
+            if (p.hasModifier(Modifiers.P_NO_MOVE) && event.hasChangedPosition()) {
+                event.setCancelled(true);
+            } else if (p.game instanceof DefaultGame && event.getTo().clone().subtract(0, 1, 0).getBlock().getType() == Material.MAGMA_BLOCK) {
+                p.game.eliminatePlayer(p);
+            }
+        });
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onVehicleEnter(@NotNull VehicleEnterEvent event) {
-        if (event.getEntered() instanceof Player player) {
-            NeoPlayer neoPlayer = GameManager.player(player, true);
-            if (neoPlayer != null) neoPlayer.removeModifier("boat_damage");
-        }
+        if (event.getEntered() instanceof Player eventPlayer)
+            Utilities.playerEventAction(eventPlayer, true, p -> true, p -> p.removeModifier(Modifiers.P_DEFAULT_BOAT_DAMAGE));
+    }
+
+    // ========== BLOCK EVENTS ==========
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockPlace(@NotNull BlockPlaceEvent event) {
+        AtomicBoolean game = new AtomicBoolean(false);
+        Utilities.playerEventAction(event.getPlayer(), true, p -> true, p -> {
+            try {
+                p.game.arena.addBlock(event.getBlock());
+            } catch (IndexOutOfBoundsException e) {
+                NeoBB.LOG.warn("Placed blocks out of bounds: {}", e.getMessage());
+                event.setCancelled(true);
+            }
+            game.set(true);
+        });
+        if (!game.get() && event.getPlayer().getGameMode() != GameMode.CREATIVE)
+            event.setCancelled(true);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockBreak(@NotNull BlockBreakEvent event) {
+        if (event.getPlayer().getGameMode() != GameMode.CREATIVE)
+            event.setCancelled(true);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -78,34 +91,16 @@ public class GameEvents implements Listener {
             event.setCancelled(true);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    // ========== ENTITY EVENTS ==========
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onEntityTargetLivingEntity(@NotNull EntityTargetLivingEntityEvent event) {
         event.setCancelled(true); // Cancel any hostile mob activity.
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamage(@NotNull EntityDamageEvent event) {
-        if (List.of(FIRE_TICK, FREEZE, POISON).contains(event.getCause())) {
+        if (DISABLED_DAMAGE.contains(event.getCause()))
             event.setCancelled(true);
-        }
-    }
-
-
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        List<Player> available = availablePlayers();
-        if (NeoBB.PRODUCTION && available.size() >= NeoBB.CONFIG.getInt("starting-players")) {
-            new DefaultGame(true, player.getWorld(), available);
-        } else {
-            player.teleport(new TDefaultWarp(player.getWorld()).location().clone());
-        }
-    }
-
-    public static @NotNull List<Player> availablePlayers() {
-        return Bukkit.getOnlinePlayers().stream()
-                .filter(player -> player.getGameMode() == GameMode.ADVENTURE && player.getInventory().isEmpty())
-                .filter(player -> GameManager.player(player, false) == null)
-                .collect(Collectors.toList());
     }
 }

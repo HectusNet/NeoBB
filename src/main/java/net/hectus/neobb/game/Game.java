@@ -5,7 +5,6 @@ import com.marcpg.libpg.lang.Translation;
 import com.marcpg.libpg.util.Randomizer;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.Rating;
-import net.hectus.neobb.event.GameEvents;
 import net.hectus.neobb.event.custom.CancellableImpl;
 import net.hectus.neobb.game.util.*;
 import net.hectus.neobb.player.NeoPlayer;
@@ -18,6 +17,7 @@ import net.hectus.neobb.turn.default_game.warp.TDefaultWarp;
 import net.hectus.neobb.turn.default_game.warp.WarpTurn;
 import net.hectus.neobb.util.Colors;
 import net.hectus.neobb.util.Cord;
+import net.hectus.neobb.util.Modifiers;
 import net.hectus.neobb.util.Utilities;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
@@ -33,7 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public abstract class Game {
+public abstract class Game extends Modifiers.Modifiable {
     public final String id = Randomizer.generateRandomString(10, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
     public final Arena arena;
     public final EffectManager effectManager = new EffectManager();
@@ -43,18 +43,16 @@ public abstract class Game {
     protected final List<NeoPlayer> initialPlayers = new ArrayList<>();
     protected final List<NeoPlayer> players = new ArrayList<>();
     protected final List<Turn<?>> history = new ArrayList<>();
-    protected final Set<String> modifiers = new HashSet<>();
+    protected final Set<Class<? extends Clazz>> allowedClazzes = new HashSet<>();
 
     protected boolean started;
     protected int turningIndex = 0;
     protected Shop shop;
 
     protected WarpTurn warp;
-    protected Set<Class<? extends Clazz>> allowedClazzes = new HashSet<>();
 
-    protected long startTick;
     protected Time timeLeft;
-    protected int turnCountdown;
+    protected int turnCountdown = info().turnTimer();
 
     public Game(boolean ranked, World world, @NotNull List<Player> players) {
         this.ranked = ranked;
@@ -64,8 +62,6 @@ public abstract class Game {
                 .map(player -> new NeoPlayer(player, this))
                 .peek(initialPlayers::add)
                 .forEach(this.players::add);
-
-        GameManager.GAMES.add(this);
 
         players.forEach(p -> {
             cleanPlayer(p);
@@ -77,13 +73,15 @@ public abstract class Game {
         // TODO: Support multiple players and make it a circle:
         players.getFirst().teleport(new Location(warp.center.getWorld(), warp.center.x() + 2.5, warp.center.y(), warp.center.z(), 90, 0));
         players.getLast().teleport(new Location(warp.center.getWorld(), warp.center.x() - 2.5, warp.center.y(), warp.center.z(), -90, 0));
+
+        GameManager.add(this);
     }
 
     public abstract GameInfo info();
 
     @MustBeInvokedByOverriders
     public void turn(@NotNull Turn<?> turn, Cancellable event) {
-        if (outOfBounds(turn, event)) return;
+        if (outOfBounds(turn.location(), event)) return;
 
         try {
             if (!(turn instanceof TTimeLimit)) {
@@ -100,14 +98,14 @@ public abstract class Game {
         effectManager.applyEffects(turn);
         currentPlayer().player.playSound(currentPlayer().player, Sound.BLOCK_NOTE_BLOCK_BELL, 0.5f, 1.0f);
         initialPlayers.forEach(p -> p.sendMessage(Translation.component(p.locale(), "gameplay.info.turn-used",
-                turn.player().player.getName(), Utilities.turnKey(turn.getClass().getSimpleName())).color(Colors.EXTRA)));
+                turn.player().player.getName(), Utilities.turnName(turn.getClass().getSimpleName(), p.locale())).color(Colors.EXTRA)));
 
         arena.resetCurrentBlocks();
         resetTurnCountdown();
         players.forEach(p -> p.inventory.sync());
 
-        if (turn.player().hasModifier("extra-turn")) {
-            turn.player().removeModifier("extra-turn");
+        if (turn.player().hasModifier(Modifiers.P_EXTRA_TURN)) {
+            turn.player().removeModifier(Modifiers.P_EXTRA_TURN);
         } else {
             moveToNextPlayer();
         }
@@ -117,8 +115,12 @@ public abstract class Game {
      * Verifies if the turn can be used and will return true if it is cancelled and the turn method can exit safely, due to being outside of the arena for example.
      * @return {@code false} if the turn method should abort, {@code true} if it can continue.
      */
-    public boolean outOfBounds(@NotNull Turn<?> turn, Cancellable event) {
-        if (!Cord.ofLocation(turn.location().clone().subtract(warp.location())).inBounds(0, 8, 0, arena.currentPlacedBlocks()[0].length - 1, 0, 8)) {
+    public final boolean outOfBounds(@NotNull Location location, Cancellable event) {
+        if (!Cord.ofLocation(location.clone().subtract(warp.location())).inBounds(0, 9, 0, arena.currentPlacedBlocks()[0].length - 1, 0, 9)) {
+            event.setCancelled(true);
+            return true;
+        }
+        if (!Cord.ofLocation(location.clone()).inBounds(warp.lowCorner(), warp.highCorner())) {
             event.setCancelled(true);
             return true;
         }
@@ -128,10 +130,10 @@ public abstract class Game {
     public @Nullable List<Component> scoreboard(NeoPlayer player) { return null; }
     public @Nullable Component actionbar(NeoPlayer player) { return null; }
 
-    public void gameTick() {
+    public void gameTick(int tick) {
         if (started) {
             players.forEach(NeoPlayer::tick);
-            if (GameEvents.currentTick - startTick % 20 == 0) {
+            if (tick % 20 == 0) {
                 timeLeft.decrement();
                 if (timeLeft.get() == 0)
                     draw(false);
@@ -148,10 +150,12 @@ public abstract class Game {
         return players;
     }
 
-    public final void eliminatePlayer(NeoPlayer player) {
-        if (player.hasModifier("revive")) {
+    public void eliminatePlayer(@NotNull NeoPlayer player) {
+        if (player.hasModifier(Modifiers.P_REVIVE)) {
             player.player.playEffect(EntityEffect.TOTEM_RESURRECT);
             player.sendMessage(Translation.component(player.locale(), "gameplay.info.revive.use").color(Colors.POSITIVE));
+            player.removeModifier(Modifiers.P_REVIVE);
+            return;
         }
 
         players.remove(player);
@@ -172,18 +176,6 @@ public abstract class Game {
 
     public final List<Turn<?>> history() {
         return history;
-    }
-
-    public final void addModifier(String modifier) {
-        modifiers.add(modifier);
-    }
-
-    public final void removeModifier(String modifier) {
-        modifiers.remove(modifier);
-    }
-
-    public final boolean hasModifier(String modifier) {
-        return modifiers.contains(modifier);
     }
 
     public final World world() {
@@ -210,7 +202,7 @@ public abstract class Game {
         this.warp = warp;
         allowedClazzes.clear();
         allowedClazzes.addAll(warp.allows());
-        modifiers.removeIf(s -> s.startsWith("warp-prevent."));
+        modifiers.removeIf(s -> s.startsWith(Modifiers.G_DEFAULT_WARP_PREVENT_PREFIX));
 
         players.forEach(p -> {
             if (warp.temperature() == WarpTurn.Temperature.COLD) {
@@ -222,13 +214,13 @@ public abstract class Game {
 
     public boolean allows(Turn<?> turn) {
         for (Class<? extends Clazz> clazz : allowedClazzes) {
-            if (clazz.isInstance(turn) && !hasModifier("warp-prevent." + Utilities.camelToSnake(Utilities.counterFilterName(clazz.getSimpleName()))))
+            if (clazz.isInstance(turn) && (!(turn instanceof WarpTurn) || !hasModifier(Modifiers.G_DEFAULT_WARP_PREVENT_PREFIX + Utilities.camelToSnake(Utilities.counterFilterName(clazz.getSimpleName())))))
                 return true;
         }
         return false;
     }
 
-    public Set<Class<? extends Clazz>> allowedClazzes() {
+    public final Set<Class<? extends Clazz>> allowedClazzes() {
         return allowedClazzes;
     }
 
@@ -236,13 +228,9 @@ public abstract class Game {
         return timeLeft;
     }
 
-    public final int turnCountdown() {
-        return turnCountdown;
-    }
-
     public final void turnCountdownTick() {
         turnCountdown--;
-        if (turnCountdown == 0)
+        if (turnCountdown <= 0)
             turn(new TTimeLimit(new Time(turnCountdown), currentPlayer()), new CancellableImpl());
     }
 
@@ -259,6 +247,8 @@ public abstract class Game {
     }
 
     public final NeoPlayer currentPlayer() {
+        if (turningIndex >= players.size())
+            turningIndex = 0;
         return players.get(turningIndex);
     }
 
@@ -279,13 +269,12 @@ public abstract class Game {
     public void start() {
         timeLeft = new Time(info().totalTime());
         timeLeft.setAllowNegatives(true);
-        startTick = GameEvents.currentTick;
         setStarted(true);
     }
 
     public void end(boolean force) {
         initialPlayers.forEach(p -> cleanPlayer(p.player));
-        GameManager.GAMES.remove(this);
+        GameManager.remove(this);
         effectManager.clearHighlight();
 
         if (force) return;
@@ -297,12 +286,6 @@ public abstract class Game {
                 arena.cleanUp();
             }
         }, 100); // 5 Seconds
-    }
-
-    private static void cleanPlayer(@NotNull Player player) {
-        player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
-        player.getInventory().clear();
-        player.clearActivePotionEffects();
     }
 
     public final void win(@NotNull NeoPlayer player) {
@@ -330,5 +313,12 @@ public abstract class Game {
 
         end(false);
         if (ranked) Rating.updateRankingsWin(player.opponents(false).getFirst(), player);
+    }
+
+    private static void cleanPlayer(@NotNull Player player) {
+        player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+        player.closeInventory();
+        player.getInventory().clear();
+        player.clearActivePotionEffects();
     }
 }

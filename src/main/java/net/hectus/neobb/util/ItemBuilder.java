@@ -2,10 +2,7 @@ package net.hectus.neobb.util;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
@@ -58,49 +55,6 @@ public final class ItemBuilder {
 
     public ItemBuilder amount(@Range(from = 0, to = 64) int amount) {
         item.setAmount(amount);
-        return this;
-    }
-
-    @Deprecated
-    public ItemBuilder material(Material material) {
-        item.setType(material);
-        return this;
-    }
-
-    public ItemBuilder enchant(Enchantment enchantment, int level, boolean ignoreLevelRestrictions) {
-        meta.addEnchant(enchantment, level, ignoreLevelRestrictions);
-        return this;
-    }
-
-    public ItemBuilder unEnchant(Enchantment enchantment) {
-        meta.removeEnchant(enchantment);
-        return this;
-    }
-
-    public ItemBuilder unEnchant() {
-        meta.removeEnchantments();
-        return this;
-    }
-
-    public ItemBuilder addItemFlags(ItemFlag... flags) {
-        meta.addItemFlags(flags);
-        return this;
-    }
-
-    public ItemBuilder removeItemFlags(ItemFlag... flags) {
-        meta.removeItemFlags(flags);
-        return this;
-    }
-
-    public ItemBuilder damage(int damage) {
-        if (meta instanceof Damageable damageable) {
-            damageable.setDamage(damage);
-        }
-        return this;
-    }
-
-    public ItemBuilder unbreakable(boolean unbreakable) {
-        meta.setUnbreakable(unbreakable);
         return this;
     }
 

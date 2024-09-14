@@ -32,19 +32,11 @@ public class Arena {
     }
 
     public void cleanUp() {
-        Utilities.loop(totalPlacedBlocks, false, b -> game.warp().lowCorner().add(b.cord().toLocation(world)).getBlock().setType(Material.AIR));
+        Utilities.loop(totalPlacedBlocks, false, b -> game.warp().lowCorner().add(b.cord()).toLocation(world).getBlock().setType(Material.AIR));
         game.history().forEach(t -> {
             if (t.data() instanceof Entity entity)
                 entity.remove();
         });
-    }
-
-    public BlockInfo getBlock(@Range(from = 0, to = 8) int x, int y, @Range(from = 0, to = 8) int z) {
-        return totalPlacedBlocks[x][y][z];
-    }
-
-    public BlockInfo getBlockCurrent(@Range(from = 0, to = 8) int x, int y, @Range(from = 0, to = 8) int z) {
-        return placedBlocks[x][y][z];
     }
 
     public int currentPlacedBlocksAmount() {
@@ -79,7 +71,7 @@ public class Arena {
     }
 
     public void addBlock(@NotNull Block block) {
-        Cord c = Cord.ofLocation(block.getLocation().clone().subtract(game.warp().lowCorner()));
+        Cord c = Cord.ofLocation(block.getLocation().clone().subtract(game.warp().location()));
         setBlock((int) c.x(), (int) c.y(), (int) c.z(), new BlockInfo(c, block.getType()));
     }
 }
