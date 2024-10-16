@@ -19,6 +19,9 @@ public class Modifiers {
     public static final String G_DEFAULT_WARP_PREVENT_PREFIX = "warp-prevent.";
     public static final String G_DEFAULT_REDSTONE_POWER = "redstone-power.";
 
+    public static final String G_LEGACY_PORTAL_AWAIT = "portal-await";
+    public static final String G_LEGACY_NO_ATTACK = "no-attack";
+
     public static abstract class Modifiable {
         protected final Set<String> modifiers = new HashSet<>();
 

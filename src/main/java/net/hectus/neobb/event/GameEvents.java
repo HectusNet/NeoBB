@@ -2,7 +2,7 @@ package net.hectus.neobb.event;
 
 import com.destroystokyo.paper.event.server.ServerTickEndEvent;
 import net.hectus.neobb.NeoBB;
-import net.hectus.neobb.game.DefaultGame;
+import net.hectus.neobb.game.HectusGame;
 import net.hectus.neobb.game.util.GameManager;
 import net.hectus.neobb.util.Modifiers;
 import net.hectus.neobb.util.Utilities;
@@ -49,7 +49,7 @@ public class GameEvents implements Listener {
 
             if (p.hasModifier(Modifiers.P_NO_MOVE) && event.hasChangedPosition()) {
                 event.setCancelled(true);
-            } else if (p.game instanceof DefaultGame && event.getTo().clone().subtract(0, 1, 0).getBlock().getType() == Material.MAGMA_BLOCK) {
+            } else if (p.game instanceof HectusGame && event.getTo().clone().subtract(0, 1, 0).getBlock().getType() == Material.MAGMA_BLOCK) {
                 p.game.eliminatePlayer(p);
             }
         });
@@ -63,7 +63,7 @@ public class GameEvents implements Listener {
 
     // ========== BLOCK EVENTS ==========
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBlockPlace(@NotNull BlockPlaceEvent event) {
         AtomicBoolean game = new AtomicBoolean(false);
         Utilities.playerEventAction(event.getPlayer(), true, p -> true, p -> {

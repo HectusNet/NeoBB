@@ -16,7 +16,7 @@ public abstract class HereTurn extends Turn<Block> {
 
     @Override
     public ItemStack item() {
-        return new ItemStack(Material.valueOf(Utilities.camelToSnake(Utilities.counterFilterName(getClass().getSimpleName().replaceFirst("H", ""))).toUpperCase()));
+        return new ItemStack(Material.valueOf(Utilities.camelToSnake(Utilities.counterFilterName(getClass().getSimpleName())).toUpperCase()));
     }
 
     @Override

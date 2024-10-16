@@ -1,21 +1,21 @@
-package net.hectus.neobb.game;
+package net.hectus.neobb.game.mode;
 
 import com.marcpg.libpg.data.time.Time;
 import com.marcpg.libpg.lang.Translation;
 import net.hectus.neobb.NeoBB;
+import net.hectus.neobb.game.Game;
 import net.hectus.neobb.game.util.GameInfo;
 import net.hectus.neobb.lore.HereItemLoreBuilder;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.shop.RandomizedShop;
 import net.hectus.neobb.turn.Turn;
+import net.hectus.neobb.turn.default_game.warp.TDefaultWarp;
 import net.hectus.neobb.turn.here_game.*;
 import net.hectus.neobb.util.Colors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,15 +24,13 @@ import java.util.List;
 import java.util.Locale;
 
 public class HereGame extends Game {
-    public static final GameInfo INFO = new GameInfo(0, 5, new Time(10, Time.Unit.MINUTES), 15, List.of(
+    public static final GameInfo INFO = new GameInfo(false, 0, 5, new Time(10, Time.Unit.MINUTES), 15, RandomizedShop.class, HereItemLoreBuilder.class, List.of(
             HTChest.class, HTDaylightDetector.class, HTFlowerPot.class, HTJackOLantern.class, HTOakDoor.class, HTOakFenceGate.class,
             HTPointedDripstone.class, HTRedstoneLamp.class, HTTorch.class, HTWaxedExposedCutCopperStairs.class
     ));
 
     public HereGame(boolean ranked, World world, @NotNull List<Player> players) {
-        super(ranked, world, players);
-        this.shop = new RandomizedShop(this, new HereItemLoreBuilder());
-        this.players.forEach(player -> shop.open(player));
+        super(ranked, world, players, new TDefaultWarp(world));
     }
 
     @Override
@@ -41,18 +39,7 @@ public class HereGame extends Game {
     }
 
     @Override
-    public void turn(@NotNull Turn<?> turn, Cancellable event) {
-        if (outOfBounds(turn.location(), event)) return;
-
-        if (turn.unusable()) {
-            super.turn(turn, event);
-            turn.player().inventory.fillInRandomly();
-            turn.player().sendMessage(Component.text("That is not quite how to use this turn...", Colors.NEGATIVE));
-            turn.player().player.playSound(turn.player().player, Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
-            return;
-        }
-
-        super.turn(turn, event);
+    public void postTurn(@NotNull Turn<?> turn, boolean skipped) {
         turn.player().inventory.fillInRandomly();
     }
 

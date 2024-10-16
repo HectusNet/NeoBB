@@ -1,8 +1,10 @@
 package net.hectus.neobb.player;
 
+import com.marcpg.libpg.lang.Translation;
 import com.marcpg.libpg.util.Randomizer;
 import net.hectus.neobb.shop.Shop;
 import net.hectus.neobb.turn.Turn;
+import net.hectus.neobb.util.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -40,7 +42,11 @@ public class NeoInventory {
         return deck;
     }
 
-    public void setDeckSlot(int slot, @Nullable ItemStack item, Turn<?> turn) {
+    public Turn<?>[] dummyTurnDeck() {
+        return dummyTurnDeck;
+    }
+
+    public void setDeckSlot(int slot, @Nullable ItemStack item, @Nullable Turn<?> turn) {
         this.deck[slot] = item;
         this.dummyTurnDeck[slot] = turn;
         sync();
@@ -59,7 +65,7 @@ public class NeoInventory {
     public void fillInRandomly() {
         for (int i = 0; i < deck.length; i++) {
             if (deck[i] == null) {
-                Turn<?> turn = Shop.turn(Randomizer.fromCollection(player.game.shop().turns), player);
+                Turn<?> turn = Shop.turn(Randomizer.fromCollection(player.shop.turns), player);
                 setDeckSlot(i, turn.items().getFirst(), turn);
             }
         }
@@ -105,6 +111,9 @@ public class NeoInventory {
 
             inv.setItem(i, item);
         }
-        inv.setItem(13, new ItemStack(Material.GOLD_INGOT, Math.min(coins, 64)));
+        inv.setItem(13, new ItemBuilder(coins == 0 ? Material.REDSTONE : Material.GOLD_INGOT)
+                .amount(Math.clamp(1, coins, 64))
+                .name(Translation.component(player.locale(), "item-lore.cost.value", coins))
+                .build());
     }
 }

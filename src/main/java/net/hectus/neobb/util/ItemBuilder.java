@@ -25,11 +25,6 @@ public final class ItemBuilder {
         this(new ItemStack(material));
     }
 
-    public ItemBuilder editItem(@NotNull Consumer<ItemStack> itemEdit) {
-        itemEdit.accept(item);
-        return this;
-    }
-
     public ItemBuilder editMeta(@NotNull Consumer<ItemMeta> metaEdit) {
         metaEdit.accept(meta);
         return this;

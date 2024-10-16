@@ -7,10 +7,6 @@ import net.hectus.neobb.structure.StructureManager;
 import net.hectus.neobb.turn.default_game.attributes.clazz.RedstoneClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.EventFunction;
 import net.hectus.neobb.util.Modifiers;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.List;
 
 public class TRedstoneWall extends StructureTurn implements EventFunction, RedstoneClazz {
     public TRedstoneWall(NeoPlayer player) { super(player); }
@@ -24,11 +20,6 @@ public class TRedstoneWall extends StructureTurn implements EventFunction, Redst
     @Override
     public Structure referenceStructure() {
         return StructureManager.structure("redstone_wall");
-    }
-
-    @Override
-    public List<ItemStack> items() {
-        return List.of(new ItemStack(Material.REDSTONE_BLOCK, 6));
     }
 
     @Override

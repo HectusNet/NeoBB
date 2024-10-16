@@ -32,6 +32,7 @@ public class TOakDoorTurtling extends StructureTurn implements DefenseFunction, 
 
     @Override
     public List<ItemStack> items() {
+        // Not sure if it would be OAK_DOOR or some lower part thing with the automatic item detection based on the saved structure.
         return List.of(new ItemStack(Material.OAK_DOOR, 4));
     }
 

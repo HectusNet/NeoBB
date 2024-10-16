@@ -13,6 +13,11 @@ public class TPurpleWool extends BlockTurn implements AttackFunction, NeutralCla
     public TPurpleWool(Block data, NeoPlayer player) { super(data, player); }
 
     @Override
+    public int cost() {
+        return 4;
+    }
+
+    @Override
     public boolean unusable() {
         if (isDummy()) return true;
 
@@ -25,10 +30,5 @@ public class TPurpleWool extends BlockTurn implements AttackFunction, NeutralCla
     @Override
     public void apply() {
         player.game.win(player);
-    }
-
-    @Override
-    public int cost() {
-        return 4;
     }
 }

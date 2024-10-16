@@ -12,8 +12,6 @@ import net.hectus.neobb.turn.default_game.attributes.clazz.SupernaturalClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.BuffFunction;
 import net.hectus.neobb.turn.default_game.attributes.function.CounterFunction;
 import net.hectus.neobb.util.Modifiers;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -34,11 +32,6 @@ public class TIronBarJail extends StructureTurn implements BuffFunction, Neutral
     @Override
     public Structure referenceStructure() {
         return StructureManager.structure("iron_bar_jail");
-    }
-
-    @Override
-    public List<ItemStack> items() {
-        return List.of(new ItemStack(Material.IRON_BARS, 4));
     }
 
     @Override

@@ -2,7 +2,7 @@ package net.hectus.neobb.event;
 
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import net.hectus.neobb.NeoBB;
-import net.hectus.neobb.game.DefaultGame;
+import net.hectus.neobb.game.mode.DefaultGame;
 import net.hectus.neobb.game.util.GameManager;
 import net.hectus.neobb.turn.default_game.warp.TDefaultWarp;
 import net.hectus.neobb.util.Modifiers;
@@ -18,6 +18,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
@@ -48,6 +49,12 @@ public class PlayerEvents implements Listener {
                     p.inventory.addCoins(cost);
                 } catch (Exception ignored) {}
             });
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerAttemptPickupItem(@NotNull PlayerAttemptPickupItemEvent event) {
+        // Just enabling keep inventory would work too, but would get rid of the cool effect when a player dies.
+        event.setCancelled(true);
     }
 
     // ========== MOVEMENT EVENTS ==========

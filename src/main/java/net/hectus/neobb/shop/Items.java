@@ -1,6 +1,7 @@
 package net.hectus.neobb.shop;
 
 import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -18,6 +19,9 @@ import java.io.IOException;
 import java.util.function.BiConsumer;
 
 public class Items {
+    public static final ItemStack GRAY_BACKGROUND = new net.hectus.neobb.util.ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name(Component.empty()).build();
+    public static final ItemStack BLACK_BACKGROUND = new net.hectus.neobb.util.ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).name(Component.empty()).build();
+
     public static class ClickItem extends AbstractItem {
         protected final ItemStack item;
         protected final BiConsumer<Player, InventoryClickEvent> clickConsumer;

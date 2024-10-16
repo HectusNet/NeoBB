@@ -46,9 +46,21 @@ public abstract class WarpTurn extends StructureTurn implements WarpFunction {
      */
     public abstract Pair<Material, Material> materials();
 
+    public boolean canBePlayed() {
+        return true;
+    }
+
     @Override
     public List<ItemStack> items() {
         return List.of(new ItemStack(materials().left(), 4), new ItemStack(materials().right()));
+    }
+
+    /**
+     * Helper method, because Java doesn't have something like super.super.method()
+     * @return The same as {@link StructureTurn#items()}
+     */
+    public List<ItemStack> structureTurnItems() {
+        return super.items();
     }
 
     public enum Temperature { COLD, NORMAL, HOT }
@@ -80,10 +92,9 @@ public abstract class WarpTurn extends StructureTurn implements WarpFunction {
 
     @Override
     public void apply() {
-        if (player.hasModifier(Modifiers.P_DEFAULT_100P_WARP) || Randomizer.boolByChance(chance())) {
+        if (canBePlayed() && (Randomizer.boolByChance(chance()) || player.hasModifier(Modifiers.P_DEFAULT_100P_WARP))) {
             player.removeModifier(Modifiers.P_DEFAULT_100P_WARP);
-            WarpTurn oldWarp = player.game.warp();
-            player.game.players().forEach(p -> p.player.teleport(p.player.getLocation().clone().subtract(oldWarp.location()).add(location())));
+            player.game.players().forEach(p -> p.player.teleport(p.player.getLocation().clone().subtract(player.game.warp().location()).add(location())));
             player.game.warp(this);
         }
     }

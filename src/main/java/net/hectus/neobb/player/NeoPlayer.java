@@ -5,6 +5,7 @@ import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.cosmetic.PlaceParticle;
 import net.hectus.neobb.game.BossBarGame;
 import net.hectus.neobb.game.Game;
+import net.hectus.neobb.shop.Shop;
 import net.hectus.neobb.util.Modifiers;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
@@ -26,6 +27,7 @@ public class NeoPlayer extends Modifiers.Modifiable implements Target, Forwardin
 
     public final Player player;
     public final Game game;
+    public final Shop shop;
     public NeoInventory inventory;
 
     private int luck = 20;
@@ -43,10 +45,16 @@ public class NeoPlayer extends Modifiers.Modifiable implements Target, Forwardin
     private int draws;
     private int turns;
 
-    public NeoPlayer(Player player, Game game) {
+    public NeoPlayer(Player player, @NotNull Game game) {
         this.player = player;
         this.game = game;
         this.inventory = new NeoInventory(this);
+        try {
+            this.shop = game.info().shop().getConstructor(NeoPlayer.class).newInstance(this);
+            this.shop.open();
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
         fetchDatabase();
     }
 
@@ -70,7 +78,6 @@ public class NeoPlayer extends Modifiers.Modifiable implements Target, Forwardin
                 Score score = objective.getScore("score-" + i);
                 score.numberFormat(NumberFormat.blank());
                 score.setScore(scoreboard.size() - i);
-
                 score.customName(scoreboard.get(i));
             }
         }
@@ -82,6 +89,11 @@ public class NeoPlayer extends Modifiers.Modifiable implements Target, Forwardin
         if (game instanceof BossBarGame bossBarGame) {
             bossBarGame.bossBar(bossBarGame.bossBar());
         }
+    }
+
+    public void validate() {
+        if (hasModifier(Modifiers.P_DEFAULT_ATTACKED) && !hasModifier(Modifiers.P_DEFAULT_DEFENDED))
+            game.eliminatePlayer(this);
     }
 
     public List<NeoPlayer> opponents(boolean onlyAlive) {

@@ -1,5 +1,6 @@
 package net.hectus.neobb.util;
 
+import com.marcpg.libpg.storing.Pair;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
@@ -14,15 +15,6 @@ public record Cord(double x, double y, double z) implements Serializable {
      */
     public @NotNull Location toLocation(@NotNull World world) {
         return new Location(world, x, y, z);
-    }
-
-    /**
-     * Subtracts the input cord from this cord. Does not affect this object and creates a new one for the result.
-     * @param cord The subtrahend of this subtraction.
-     * @return The result/difference of this subtraction as a new Cord.
-     */
-    public @NotNull Cord subtract(@NotNull Cord cord) {
-        return new Cord(x - cord.x, y - cord.y, z - cord.z);
     }
 
     /**
@@ -49,5 +41,19 @@ public record Cord(double x, double y, double z) implements Serializable {
      */
     public static @NotNull Cord ofLocation(@NotNull Location location) {
         return new Cord(location.getX(), location.getY(), location.getZ());
+    }
+
+    /**
+     * Converts two corners, so one has the lowest x, y and z and one has the highest x, y and z.
+     * @param corner1 The first corner.
+     * @param corner2 The second corner.
+     * @return A pair where the left side has the lower and the right the higher x, y and z. <br>
+     *         {@code Pair<Lowest XYZ, Highest XYZ>}
+     */
+    public static @NotNull Pair<Cord, Cord> corners(@NotNull Cord corner1, @NotNull Cord corner2) {
+        return new Pair<Cord, Cord>(
+                new Cord(Math.min(corner1.x(), corner2.x()), Math.min(corner1.y(), corner2.y()), Math.min(corner1.z(), corner2.z())),
+                new Cord(Math.max(corner1.x(), corner2.x()), Math.max(corner1.y(), corner2.y()), Math.max(corner1.z(), corner2.z()))
+        );
     }
 }

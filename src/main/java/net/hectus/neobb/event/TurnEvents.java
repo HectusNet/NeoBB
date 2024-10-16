@@ -1,10 +1,14 @@
 package net.hectus.neobb.event;
 
+import com.marcpg.libpg.util.Randomizer;
+import io.papermc.paper.event.player.PlayerNameEntityEvent;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.event.custom.CancellableImpl;
-import net.hectus.neobb.game.DefaultGame;
 import net.hectus.neobb.game.Game;
-import net.hectus.neobb.game.HereGame;
+import net.hectus.neobb.game.HectusGame;
+import net.hectus.neobb.game.mode.DefaultGame;
+import net.hectus.neobb.game.mode.HereGame;
+import net.hectus.neobb.game.mode.LegacyGame;
 import net.hectus.neobb.game.util.GameManager;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.PlacedStructure;
@@ -15,22 +19,38 @@ import net.hectus.neobb.turn.default_game.item.TChorusFruit;
 import net.hectus.neobb.turn.default_game.item.TIronShovel;
 import net.hectus.neobb.turn.default_game.mob.*;
 import net.hectus.neobb.turn.default_game.other.TBoat;
+import net.hectus.neobb.turn.default_game.other.TNoteBlock;
+import net.hectus.neobb.turn.default_game.structure.*;
+import net.hectus.neobb.turn.default_game.structure.glass_wall.*;
 import net.hectus.neobb.turn.default_game.throwable.*;
 import net.hectus.neobb.turn.default_game.warp.*;
 import net.hectus.neobb.turn.here_game.*;
+import net.hectus.neobb.turn.legacy_game.block.LTPurpleWool;
+import net.hectus.neobb.turn.legacy_game.block.LTSeaPickle;
+import net.hectus.neobb.turn.legacy_game.block.LTTnt;
+import net.hectus.neobb.turn.legacy_game.item.LTDinnerboneTag;
+import net.hectus.neobb.turn.legacy_game.item.LTEnchantedGoldenApple;
+import net.hectus.neobb.turn.legacy_game.item.LTLightningTrident;
+import net.hectus.neobb.turn.legacy_game.other.LTNoteBlock;
+import net.hectus.neobb.turn.legacy_game.structure.LTNetherPortal;
+import net.hectus.neobb.turn.legacy_game.structure.LTPumpkinWall;
+import net.hectus.neobb.turn.legacy_game.structure.LTRedstoneBlockWall;
+import net.hectus.neobb.turn.legacy_game.structure.glass_wall.LTLightBlueGlassWall;
+import net.hectus.neobb.turn.legacy_game.warp.*;
 import net.hectus.neobb.util.Colors;
+import net.hectus.neobb.util.Modifiers;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.type.NoteBlock;
+import org.bukkit.block.data.type.SeaPickle;
 import org.bukkit.entity.*;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.TNTPrimeEvent;
 import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -38,6 +58,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
@@ -57,7 +78,7 @@ public class TurnEvents implements Listener {
         Block block = event.getBlock();
 
         player.game.resetTurnCountdown();
-        if (StructureManager.isStructureMaterial(block.getType())) {
+        if (player.game.info().hasStructures() && StructureManager.isStructureMaterial(block.getType())) {
             if (player.game.arena.currentPlacedBlocksAmount() == 0) {
                 Bukkit.getScheduler().runTaskLater(NeoBB.PLUGIN, () -> {
                     if (player.game.arena.currentPlacedBlocksAmount() > 1) {
@@ -90,7 +111,7 @@ public class TurnEvents implements Listener {
                 case WAXED_EXPOSED_CUT_COPPER_STAIRS -> player.game.turn(new HTWaxedExposedCutCopperStairs(block, player), event);
                 default -> event.setCancelled(true);
             }
-        } else if (player.game instanceof DefaultGame) {
+        } else if (player.game instanceof HectusGame) {
             switch (block.getType()) {
                 case BEE_NEST -> player.game.turn(new TBeeNest(block, player), event);
                 case BLACK_WOOL -> player.game.turn(new TBlackWool(block, player), event);
@@ -128,7 +149,7 @@ public class TurnEvents implements Listener {
                 case PACKED_ICE -> player.game.turn(new TPackedIce(block, player), event);
                 case PINK_BED -> player.game.turn(new TPinkBed(block, player), event);
                 case POWDER_SNOW -> player.game.turn(new TPowderSnow(block, player), event);
-                case PURPLE_WOOL -> player.game.turn(new TPurpleWool(block, player), event);
+                case PURPLE_WOOL -> player.game.turn(player.game instanceof LegacyGame ? new LTPurpleWool(block, player) : new TPurpleWool(block, player), event);
                 case RED_BED -> player.game.turn(new TRedBed(block, player), event);
                 case RED_CARPET -> player.game.turn(new TRedCarpet(block, player), event);
                 case REPEATER -> player.game.turn(new TRepeater(block, player), event);
@@ -143,7 +164,6 @@ public class TurnEvents implements Listener {
                 case VERDANT_FROGLIGHT -> player.game.turn(new TVerdantFroglight(block, player), event);
                 case WATER -> player.game.turn(new TWater(block, player), event);
                 case WHITE_WOOL -> player.game.turn(new TWhiteWool(block, player), event);
-                default -> event.setCancelled(true);
             }
         }
     }
@@ -151,22 +171,73 @@ public class TurnEvents implements Listener {
     private void handleStructure(BlockPlaceEvent event, Block block, @NotNull NeoPlayer player) {
         Structure structure = StructureManager.match(player.game.arena);
         if (structure == null) return;
+
+        PlacedStructure s = new PlacedStructure(structure, block);
+        World w = block.getWorld();
+        if (player.game instanceof HectusGame) {
+            switch (structure.name) {
+                case "iron_bar_jail" -> player.game.turn(new TIronBarJail(s, player, player.nextPlayer()), event); // TODO: Make the trapped player actually be checked.
+                case "oak_door_turtling" -> player.game.turn(new TOakDoorTurtling(s, player), event);
+
+                case "glass_wall" -> player.game.turn(new TGlassWall(s, player), event);
+                case "blue_glass_wall" -> player.game.turn(new TBlueGlassWall(s, player), event);
+                case "orange_glass_wall" -> player.game.turn(new TOrangeGlassWall(s, player), event);
+                case "pink_glass_wall" -> player.game.turn(new TPinkGlassWall(s, player), event);
+                case "red_glass_wall" -> player.game.turn(new TRedGlassWall(s, player), event);
+            }
+        }
         if (player.game instanceof DefaultGame) {
             switch (structure.name) {
-                case "amethyst-warp" -> player.game.turn(new TAmethystWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-                case "cliff-warp" -> player.game.turn(new TCliffWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-                case "desert-warp" -> player.game.turn(new TDesertWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-                case "end-warp" -> player.game.turn(new TEndWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-                case "frozen-warp" -> player.game.turn(new TFrozenWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-                case "meadow-warp" -> player.game.turn(new TMeadowWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-                case "mushroom-warp" -> player.game.turn(new TMushroomWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-                case "nerd-warp" -> player.game.turn(new TNerdWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-                case "nether-warp" -> player.game.turn(new TNetherWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-                case "ocean-warp" -> player.game.turn(new TOceanWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-                case "redstone-warp" -> player.game.turn(new TRedstoneWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-                case "sun-warp" -> player.game.turn(new TSunWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-                case "void-warp" -> player.game.turn(new TVoidWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
-                case "wood-warp" -> player.game.turn(new TWoodWarp(new PlacedStructure(structure, block), block.getWorld(), player), event);
+                case "daylight_sensor_line" -> player.game.turn(new TDaylightSensorLine(s, player), event);
+                case "pumpkin_wall" -> player.game.turn(new TPumpkinWall(s, player), event);
+                case "redstone_wall" -> player.game.turn(new TRedstoneWall(s, player), event);
+
+                case "green_glass_wall" -> player.game.turn(new TGreenGlassWall(s, player), event);
+                case "white_glass_wall" -> player.game.turn(new TWhiteGlassWall(s, player), event);
+
+                case "amethyst-warp" -> player.game.turn(new TAmethystWarp(s, w, player), event);
+                case "cliff-warp" -> player.game.turn(new TCliffWarp(s, w, player), event);
+                case "desert-warp" -> player.game.turn(new TDesertWarp(s, w, player), event);
+                case "end-warp" -> player.game.turn(new TEndWarp(s, w, player), event);
+                case "frozen-warp" -> player.game.turn(new TFrozenWarp(s, w, player), event);
+                case "meadow-warp" -> player.game.turn(new TMeadowWarp(s, w, player), event);
+                case "mushroom-warp" -> player.game.turn(new TMushroomWarp(s, w, player), event);
+                case "nerd-warp" -> player.game.turn(new TNerdWarp(s, w, player), event);
+                case "nether-warp" -> player.game.turn(new TNetherWarp(s, w, player), event);
+                case "ocean-warp" -> player.game.turn(new TOceanWarp(s, w, player), event);
+                case "redstone-warp" -> player.game.turn(new TRedstoneWarp(s, w, player), event);
+                case "sun-warp" -> player.game.turn(new TSunWarp(s, w, player), event);
+                case "void-warp" -> player.game.turn(new TVoidWarp(s, w, player), event);
+                case "wood-warp" -> player.game.turn(new TWoodWarp(s, w, player), event);
+            }
+        }
+        if (player.game instanceof LegacyGame) {
+            switch (structure.name) {
+                case "legacy-pumpkin_wall" -> player.game.turn(new LTPumpkinWall(s, player), event);
+                case "legacy-lightning_rod_strip" -> player.game.turn(new LTPumpkinWall(s, player), event);
+                case "legacy-redstone_block_wall" -> player.game.turn(new LTRedstoneBlockWall(s, player), event);
+
+                case "white_glass_wall" -> player.game.turn(new TWhiteGlassWall(s, player), event);
+                case "light_blue_glass_wall" -> player.game.turn(new LTLightBlueGlassWall(s, player), event);
+
+                // TODO: Create warp classes for these structures:
+                case "legacy-aether-warp" -> player.game.turn(new LTAetherWarp(s, w, player), event);
+                case "legacy-amethyst-warp" -> player.game.turn(new LTAmethystWarp(s, w, player), event);
+                case "legacy-book-warp" -> player.game.turn(new LTBookWarp(s, w, player), event);
+                case "legacy-cliff-warp" -> player.game.turn(new LTCliffWarp(s, w, player), event);
+                case "legacy-end-warp" -> player.game.turn(new LTEndWarp(s, w, player), event);
+                case "legacy-ice-warp" -> player.game.turn(new LTIceWarp(s, w, player), event);
+                case "legacy-mushroom-warp" -> player.game.turn(new LTMushroomWarp(s, w, player), event);
+                case "legacy-nether-warp" -> player.game.turn(new LTNetherWarp(s, w, player), event);
+                case "legacy-redstone-warp" -> player.game.turn(new LTRedstoneWarp(s, w, player), event);
+                case "legacy-snow-warp" -> player.game.turn(new LTSnowWarp(s, w, player), event);
+                case "legacy-sun-warp" -> player.game.turn(new LTSunWarp(s, w, player), event);
+                case "legacy-underwater-warp" -> player.game.turn(new LTUnderwaterWarp(s, w, player), event);
+                case "legacy-void-warp" -> player.game.turn(new LTVoidWarp(s, w, player), event);
+                case "legacy-wood-warp" -> player.game.turn(new LTWoodWarp(s, w, player), event);
+
+                case "legacy-heaven-warp" -> player.game.turn(Randomizer.boolByChance(55) ? new LTHeavenWarp(s, w, player) : new LTHellWarp(s, w, player), event);
+                case "legacy-hell-warp" -> player.game.turn(Randomizer.boolByChance(55) ? new LTHellWarp(s, w, player) : new LTHeavenWarp(s, w, player), event);
             }
         }
     }
@@ -193,12 +264,20 @@ public class TurnEvents implements Listener {
                     case PUFFERFISH_SPAWN_EGG -> player.game.turn(new TPufferfish(loc.getWorld().spawn(loc, PufferFish.class), player), event);
                     case SHEEP_SPAWN_EGG -> player.game.turn(new TSheep(loc.getWorld().spawn(loc, Sheep.class), player), event);
                 }
-            }
+            } else if (event.getClickedBlock() != null && event.getClickedBlock().getBlockData() instanceof NoteBlock noteBlock)
+                player.game.turn(new TNoteBlock(noteBlock, event.getClickedBlock().getLocation(), player), event);
         } else if (player.game instanceof HereGame) {
             if (player.game.history().isEmpty()) return;
             if (player.game.history().getLast() instanceof InteractableHereTurn interactable &&
                     player == interactable.player() && interactable.data().getLocation().equals(event.getClickedBlock().getLocation())) {
                 interactable.interact();
+            }
+        } else if (player.game instanceof LegacyGame) {
+            if (event.getClickedBlock() != null && event.getClickedBlock().getBlockData() instanceof NoteBlock noteBlock) {
+                player.game.turn(new LTNoteBlock(noteBlock, event.getClickedBlock().getLocation(), player), event);
+            } else if (event.getClickedBlock() != null && event.getClickedBlock().getBlockData() instanceof SeaPickle seaPickle) {
+                if (seaPickle.getPickles() == seaPickle.getMaximumPickles())
+                    player.game.turn(new LTSeaPickle(event.getClickedBlock(), player), event);
             }
         }
     }
@@ -222,6 +301,12 @@ public class TurnEvents implements Listener {
 
             if (player.game instanceof DefaultGame)
                 player.game.turn(new TChorusFruit(event.getItem(), event.getPlayer().getLocation(), player), event);
+        } else if (event.getItem().getType() == Material.ENCHANTED_GOLDEN_APPLE) {
+            NeoPlayer player = GameManager.player(event.getPlayer(), true);
+            if (unusable(event.getPlayer(), player, true, event, "You cannot eat enchanted golden apples right now!")) return;
+
+            if (player.game instanceof LegacyGame)
+                player.game.turn(new LTEnchantedGoldenApple(event.getItem(), event.getPlayer().getLocation(), player), event);
         }
     }
 
@@ -268,6 +353,10 @@ public class TurnEvents implements Listener {
                 } else if (event.getEntity() instanceof EnderPearl enderPearl) {
                     player.game.turn(new TEnderPearl(enderPearl, enderPearl.getLocation(), player), event);
                 }
+            } else if (player.game instanceof LegacyGame) {
+                if (event.getEntity() instanceof Trident trident) {
+                    player.game.turn(new LTLightningTrident(trident.getItemStack(), trident.getLocation(), player), event);
+                }
             }
         }
     }
@@ -280,6 +369,37 @@ public class TurnEvents implements Listener {
         if (player.game instanceof DefaultGame && event.getItemDrop().getItemStack().getType() == Material.IRON_SHOVEL)
             player.game.turn(new TIronShovel(event.getItemDrop().getItemStack(), event.getItemDrop().getLocation(), player), event);
     }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerNameEntity(@NotNull PlayerNameEntityEvent event) {
+        NeoPlayer player = GameManager.player(event.getPlayer(), true);
+        if (unusable(event.getPlayer(), player, true, event, "You cannot name mobs right now!")) return;
+
+        if (event.getEntity() instanceof Sheep sheep && event.getName().equals(Component.text("Dinnerbone")))
+            player.game.turn(new LTDinnerboneTag(event.getPlayer().getActiveItem(), event.getEntity().getLocation(), player), event);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onTNTPrime(@NotNull TNTPrimeEvent event) {
+        if (event.getPrimingEntity() instanceof Player p) {
+            NeoPlayer player = GameManager.player(p, true);
+            if (unusable(p, player, true, event, "You cannot prime tnt right now!")) return;
+
+            player.game.turn(new LTTnt(event.getBlock(), player), event);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPortalCreate(@NotNull PortalCreateEvent event) {
+        if (event.getReason() == PortalCreateEvent.CreateReason.FIRE && event.getEntity() instanceof Player p) {
+            NeoPlayer player = GameManager.player(p, true);
+            if (unusable(p, player, false, event, "You cannot ignite portals right now!")) return;
+
+            if (player.game.hasModifier(Modifiers.G_LEGACY_PORTAL_AWAIT))
+                player.game.turn(new LTNetherPortal(event.getBlocks(), event.getEntity().getLocation(), player), event);
+        }
+    }
+
 
     private boolean unusable(Player fallbackPlayer, NeoPlayer player, boolean requireTurning, Cancellable event, String message) {
         if (player == null) {

@@ -7,7 +7,7 @@ import net.hectus.neobb.turn.default_game.attributes.clazz.HotClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NeutralClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.CounterbuffFunction;
 import net.hectus.neobb.turn.default_game.block.TCauldron;
-import net.hectus.neobb.turn.here_game.HereTurn;
+import net.hectus.neobb.turn.default_game.flower.TDirt;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
@@ -32,6 +32,6 @@ public class TIronShovel extends ItemTurn implements CounterbuffFunction, Neutra
 
     @Override
     public List<CounterFilter> counters() {
-        return List.of(CounterFilter.of(turn -> turn instanceof HereTurn, "dirt"), CounterFilter.of(turn -> turn instanceof HereTurn, "grass"), CounterFilter.of(turn -> turn instanceof TCauldron, "cauldron"), CounterFilter.clazz(HotClazz.class)); // TODO: Switch to actual turn classes.
+        return List.of(CounterFilter.of(turn -> turn instanceof TDirt, "dirt"), CounterFilter.of(turn -> turn instanceof TCauldron, "cauldron"), CounterFilter.clazz(HotClazz.class));
     }
 }

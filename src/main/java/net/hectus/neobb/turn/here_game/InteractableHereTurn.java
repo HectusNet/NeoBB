@@ -4,8 +4,6 @@ import net.hectus.neobb.player.NeoPlayer;
 import org.bukkit.block.Block;
 
 public abstract class InteractableHereTurn extends HereTurn {
-    // TODO: Implement interactable turns properly!
-
     private int interactions = 0;
     private long lastInteraction = System.currentTimeMillis();
 

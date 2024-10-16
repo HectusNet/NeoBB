@@ -1,7 +1,6 @@
 package net.hectus.neobb.turn.default_game.warp;
 
 import com.marcpg.libpg.storing.Pair;
-import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NatureClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NeutralClazz;
@@ -13,7 +12,6 @@ import java.util.List;
 
 public class TDefaultWarp extends WarpTurn {
     public TDefaultWarp(World world) { super(world, "default"); }
-    public TDefaultWarp(PlacedStructure data, World world) { super(data, world, null, "default"); }
 
     @Override
     public int chance() {

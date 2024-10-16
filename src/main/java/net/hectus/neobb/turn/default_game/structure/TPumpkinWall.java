@@ -7,8 +7,6 @@ import net.hectus.neobb.structure.Structure;
 import net.hectus.neobb.structure.StructureManager;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NatureClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.BuffFunction;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -24,11 +22,6 @@ public class TPumpkinWall extends StructureTurn implements BuffFunction, NatureC
     @Override
     public Structure referenceStructure() {
         return StructureManager.structure("pumpkin_wall");
-    }
-
-    @Override
-    public List<ItemStack> items() {
-        return List.of(new ItemStack(Material.JACK_O_LANTERN, 10));
     }
 
     @Override

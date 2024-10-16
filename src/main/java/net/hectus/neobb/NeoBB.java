@@ -15,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
+import xyz.xenondevs.invui.InvUI;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +33,7 @@ import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class NeoBB extends JavaPlugin {
-    public static final String VERSION = "0.0.7";
+    public static final String VERSION = "0.0.8";
 
     public static NeoBB PLUGIN;
     public static Logger LOG;
@@ -72,9 +73,12 @@ public final class NeoBB extends JavaPlugin {
         connectDatabase();
         StructureManager.load();
 
+        InvUI.getInstance().setPlugin(this);
+
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             event.registrar().register(Commands.startCommand());
             event.registrar().register(Commands.giveupCommand());
+            event.registrar().register(Commands.structureCommand());
         });
 
         getServer().getPluginManager().registerEvents(new GameEvents(), this);

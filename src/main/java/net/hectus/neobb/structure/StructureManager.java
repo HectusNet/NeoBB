@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -29,21 +30,30 @@ public final class StructureManager {
     );
 
     public static void load() {
-        getStructures().forEach(StructureManager::addStructure);
+        getStructures().forEach(StructureManager::add);
 
         for (Class<? extends WarpTurn> warp : WARPS) {
             try {
-                addStructure(warp.getConstructor(World.class).newInstance(Bukkit.getWorld("world")).referenceStructure());
+                add(warp.getConstructor(World.class).newInstance(Bukkit.getWorld("world")).referenceStructure());
             } catch (Exception e) {
                 NeoBB.LOG.warn("Couldn't load warp structure!", e);
             }
         }
     }
 
-    public static void addStructure(Structure structure) {
+    public static void add(Structure structure) {
         STRUCTURES.add(structure);
         Arrays.stream(structure.blocks).flatMap(Arrays::stream).flatMap(Arrays::stream)
-                .forEach(b -> STRUCTURE_MATERIALS.add(b.material()));
+                .forEach(b -> STRUCTURE_MATERIALS.add(b != null ? b.material() : Material.AIR));
+    }
+
+    public static void remove(Structure structure) {
+        STRUCTURES.remove(structure);
+        try {
+            structure.remove();
+        } catch (IOException e) {
+            NeoBB.LOG.warn("Could not remove structure from storage.", e);
+        }
     }
 
     public static boolean isStructureMaterial(Material material) {

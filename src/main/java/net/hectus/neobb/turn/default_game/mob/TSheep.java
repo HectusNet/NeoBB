@@ -29,7 +29,7 @@ public class TSheep extends MobTurn<Sheep> implements BuffFunction, Supernatural
             case GRAY -> new Buff.Luck(Buff.BuffTarget.YOU, 25).apply(player);
             case BLACK -> new Buff.Luck(Buff.BuffTarget.OPPONENTS, -15).apply(player);
             case BROWN -> {
-                Turn<?> turn = Shop.turn(Randomizer.fromCollection(player.game.shop().turns), player);
+                Turn<?> turn = Shop.turn(Randomizer.fromCollection(player.shop.turns), player);
                 turn.items().forEach(item -> player.inventory.addToDeck(item, turn));
             }
             case null, default -> {

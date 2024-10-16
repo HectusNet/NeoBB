@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "net.hectus.neobb"
-version = "0.0.7"
+version = "0.0.8"
 description = "A reworked version of NeoBB with some interesting spins."
 
 java.sourceCompatibility = JavaVersion.VERSION_21
@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
     implementation("org.postgresql:postgresql:42.7.4")
     implementation("xyz.xenondevs.invui:invui:1.37")
     implementation("com.marcpg:libpg:0.1.1")
@@ -33,10 +33,7 @@ tasks {
     }
     runServer {
         dependsOn(shadowJar)
-        minecraftVersion("1.21.1")
-        downloadPlugins {
-            url("https://github.com/playit-cloud/playit-minecraft-plugin/releases/latest/download/playit-minecraft-plugin.jar")
-        }
+        minecraftVersion("1.21")
     }
     shadowJar {
         archiveClassifier.set("")

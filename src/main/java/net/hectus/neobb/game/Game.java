@@ -9,11 +9,10 @@ import net.hectus.neobb.event.custom.CancellableImpl;
 import net.hectus.neobb.game.util.*;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.player.TargetObj;
-import net.hectus.neobb.shop.Shop;
+import net.hectus.neobb.turn.DummyTurn;
 import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.turn.default_game.TTimeLimit;
 import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
-import net.hectus.neobb.turn.default_game.warp.TDefaultWarp;
 import net.hectus.neobb.turn.default_game.warp.WarpTurn;
 import net.hectus.neobb.util.Colors;
 import net.hectus.neobb.util.Cord;
@@ -24,7 +23,6 @@ import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,58 +45,90 @@ public abstract class Game extends Modifiers.Modifiable {
 
     protected boolean started;
     protected int turningIndex = 0;
-    protected Shop shop;
 
     protected WarpTurn warp;
 
     protected Time timeLeft;
     protected int turnCountdown = info().turnTimer();
 
-    public Game(boolean ranked, World world, @NotNull List<Player> players) {
+    public Game(boolean ranked, World world, @NotNull List<Player> players, WarpTurn defaultWarp) {
         this.ranked = ranked;
         this.arena = new Arena(this, world);
-
-        players.stream()
-                .map(player -> new NeoPlayer(player, this))
-                .peek(initialPlayers::add)
-                .forEach(this.players::add);
+        this.warp = defaultWarp;
+        this.allowedClazzes.addAll(warp.allows());
 
         players.forEach(p -> {
             cleanPlayer(p);
             p.setGameMode(GameMode.SURVIVAL);
         });
 
-        warp(new TDefaultWarp(world));
+        double radius = 2.5;
+        int playerCount = players.size();
 
-        // TODO: Support multiple players and make it a circle:
-        players.getFirst().teleport(new Location(warp.center.getWorld(), warp.center.x() + 2.5, warp.center.y(), warp.center.z(), 90, 0));
-        players.getLast().teleport(new Location(warp.center.getWorld(), warp.center.x() - 2.5, warp.center.y(), warp.center.z(), -90, 0));
+        for (int i = 0; i < playerCount; i++) {
+            double angle = 2 * Math.PI * i / playerCount;
+            players.get(i).teleport(new Location(warp.center.getWorld(),
+                    warp.center.x() + radius * Math.cos(angle),
+                    warp.center.y(),
+                    warp.center.z() + radius * Math.sin(angle),
+                    (float) Math.toDegrees(angle + Math.PI / 2), 0 // No, I am not a math guy...
+            ));
+        }
 
+        players.stream()
+                .map(player -> new NeoPlayer(player, this))
+                .peek(initialPlayers::add)
+                .forEach(this.players::add);
+
+        NeoBB.LOG.info("{}: Initialized the game.", id);
         GameManager.add(this);
     }
 
     public abstract GameInfo info();
 
-    @MustBeInvokedByOverriders
-    public void turn(@NotNull Turn<?> turn, Cancellable event) {
-        if (outOfBounds(turn.location(), event)) return;
+    public final void turn(@NotNull Turn<?> turn, Cancellable event) {
+        if (outOfBounds(turn.location(), event)) {
+            NeoBB.LOG.info("{}: {} used {} out of bounds.", id, turn.player().player.getName(), turn.getClass().getName().replace("net.hectus.neobb.turn.", ""));
+            event.setCancelled(true);
+            return;
+        }
 
-        try {
-            if (!(turn instanceof TTimeLimit)) {
+        if (turn instanceof DummyTurn) {
+            history.add(turn);
+            return;
+        }
+
+        if (turn.unusable()) {
+            NeoBB.LOG.info("{}: {} used {} incorrectly.", id, turn.player().player.getName(), turn.getClass().getName().replace("net.hectus.neobb.turn.", ""));
+            turn.player().sendMessage(Component.text("That is not quite how to use this turn...", Colors.NEGATIVE));
+            turn.player().player.playSound(turn.player().player, Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+            nextTurn(turn);
+        }
+
+        boolean skipped = preTurn(turn);
+
+        if (!(turn instanceof TTimeLimit)) {
+            try {
                 turn.player().inventory.setDeckSlot(turn.player().player.getInventory().getHeldItemSlot(), null, null);
-            }
-        } catch (ArrayIndexOutOfBoundsException ignored) {}
+            } catch (ArrayIndexOutOfBoundsException ignored) {}
+        }
 
-        turn.apply();
+        if (!skipped && executeTurn(turn)) {
+            turn.apply();
+            effectManager.applyEffects(turn);
+            currentPlayer().player.playSound(currentPlayer().player, Sound.BLOCK_NOTE_BLOCK_BELL, 0.5f, 1.0f);
+            initialPlayers.forEach(p -> p.sendMessage(Translation.component(p.locale(), "gameplay.info.turn-used",
+                    turn.player().player.getName(), Utilities.turnName(turn.getClass().getName().replace("net.hectus.neobb.turn.", ""), p.locale())).color(Colors.EXTRA)));
+        }
 
+        nextTurn(turn);
+        postTurn(turn, skipped);
+    }
+
+    public final void nextTurn(@NotNull Turn<?> turn) {
         history.add(turn);
         turn.player().addTurn();
         turnScheduler.tick();
-
-        effectManager.applyEffects(turn);
-        currentPlayer().player.playSound(currentPlayer().player, Sound.BLOCK_NOTE_BLOCK_BELL, 0.5f, 1.0f);
-        initialPlayers.forEach(p -> p.sendMessage(Translation.component(p.locale(), "gameplay.info.turn-used",
-                turn.player().player.getName(), Utilities.turnName(turn.getClass().getSimpleName(), p.locale())).color(Colors.EXTRA)));
 
         arena.resetCurrentBlocks();
         resetTurnCountdown();
@@ -109,7 +139,30 @@ public abstract class Game extends Modifiers.Modifiable {
         } else {
             moveToNextPlayer();
         }
+        turn.player().validate();
+
+        NeoBB.LOG.info("{}: {} used {}.", id, turn.player().player.getName(), turn.getClass().getName().replace("net.hectus.neobb.turn.", ""));
     }
+
+    /**
+     * This is called after the placement and usability were validated.
+     * @return {@code true} if the turn should be skipped, {@code false} otherwise.
+     */
+    public boolean preTurn(Turn<?> turn) { return false; }
+
+    /**
+     * This is executed right before {@link Turn#apply()} is called.
+     * If the turn is skipped, this will never be executed.
+     * @return {@code true} if {@link Turn#apply()} should be called, {@code false} otherwise.
+     */
+    public boolean executeTurn(Turn<?> turn) { return true; }
+
+    /**
+     * This is called after the turn finished.
+     * It will be called no matter if the turn got skipped or not.
+     * @param skipped If this turn was skipped.
+     */
+    public void postTurn(Turn<?> turn, boolean skipped) {}
 
     /**
      * Verifies if the turn can be used and will return true if it is cancelled and the turn method can exit safely, due to being outside of the arena for example.
@@ -154,12 +207,14 @@ public abstract class Game extends Modifiers.Modifiable {
         if (player.hasModifier(Modifiers.P_REVIVE)) {
             player.player.playEffect(EntityEffect.TOTEM_RESURRECT);
             player.sendMessage(Translation.component(player.locale(), "gameplay.info.revive.use").color(Colors.POSITIVE));
+            NeoBB.LOG.info("{}: {} used a revive.", id, player.player.getName());
             player.removeModifier(Modifiers.P_REVIVE);
             return;
         }
 
         players.remove(player);
         player.player.setHealth(0.0);
+        NeoBB.LOG.info("{}: {} got eliminated.", id, player.player.getName());
 
         Bukkit.getScheduler().runTaskLater(NeoBB.PLUGIN, () -> {
             if (players.size() == 1) {
@@ -190,15 +245,13 @@ public abstract class Game extends Modifiers.Modifiable {
         this.started = started;
     }
 
-    public final Shop shop() {
-        return shop;
-    }
-
     public final WarpTurn warp() {
         return warp;
     }
 
     public void warp(@NotNull WarpTurn warp) {
+        NeoBB.LOG.info("{}: {} warped from {} to {}.", id, warp.player().player.getName(), this.warp.name, warp.name);
+
         this.warp = warp;
         allowedClazzes.clear();
         allowedClazzes.addAll(warp.allows());
@@ -269,6 +322,7 @@ public abstract class Game extends Modifiers.Modifiable {
     public void start() {
         timeLeft = new Time(info().totalTime());
         timeLeft.setAllowNegatives(true);
+        NeoBB.LOG.info("{}: Started the game.", id);
         setStarted(true);
     }
 
@@ -277,7 +331,12 @@ public abstract class Game extends Modifiers.Modifiable {
         GameManager.remove(this);
         effectManager.clearHighlight();
 
-        if (force) return;
+        if (force) {
+            NeoBB.LOG.info("{}: Stopped the game forcefully.", id);
+            return;
+        } else {
+            NeoBB.LOG.info("{}: Stopped the game gracefully.", id);
+        }
         Bukkit.getScheduler().runTaskLater(NeoBB.PLUGIN, () -> {
             initialPlayers.forEach(p -> p.player.kick(Component.text("Game ended!")));
             if (NeoBB.PRODUCTION) {
@@ -295,6 +354,8 @@ public abstract class Game extends Modifiers.Modifiable {
         player.opponents(false).forEach(p -> p.showTitle(Title.title(Translation.component(p.locale(), "gameplay.info.ending.lose").color(Colors.NEGATIVE),
                 Translation.component(p.locale(), "gameplay.info.ending.lose-sub").color(Colors.NEUTRAL))));
 
+        NeoBB.LOG.info("{}: {} won the game.", id, player.player.getName());
+
         end(false);
         if (ranked) Rating.updateRankingsWin(player, player.opponents(false).getFirst());
     }
@@ -303,6 +364,8 @@ public abstract class Game extends Modifiers.Modifiable {
         players.forEach(p -> p.showTitle(Title.title(Translation.component(p.locale(), "gameplay.info.ending.draw").color(Colors.NEUTRAL),
                 Translation.component(p.locale(), "gameplay.info.ending.draw-sub").color(Colors.EXTRA))));
 
+        NeoBB.LOG.info("{}: The game resulted in a draw.", id);
+
         end(force);
         if (ranked) Rating.updateRankingsDraw(initialPlayers.get(0), initialPlayers.get(1));
     }
@@ -310,6 +373,8 @@ public abstract class Game extends Modifiers.Modifiable {
     public final void giveUp(@NotNull NeoPlayer player) {
         players.forEach(p -> p.showTitle(Title.title(Translation.component(p.locale(), "gameplay.info.ending.giveup", player.player.getName()).color(Colors.NEUTRAL),
                 Translation.component(p.locale(), "gameplay.info.ending.giveup-sub", player.player.getName()).color(Colors.EXTRA))));
+
+        NeoBB.LOG.info("{}: {} gave up.", id, player.player.getName());
 
         end(false);
         if (ranked) Rating.updateRankingsWin(player.opponents(false).getFirst(), player);

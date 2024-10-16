@@ -11,8 +11,6 @@ import net.hectus.neobb.turn.default_game.attributes.clazz.NatureClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.RedstoneClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.WaterClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.CounterbuffFunction;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -28,11 +26,6 @@ public class TDaylightSensorLine extends StructureTurn implements CounterbuffFun
     @Override
     public Structure referenceStructure() {
         return StructureManager.structure("daylight_sensor_line");
-    }
-
-    @Override
-    public List<ItemStack> items() {
-        return List.of(new ItemStack(Material.DAYLIGHT_DETECTOR, 5));
     }
 
     @Override

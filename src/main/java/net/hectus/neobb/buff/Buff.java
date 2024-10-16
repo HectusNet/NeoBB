@@ -57,7 +57,17 @@ public abstract class Buff {
 
         @Override
         public void apply(@NotNull NeoPlayer source) {
-            source.addModifier(Modifiers.P_EXTRA_TURN);
+            Target target = getTarget(source);
+            if (target instanceof NeoPlayer player) {
+                player.addModifier(Modifiers.P_EXTRA_TURN);
+
+                if (turns > 1) { // Not nice, but works. Too lazy to create a proper way.
+                    for (int i = 1; i < turns; i++)
+                        player.game.turnScheduler.runTaskLater("extra-turn-" + player.player.getName(), () -> player.addModifier(Modifiers.P_EXTRA_TURN), i);
+                }
+            } else if (target instanceof TargetObj players) {
+                players.players().forEach(p -> p.addModifier(Modifiers.P_EXTRA_TURN));
+            }
         }
 
         @Override

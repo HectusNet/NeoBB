@@ -1,10 +1,20 @@
 package net.hectus.neobb.structure;
 
+import com.google.gson.GsonBuilder;
+import com.marcpg.libpg.storing.Pair;
+import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.util.Arena;
+import net.hectus.neobb.util.Cord;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,6 +41,35 @@ public class Structure implements Serializable {
                 .collect(Collectors.toSet()));
     }
 
+    public Structure(String name, World world, @NotNull Cord corner1, @NotNull Cord corner2) {
+        this(name, blocks(world, corner1, corner2));
+    }
+
+    public void save() {
+        String mode = Objects.requireNonNullElse(NeoBB.CONFIG.getString("structure-mode"), "local");
+        if (mode.equals("server")) {
+            NeoBB.LOG.warn("Saving structures to the server is not supported yet!");
+        } else {
+            File file = NeoBB.STRUCTURE_DIR.resolve(name + ".json").toFile();
+            try (FileWriter writer = new FileWriter(file)) {
+                new GsonBuilder().setPrettyPrinting().create().toJson(this, writer);
+                NeoBB.LOG.info("Saved structure {} to {}", name, file.getAbsolutePath());
+            } catch (IOException e) {
+                NeoBB.LOG.error("Failed to save structure {} to {}", name, file.getAbsolutePath(), e);
+            }
+        }
+    }
+
+    public void remove() throws IOException {
+        String mode = Objects.requireNonNullElse(NeoBB.CONFIG.getString("structure-mode"), "local");
+        if (mode.equals("server")) {
+            NeoBB.LOG.warn("Removing structures from the server is not supported yet!");
+        } else {
+            Files.delete(NeoBB.STRUCTURE_DIR.resolve(name + ".json"));
+            NeoBB.LOG.info("Removed structure {}", name);
+        }
+    }
+
     public boolean isInArena(@NotNull Arena arena) {
         return matchMaterials(arena.currentPlacedMaterials(), materials) && isInRegion(arena.currentPlacedBlocks());
     }
@@ -44,20 +83,14 @@ public class Structure implements Serializable {
     }
 
     public boolean isInRegion(BlockInfo @NotNull [][][] region) {
-        int worldX = region.length;
-        int worldY = region[0].length;
-        int worldZ = region[0][0].length;
-
-        for (int startX = 0; startX <= worldX - blocksX; startX++) {
-            for (int startY = 0; startY <= worldY - blocksY; startY++) {
-                for (int startZ = 0; startZ <= worldZ - blocksZ; startZ++) {
-                    if (matchesStructure(region, startX, startY, startZ)) {
+        for (int startX = 0; startX <= region.length - blocksX; startX++) {
+            for (int startY = 0; startY <= region[0].length - blocksY; startY++) {
+                for (int startZ = 0; startZ <= region[0][0].length - blocksZ; startZ++) {
+                    if (matchesStructure(region, startX, startY, startZ))
                         return true;
-                    }
                 }
             }
         }
-
         return false;
     }
 
@@ -65,14 +98,30 @@ public class Structure implements Serializable {
         for (int x = 0; x < blocksX; x++) {
             for (int y = 0; y < blocksY; y++) {
                 for (int z = 0; z < blocksZ; z++) {
-                    BlockInfo worldBlock = region[startX + x][startY + y][startZ + z];
                     BlockInfo structureBlock = blocks[x][y][z];
-
-                    if (structureBlock != null && !structureBlock.equals(worldBlock))
+                    if (structureBlock != null && !structureBlock.equals(region[startX + x][startY + y][startZ + z]))
                         return false;
                 }
             }
         }
         return true;
+    }
+
+    public static BlockInfo @NotNull [][][] blocks(World world, @NotNull Cord corner1, @NotNull Cord corner2) {
+        Pair<Cord, Cord> corners = Cord.corners(corner1, corner2);
+        Cord low = corners.left(), high = corners.right();
+
+        BlockInfo[][][] blocks = new BlockInfo[(int) (high.x() - low.x() + 1)][(int) (high.y() - low.y() + 1)][(int) (high.z() - low.z() + 1)];
+        for (int x = (int) low.x(); x <= high.x(); x++) {
+            for (int y = (int) low.y(); y <= high.y(); y++) {
+                for (int z = (int) low.z(); z <= high.z(); z++) {
+                    Block block = world.getBlockAt(x, y, z);
+                    System.out.println(block);
+                    if (block.getType().isAir()) continue;
+                    blocks[x - (int) low.x()][y - (int) low.y()][z - (int) low.z()] = new BlockInfo(new Cord(x, y, z), block.getType());
+                }
+            }
+        }
+        return blocks;
     }
 }

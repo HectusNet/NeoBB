@@ -3,7 +3,6 @@ package net.hectus.neobb.util;
 import com.marcpg.libpg.lang.Translation;
 import net.hectus.neobb.game.util.GameManager;
 import net.hectus.neobb.player.NeoPlayer;
-import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -11,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.*;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -28,7 +28,7 @@ public final class Utilities {
     }
 
     public static @NotNull String counterFilterName(@NotNull String className) {
-        return className.replaceAll("^T(?!.*(Function|Usage|Clazz)$)|Function$|Usage$|Clazz$", "");
+        return className.replaceAll("^.?T(?!.*(Function|Usage|Clazz)$)|Function$|Usage$|Clazz$", "");
     }
 
     public static @NotNull String turnName(@NotNull String className, Locale locale) {
@@ -44,16 +44,6 @@ public final class Utilities {
 
     public static @NotNull Location listToLocation(World world, @NotNull List<Integer> list) {
         return new Location(world, list.get(0), list.get(1), list.get(2));
-    }
-
-    public static <T> void loop(T @NotNull [][][] array, boolean allowNull, TriConsumer<Integer, Integer, Integer> action) {
-        for (int x = 0; x < array.length; x++) {
-            for (int y = 0; y < array[0].length; y++) {
-                for (int z = 0; z < array[0][0].length; z++) {
-                    if (allowNull || array[x][y][z] != null) action.accept(x, y, z);
-                }
-            }
-        }
     }
 
     public static <T> void loop(T @NotNull [][][] array, boolean allowNull, Consumer<T> action) {
@@ -77,5 +67,33 @@ public final class Utilities {
         NeoPlayer player = GameManager.player(eventPlayer, true);
         if (player != null && (!started || player.game.started()) && additionalPredicate.test(player))
             action.accept(player);
+    }
+
+    private static final ZoneId EARLIEST_TIMEZONE = ZoneId.of("Pacific/Honolulu");  // UTC−10
+    private static final ZoneId LATEST_TIMEZONE = ZoneId.of("Pacific/Auckland"); // UTC+12
+
+    /**
+     * Checks whether it's a weekday (monday-friday) in any major time zone.
+     * This is inclusive, meaning it only requires one to be true, to not cause any confusion amongst
+     * international players. The time zones that are checked are from UTC-10 to UTC+12, because no major
+     * population lives beyond that point. No, Kiritimati is not a major population center.
+     * @return {@code true} if it is monday-friday, {@code false} if it is saturday or sunday.
+     */
+    public static boolean isWeekday() {
+        return isWeekday(ZonedDateTime.now(EARLIEST_TIMEZONE).getDayOfWeek()) &&
+                isWeekday(ZonedDateTime.now(LATEST_TIMEZONE).getDayOfWeek());
+    }
+
+    public static boolean isWeekday(DayOfWeek day) {
+        return day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY;
+    }
+
+    /**
+     * Checks if it is daytime (8am to 8pm) in the UTC time zone.
+     * @return {@code true} if it is daytime, {@code false} if it is nighttime.
+     */
+    public static boolean isDaytime() {
+        LocalTime time = ZonedDateTime.now(ZoneOffset.UTC).toLocalTime();
+        return time.isAfter(LocalTime.of(8, 0)) && time.isBefore(LocalTime.of(20, 0));
     }
 }
