@@ -20,11 +20,6 @@ public class TGlassWall extends GlassWallTurn implements NeutralClazz {
     }
 
     @Override
-    public List<ItemStack> items() {
-        return List.of(new ItemStack(Material.GLASS, 6));
-    }
-
-    @Override
     public String color() {
         return "";
     }

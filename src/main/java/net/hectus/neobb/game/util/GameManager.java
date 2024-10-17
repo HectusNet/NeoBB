@@ -26,6 +26,7 @@ public final class GameManager {
     }
 
     public static @Nullable Game game(String id) {
+        if (id == null) return null;
         return gameCacheById.get(id);
     }
 

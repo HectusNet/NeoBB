@@ -17,19 +17,29 @@ import net.hectus.neobb.turn.default_game.item.TChorusFruit;
 import net.hectus.neobb.turn.default_game.item.TIronShovel;
 import net.hectus.neobb.turn.default_game.mob.*;
 import net.hectus.neobb.turn.default_game.other.TBoat;
-import net.hectus.neobb.turn.default_game.structure.*;
-import net.hectus.neobb.turn.default_game.structure.glass_wall.*;
+import net.hectus.neobb.turn.default_game.structure.TIronBarJail;
+import net.hectus.neobb.turn.default_game.structure.TOakDoorTurtling;
+import net.hectus.neobb.turn.default_game.structure.glass_wall.TBlueGlassWall;
+import net.hectus.neobb.turn.default_game.structure.glass_wall.TOrangeGlassWall;
+import net.hectus.neobb.turn.default_game.structure.glass_wall.TPinkGlassWall;
+import net.hectus.neobb.turn.default_game.structure.glass_wall.TRedGlassWall;
 import net.hectus.neobb.turn.default_game.throwable.*;
-import net.hectus.neobb.turn.default_game.warp.*;
+import net.hectus.neobb.turn.default_game.warp.WarpTurn;
 import net.hectus.neobb.turn.legacy_game.block.LTPurpleWool;
+import net.hectus.neobb.turn.legacy_game.block.LTSeaPickle;
 import net.hectus.neobb.turn.legacy_game.block.LTTnt;
 import net.hectus.neobb.turn.legacy_game.item.LTDinnerboneTag;
 import net.hectus.neobb.turn.legacy_game.item.LTEnchantedGoldenApple;
 import net.hectus.neobb.turn.legacy_game.item.LTLightningTrident;
 import net.hectus.neobb.turn.legacy_game.other.LTNoteBlock;
+import net.hectus.neobb.turn.legacy_game.structure.LTDaylightSensorStrip;
 import net.hectus.neobb.turn.legacy_game.structure.LTNetherPortal;
-import net.hectus.neobb.turn.legacy_game.warp.LTDefaultWarp;
-import net.hectus.neobb.turn.legacy_game.warp.LTRedstoneWarp;
+import net.hectus.neobb.turn.legacy_game.structure.LTPumpkinWall;
+import net.hectus.neobb.turn.legacy_game.structure.LTRedstoneBlockWall;
+import net.hectus.neobb.turn.legacy_game.structure.glass_wall.LTGlassWall;
+import net.hectus.neobb.turn.legacy_game.structure.glass_wall.LTLightBlueGlassWall;
+import net.hectus.neobb.turn.legacy_game.structure.glass_wall.LTLimeGlassWall;
+import net.hectus.neobb.turn.legacy_game.warp.*;
 import net.hectus.neobb.util.Colors;
 import net.hectus.neobb.util.Modifiers;
 import net.kyori.adventure.text.Component;
@@ -54,15 +64,16 @@ public class LegacyGame extends HectusGame {
             TBlackWool.class, TNetherrack.class, TPowderSnow.class, TMagentaGlazedTerracotta.class, TRespawnAnchor.class, TWater.class,
             TLightBlueWool.class, TBrainCoralBlock.class, TFireCoralFan.class, TGreenCarpet.class, TDragonHead.class, TWhiteTulip.class,
             TCornflower.class, TWitherRose.class, TBlueOrchid.class, TSunflower.class, TAzureBluet.class, TAllium.class, TOrangeTulip.class,
-            TPoppy.class, TRedTulip.class, TPinkTulip.class, TOxeyeDaisy.class, TSunWarp.class, TFrozenWarp.class, TCliffWarp.class,
-            TDesertWarp.class, TOceanWarp.class, TWoodWarp.class, TMeadowWarp.class, TRedstoneWarp.class, TVoidWarp.class,
-            TMushroomWarp.class, TNetherWarp.class, TNerdWarp.class, TAmethystWarp.class, TEndWarp.class, TBoat.class, TChorusFruit.class,
-            TIronShovel.class, TPiglin.class, TPhantom.class, TSheep.class, TBee.class, TAxolotl.class, TEvoker.class, TPufferfish.class,
-            TPolarBear.class, TBlaze.class, TSnowball.class, TSplashLevitationPotion.class, TEnderPearl.class, TSplashWaterBottle.class,
-            TSplashJumpBoostPotion.class, TBlueGlassWall.class, TOrangeGlassWall.class, TGreenGlassWall.class, TWhiteGlassWall.class,
-            TPinkGlassWall.class, TRedGlassWall.class, TGlassWall.class, TDaylightSensorLine.class, TIronBarJail.class,
-            TOakDoorTurtling.class, TPumpkinWall.class, TRedstoneWall.class, TDirt.class, TFlowerPot.class, LTDinnerboneTag.class,
-            LTLightningTrident.class, LTPurpleWool.class, LTTnt.class, LTNetherPortal.class, LTEnchantedGoldenApple.class, LTNoteBlock.class
+            TPoppy.class, TRedTulip.class, TPinkTulip.class, TOxeyeDaisy.class, TBoat.class, TChorusFruit.class, TIronShovel.class,
+            TPiglin.class, TPhantom.class, TSheep.class, TBee.class, TAxolotl.class, TEvoker.class, TPufferfish.class, TPolarBear.class,
+            TBlaze.class, TSnowball.class, TSplashLevitationPotion.class, TEnderPearl.class, TSplashWaterBottle.class,
+            TSplashJumpBoostPotion.class, TBlueGlassWall.class, TOrangeGlassWall.class, TPinkGlassWall.class, TRedGlassWall.class,
+            TIronBarJail.class, TOakDoorTurtling.class, TDirt.class, TFlowerPot.class, LTDinnerboneTag.class, LTLightningTrident.class,
+            LTPurpleWool.class, LTTnt.class, LTNetherPortal.class, LTEnchantedGoldenApple.class, LTNoteBlock.class, LTSeaPickle.class,
+            LTPumpkinWall.class, LTDaylightSensorStrip.class, LTRedstoneBlockWall.class, LTLightBlueGlassWall.class, LTLimeGlassWall.class,
+            LTGlassWall.class, LTAetherWarp.class, LTAmethystWarp.class, LTBookWarp.class, LTCliffWarp.class, LTDesertWarp.class,
+            LTEndWarp.class, LTHeavenWarp.class, LTHellWarp.class, LTIceWarp.class, LTMushroomWarp.class, LTNetherWarp.class,
+            LTRedstoneWarp.class, LTSnowWarp.class, LTSunWarp.class, LTUnderwaterWarp.class, LTVoidWarp.class, LTWoodWarp.class
     ));
 
     public LegacyGame(boolean ranked, World world, @NotNull List<Player> players) {

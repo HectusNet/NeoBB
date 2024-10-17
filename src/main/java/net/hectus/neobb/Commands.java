@@ -9,6 +9,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolver;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
+import net.hectus.neobb.game.Game;
 import net.hectus.neobb.game.mode.DefaultGame;
 import net.hectus.neobb.game.mode.HereGame;
 import net.hectus.neobb.game.mode.LegacyGame;
@@ -32,40 +33,76 @@ public final class Commands {
     private static final List<String> MODES = List.of("default", "herestudio", "legacy");
 
     public static LiteralCommandNode<CommandSourceStack> startCommand() {
-        return LiteralArgumentBuilder.<CommandSourceStack>literal("start")
-                .requires(source -> source.getSender().hasPermission("neobb.start"))
-                .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("mode", StringArgumentType.word())
-                        .suggests((context, builder) -> {
-                            MODES.forEach(builder::suggest);
-                            return builder.buildFuture();
-                        })
-                        .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerSelectorArgumentResolver>argument("players", ArgumentTypes.players())
+        return LiteralArgumentBuilder.<CommandSourceStack>literal("games")
+                .requires(source -> source.getSender().hasPermission("neobb.games"))
+                .then(LiteralArgumentBuilder.<CommandSourceStack>literal("start")
+                        .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("mode", StringArgumentType.word())
+                                .suggests((context, builder) -> {
+                                    MODES.forEach(builder::suggest);
+                                    return builder.buildFuture();
+                                })
+                                .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerSelectorArgumentResolver>argument("players", ArgumentTypes.players())
+                                        .executes(context -> {
+                                            CommandSender source = context.getSource().getSender();
+                                            Locale l = source instanceof Player p ? p.locale() : Locale.getDefault();
+
+                                            List<Player> players = context.getArgument("players", PlayerSelectorArgumentResolver.class).resolve(context.getSource());
+                                            if (players.size() < 2) {
+                                                source.sendMessage(Translation.component(l, "command.games.start.not_enough_players").color(Colors.NEGATIVE));
+                                                return 1;
+                                            }
+
+                                            source.sendMessage(Translation.component(l, "command.games.start.starting", players.size()).color(Colors.POSITIVE));
+                                            try {
+                                                switch (context.getArgument("mode", String.class)) {
+                                                    case "default" -> new DefaultGame(true, players.getFirst().getWorld(), players);
+                                                    case "herestudio" -> new HereGame(false, players.getFirst().getWorld(), players);
+                                                    case "legacy" -> new LegacyGame(false, players.getFirst().getWorld(), players);
+                                                    default -> source.sendMessage(Translation.component(l, "command.games.start.unknown_mode").color(Colors.NEGATIVE));
+                                                }
+                                            } catch (Exception e) {
+                                                source.sendMessage(Translation.component(l, "command.games.start.error").color(Colors.NEGATIVE));
+                                                NeoBB.LOG.error("Could not start match!", e);
+                                            }
+                                            return 1;
+                                        })
+                                )
+                ))
+                .then(LiteralArgumentBuilder.<CommandSourceStack>literal("stop")
+                        .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("id", StringArgumentType.word())
+                                .suggests((context, builder) -> {
+                                    GameManager.GAMES.forEach(g -> builder.suggest(g.id));
+                                    return builder.buildFuture();
+                                })
                                 .executes(context -> {
                                     CommandSender source = context.getSource().getSender();
                                     Locale l = source instanceof Player p ? p.locale() : Locale.getDefault();
 
-                                    List<Player> players = context.getArgument("players", PlayerSelectorArgumentResolver.class).resolve(context.getSource());
-                                    if (players.size() < 2) {
-                                        source.sendMessage(Translation.component(l, "command.start.not_enough_players").color(Colors.NEGATIVE));
+                                    Game game = GameManager.game(context.getArgument("id", String.class));
+                                    if (game == null) {
+                                        source.sendMessage(Translation.component(l, "command.games.not_found", context.getArgument("id", String.class)).color(Colors.NEGATIVE));
                                         return 1;
                                     }
 
-                                    source.sendMessage(Translation.component(l, "command.start.starting", players.size()).color(Colors.POSITIVE));
-                                    try {
-                                        switch (context.getArgument("mode", String.class)) {
-                                            case "default" -> new DefaultGame(true, players.getFirst().getWorld(), players);
-                                            case "herestudio" -> new HereGame(false, players.getFirst().getWorld(), players);
-                                            case "legacy" -> new LegacyGame(false, players.getFirst().getWorld(), players);
-                                            default -> source.sendMessage(Translation.component(l, "command.start.unknown_mode").color(Colors.NEGATIVE));
-                                        }
-                                    } catch (Exception e) {
-                                        source.sendMessage(Translation.component(l, "command.start.error").color(Colors.NEGATIVE));
-                                        NeoBB.LOG.error("Could not start match!", e);
-                                    }
+                                    game.end(true);
+                                    source.sendMessage(Translation.component(l, "command.games.stop.success", game.id).color(Colors.NEUTRAL));
 
                                     return 1;
                                 })
-                        )
+                ))
+                .then(LiteralArgumentBuilder.<CommandSourceStack>literal("list")
+                        .executes(context -> {
+                            CommandSender source = context.getSource().getSender();
+                            for (Game game : GameManager.GAMES) {
+                                source.sendMessage(Component.text("==== ", Colors.EXTRA).append(Component.text(game.id, Colors.ACCENT)).append(Component.text(" ====", Colors.EXTRA)));
+                                source.sendMessage(Component.text("> Players: ", Colors.EXTRA).append(Component.text(game.players().size() + "/" + game.initialPlayers().size(), Colors.SECONDARY)));
+                                source.sendMessage(Component.text("> Time: ", Colors.EXTRA).append(Component.text(game.timeLeft().getPreciselyFormatted(), Colors.SECONDARY)));
+                                source.sendMessage(Component.text("> Ranked: ", Colors.EXTRA).append(Component.text(game.ranked, Colors.SECONDARY)));
+                                source.sendMessage(Component.text("> Played Turns: ", Colors.EXTRA).append(Component.text(game.history().size(), Colors.SECONDARY)));
+                                source.sendMessage(Component.text("> Turning: ", Colors.EXTRA).append(Component.text(game.currentPlayer().player.getName(), Colors.SECONDARY)));
+                            }
+                            return 1;
+                        })
                 )
                 .build();
     }
