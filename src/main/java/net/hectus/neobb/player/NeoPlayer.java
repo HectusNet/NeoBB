@@ -150,17 +150,17 @@ public class NeoPlayer extends Modifiers.Modifiable implements Target, Forwardin
             NeoBB.DATABASE.add(Map.of("uuid", uuid()));
         }
 
-        elo = (double) NeoBB.DATABASE.get(uuid(), "elo");
-        ratingDeviation = (double) NeoBB.DATABASE.get(uuid(), "rating_deviation");
-        volatility = (double) NeoBB.DATABASE.get(uuid(), "volatility");
-        lastMatchTimeMillis = (long) NeoBB.DATABASE.get(uuid(), "last_match_time");
-        wins = (int) NeoBB.DATABASE.get(uuid(), "wins");
-        losses = (int) NeoBB.DATABASE.get(uuid(), "losses");
-        draws = (int) NeoBB.DATABASE.get(uuid(), "draws");
-        turns = (int) NeoBB.DATABASE.get(uuid(), "turns");
+        elo = (double) NeoBB.DATABASE.get(uuid(), "elo", 0.0);
+        ratingDeviation = (double) NeoBB.DATABASE.get(uuid(), "rating_deviation", 0.0);
+        volatility = (double) NeoBB.DATABASE.get(uuid(), "volatility", 0.0);
+        lastMatchTimeMillis = (long) NeoBB.DATABASE.get(uuid(), "last_match_time", 0L);
+        wins = (int) NeoBB.DATABASE.get(uuid(), "wins", 0);
+        losses = (int) NeoBB.DATABASE.get(uuid(), "losses", 0);
+        draws = (int) NeoBB.DATABASE.get(uuid(), "draws", 0);
+        turns = (int) NeoBB.DATABASE.get(uuid(), "turns", 0);
 
-        cosmeticParticle = PlaceParticle.valueOf((String) NeoBB.DATABASE.get(uuid(), "cosmetic_particle"));
-        cosmeticOutline = NamedTextColor.namedColor((Integer) NeoBB.DATABASE.get(uuid(), "cosmetic_outline"));
+        cosmeticParticle = PlaceParticle.valueOf((String) NeoBB.DATABASE.get(uuid(), "cosmetic_particle", PlaceParticle.ENCHANTMENT.name()));
+        cosmeticOutline = NamedTextColor.namedColor((Integer) NeoBB.DATABASE.get(uuid(), "cosmetic_outline", NamedTextColor.WHITE.value()));
     }
 
     // ====================================

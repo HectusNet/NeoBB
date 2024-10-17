@@ -3,6 +3,7 @@ package net.hectus.neobb;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.marcpg.libpg.data.database.sql.AutoCatchingSQLConnection;
+import com.marcpg.libpg.data.database.sql.DummySQLConnection;
 import com.marcpg.libpg.data.database.sql.SQLConnection;
 import com.marcpg.libpg.lang.Translation;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -90,7 +91,7 @@ public final class NeoBB extends JavaPlugin {
     public void onDisable() {
         GameManager.GAMES.forEach(game -> game.draw(true));
         Bukkit.unloadWorld("world", false); // Prevent saving of the world!
-        if (DATABASE != null) DATABASE.closeConnection();
+        DATABASE.closeConnection();
     }
 
     void translations() throws URISyntaxException, IOException, InterruptedException {
@@ -115,7 +116,8 @@ public final class NeoBB extends JavaPlugin {
                         e -> LOG.error("Database error: {}", e.getMessage())
                 );
             } catch (Exception e) {
-                LOG.error("Couldn't establish connection to playerdata database!", e);
+                LOG.error("Couldn't establish connection to playerdata database! Using a dummy database now.", e);
+                DATABASE = new DummySQLConnection<>("table", "uuid");
             }
         }
     }
