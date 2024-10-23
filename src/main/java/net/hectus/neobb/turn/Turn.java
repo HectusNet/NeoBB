@@ -29,7 +29,9 @@ public abstract class Turn<T> {
     public void apply() {}
     public ItemStack item() { return ItemStack.empty(); }
 
-    public abstract int cost();
+    public double damage() { return 0.0; }
+
+    public int cost() { return 0; } // For games that don't have coins in their "shop".
 
     public List<ItemStack> items() {
         return List.of(item());

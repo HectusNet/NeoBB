@@ -11,8 +11,8 @@ import org.bukkit.World;
 import java.util.List;
 
 public class LTWoodWarp extends LWarpTurn {
-    public LTWoodWarp(World world) { super(world, "legacy-wood"); }
-    public LTWoodWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "legacy-wood"); }
+    public LTWoodWarp(World world) { super(world, "wood"); }
+    public LTWoodWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "wood"); }
 
     @Override
     public int chance() {

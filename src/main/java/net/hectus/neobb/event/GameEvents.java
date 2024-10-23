@@ -21,6 +21,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -33,7 +34,10 @@ public class GameEvents implements Listener {
 
     @EventHandler
     public void onServerTickEnd(@NotNull ServerTickEndEvent event) {
-        GameManager.GAMES.forEach(game -> game.gameTick(event.getTickNumber()));
+        try {
+            GameManager.GAMES.forEach(game -> game.gameTick(event.getTickNumber()));
+        } catch (ConcurrentModificationException ignored) {
+        } // Can ignore this because it only happens when the game ends in an insanely specific timespan.
     }
 
     // ========== PLAYER EVENTS ==========

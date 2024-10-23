@@ -34,7 +34,7 @@ import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class NeoBB extends JavaPlugin {
-    public static final String VERSION = "0.0.8";
+    public static final String VERSION = "0.0.9";
 
     public static NeoBB PLUGIN;
     public static Logger LOG;
@@ -80,6 +80,7 @@ public final class NeoBB extends JavaPlugin {
             event.registrar().register(Commands.startCommand());
             event.registrar().register(Commands.giveupCommand());
             event.registrar().register(Commands.structureCommand());
+            event.registrar().register(Commands.debugCommand());
         });
 
         getServer().getPluginManager().registerEvents(new GameEvents(), this);
@@ -115,10 +116,11 @@ public final class NeoBB extends JavaPlugin {
                         "uuid",
                         e -> LOG.error("Database error: {}", e.getMessage())
                 );
+                return;
             } catch (Exception e) {
                 LOG.error("Couldn't establish connection to playerdata database! Using a dummy database now.", e);
-                DATABASE = new DummySQLConnection<>("table", "uuid");
             }
         }
+        DATABASE = new DummySQLConnection<>("table", "uuid");
     }
 }

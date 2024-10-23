@@ -15,8 +15,8 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.List;
 
 public class LTSunWarp extends LWarpTurn {
-    public LTSunWarp(World world) { super(world, "legacy-sun"); }
-    public LTSunWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "legacy-sun"); }
+    public LTSunWarp(World world) { super(world, "sun"); }
+    public LTSunWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "sun"); }
 
     @Override
     public void apply() {

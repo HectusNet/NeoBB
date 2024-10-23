@@ -93,6 +93,12 @@ public final class StructureManager {
         for (Structure structure : STRUCTURES) {
             if (structure.isInArena(arena))
                 return structure;
+
+            if (structure.blocksX != structure.blocksZ) {
+                Structure rotated = structure.rotated();
+                if (rotated.isInArena(arena))
+                    return rotated;
+            }
         }
         return null;
     }

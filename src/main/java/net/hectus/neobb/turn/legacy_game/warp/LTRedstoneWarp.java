@@ -9,8 +9,8 @@ import org.bukkit.World;
 import java.util.List;
 
 public class LTRedstoneWarp extends LWarpTurn {
-    public LTRedstoneWarp(World world) { super(world, "legacy-redstone"); }
-    public LTRedstoneWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "legacy-redstone"); }
+    public LTRedstoneWarp(World world) { super(world, "redstone"); }
+    public LTRedstoneWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "redstone"); }
 
     @Override
     public void apply() {

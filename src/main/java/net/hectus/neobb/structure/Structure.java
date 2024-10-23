@@ -25,6 +25,7 @@ public class Structure implements Serializable {
     public final int blocksX;
     public final int blocksY;
     public final int blocksZ;
+    public transient Structure rotated;
 
     public Structure(String name, BlockInfo @NotNull [][][] blocks) {
         this.name = name;
@@ -68,6 +69,17 @@ public class Structure implements Serializable {
             Files.delete(NeoBB.STRUCTURE_DIR.resolve(name + ".json"));
             NeoBB.LOG.info("Removed structure {}", name);
         }
+    }
+
+    public Structure rotated() {
+        if (rotated != null) return rotated;
+
+        BlockInfo[][][] newBlocks = new BlockInfo[blocksZ][blocksY][blocksX];
+        for (BlockInfo oldBlock : Arrays.stream(blocks).parallel().flatMap(Arrays::stream).flatMap(Arrays::stream).filter(Objects::nonNull).toList()) {
+            Cord cord = oldBlock.cord().rotated();
+            newBlocks[(int) cord.x()][(int) cord.y()][(int) cord.z()] = new BlockInfo(cord, oldBlock.material());
+        }
+        return new Structure(name, newBlocks);
     }
 
     public boolean isInArena(@NotNull Arena arena) {
@@ -116,9 +128,8 @@ public class Structure implements Serializable {
             for (int y = (int) low.y(); y <= high.y(); y++) {
                 for (int z = (int) low.z(); z <= high.z(); z++) {
                     Block block = world.getBlockAt(x, y, z);
-                    System.out.println(block);
                     if (block.getType().isAir()) continue;
-                    blocks[x - (int) low.x()][y - (int) low.y()][z - (int) low.z()] = new BlockInfo(new Cord(x, y, z), block.getType());
+                    blocks[x - (int) low.x()][y - (int) low.y()][z - (int) low.z()] = new BlockInfo(new Cord(x - (int) low.x(), y - (int) low.y(), z - (int) low.z()), block.getType());
                 }
             }
         }

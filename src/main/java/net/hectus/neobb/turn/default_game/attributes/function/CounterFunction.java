@@ -21,7 +21,7 @@ public interface CounterFunction extends Function {
 
         if (!(turn.player().game instanceof LegacyGame) || last.location().add(0, 1, 0).equals(turn.location())) { // Only check if it's a legacy game.
             if (counters().stream().anyMatch(filter -> filter.doCounter(last))) {
-                counter(turn.player());
+                counter(turn.player(), last);
             } else {
                 turn.player().sendMessage(Translation.component(turn.player().locale(), "gameplay.info.wrong_counter").color(Colors.NEGATIVE));
                 turn.player().player.playSound(turn.player().player, Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
@@ -31,7 +31,7 @@ public interface CounterFunction extends Function {
         return false;
     }
 
-    default void counter(@NotNull NeoPlayer source) {
+    default void counter(@NotNull NeoPlayer source, @NotNull Turn<?> countered) {
         source.removeModifier(Modifiers.P_DEFAULT_ATTACKED);
     }
 }

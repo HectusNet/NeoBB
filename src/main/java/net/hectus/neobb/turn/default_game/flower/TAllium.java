@@ -1,11 +1,7 @@
 package net.hectus.neobb.turn.default_game.flower;
 
-import com.marcpg.libpg.util.Randomizer;
 import net.hectus.neobb.player.NeoPlayer;
 import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.stream.IntStream;
 
 public class TAllium extends FlowerTurn {
     public TAllium(NeoPlayer player) { super(player); }
@@ -18,15 +14,6 @@ public class TAllium extends FlowerTurn {
 
     @Override
     public void apply() {
-        for (NeoPlayer p : player.game.players()) {
-            if (p.inventory.isEmpty()) continue;
-
-            ItemStack[] deck = p.inventory.deck();
-            p.inventory.setDeckSlot(Randomizer.fromCollection(IntStream.range(0, deck.length)
-                    .filter(i -> deck[i] != null)
-                    .boxed()
-                    .toList()
-            ), null, null);
-        }
+        player.game.players().forEach(p -> p.inventory.removeRandom());
     }
 }

@@ -10,8 +10,8 @@ import org.bukkit.World;
 import java.util.List;
 
 public class LTEndWarp extends LWarpTurn {
-    public LTEndWarp(World world) { super(world, "legacy-end"); }
-    public LTEndWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "legacy-end"); }
+    public LTEndWarp(World world) { super(world, "end"); }
+    public LTEndWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "end"); }
 
     @Override
     public void apply() {

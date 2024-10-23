@@ -20,7 +20,7 @@ public abstract class HectusGame extends BossBarGame {
 
     @Override
     public boolean executeTurn(Turn<?> turn) {
-        if (turn instanceof CounterFunction counter && counter.counterLogic(turn)) {
+        if (turn instanceof CounterFunction counter) {
             if (counter.counterLogic(turn)) {
                 NeoBB.LOG.info("{}: Not applying counter from turn.", id);
                 return false;

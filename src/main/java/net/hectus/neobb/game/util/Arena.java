@@ -31,7 +31,7 @@ public class Arena {
         this.world = world;
     }
 
-    public void cleanUp() {
+    public void clear() {
         Utilities.loop(totalPlacedBlocks, false, b -> game.warp().lowCorner().add(b.cord()).toLocation(world).getBlock().setType(Material.AIR));
         game.history().forEach(t -> {
             if (t.data() instanceof Entity entity)

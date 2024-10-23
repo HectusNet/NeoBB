@@ -12,7 +12,8 @@ public abstract class HereTurn extends Turn<Block> {
     public HereTurn(NeoPlayer player) { super(player); }
     public HereTurn(Block data, NeoPlayer player) { super(data, data.getLocation(), player); }
 
-    public abstract double damage();
+    @Override
+    public abstract double damage(); // Change it to be abstract instead of concrete.
 
     @Override
     public ItemStack item() {
@@ -22,11 +23,6 @@ public abstract class HereTurn extends Turn<Block> {
     @Override
     public Location location() {
         return location.clone().add(0.5, 0.5, 0.5);
-    }
-
-    @Override
-    public void apply() {
-        player.nextPlayer().damage(damage());
     }
 
     @Override

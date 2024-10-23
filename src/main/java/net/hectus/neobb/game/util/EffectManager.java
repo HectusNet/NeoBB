@@ -30,7 +30,7 @@ public class EffectManager {
     }
 
     public void spawnParticle(Location loc, @NotNull NeoPlayer player) {
-        player.cosmeticParticle().spawn(loc);
+        player.cosmeticPlaceParticle().spawn(loc);
     }
 
     public void highlightBlock(@NotNull Block block, NamedTextColor outlineColor) {

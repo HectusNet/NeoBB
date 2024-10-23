@@ -12,8 +12,8 @@ import org.bukkit.World;
 import java.util.List;
 
 public class LTCliffWarp extends LWarpTurn {
-    public LTCliffWarp(World world) { super(world, "legacy-cliff"); }
-    public LTCliffWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "legacy-cliff"); }
+    public LTCliffWarp(World world) { super(world, "cliff"); }
+    public LTCliffWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "cliff"); }
 
     @Override
     public void apply() {

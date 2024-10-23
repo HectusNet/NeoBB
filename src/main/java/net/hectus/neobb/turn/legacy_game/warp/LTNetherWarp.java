@@ -11,8 +11,8 @@ import org.bukkit.World;
 import java.util.List;
 
 public class LTNetherWarp extends LWarpTurn {
-    public LTNetherWarp(World world) { super(world, "legacy-nether"); }
-    public LTNetherWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "legacy-nether"); }
+    public LTNetherWarp(World world) { super(world, "nether"); }
+    public LTNetherWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "nether"); }
 
     @Override
     public int chance() {

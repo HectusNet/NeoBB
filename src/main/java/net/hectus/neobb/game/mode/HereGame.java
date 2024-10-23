@@ -23,8 +23,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Source: <a href="https://github.com/TiagoFar78/BlockBattles">Source Code on GitHub</a>
+ */
 public class HereGame extends Game {
-    public static final GameInfo INFO = new GameInfo(false, 0, 5, new Time(10, Time.Unit.MINUTES), 15, RandomizedShop.class, HereItemLoreBuilder.class, List.of(
+    public static final GameInfo INFO = new GameInfo(false, 50.0, 0, 5, new Time(10, Time.Unit.MINUTES), 15, RandomizedShop.class, HereItemLoreBuilder.class, List.of(
             HTChest.class, HTDaylightDetector.class, HTFlowerPot.class, HTJackOLantern.class, HTOakDoor.class, HTOakFenceGate.class,
             HTPointedDripstone.class, HTRedstoneLamp.class, HTTorch.class, HTWaxedExposedCutCopperStairs.class
     ));

@@ -6,6 +6,7 @@ import net.hectus.neobb.player.NeoPlayer;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +20,18 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.bukkit.entity.EntityType.*;
+
 public final class Utilities {
+    public static final List<EntityType> ENTITY_TYPES = List.of(
+            WITHER_SKELETON, STRAY, HUSK, ZOMBIE_VILLAGER, SKELETON_HORSE, ZOMBIE_HORSE, DONKEY, MULE, EVOKER, VEX,
+            VINDICATOR, CREEPER, SKELETON, SPIDER, ZOMBIE, SLIME, GHAST, ZOMBIFIED_PIGLIN, ENDERMAN, CAVE_SPIDER,
+            SILVERFISH, BLAZE, MAGMA_CUBE, BAT, WITCH, ENDERMITE, GUARDIAN, SHULKER, PIG, SHEEP, COW, CHICKEN, SQUID,
+            WOLF, MOOSHROOM, SNOW_GOLEM, OCELOT, IRON_GOLEM, HORSE, RABBIT, POLAR_BEAR, LLAMA, PARROT, VILLAGER, TURTLE,
+            PHANTOM, DROWNED, CAT, PANDA, PILLAGER, RAVAGER, TRADER_LLAMA, WANDERING_TRADER, FOX, BEE, HOGLIN, PIGLIN,
+            STRIDER, ZOGLIN, AXOLOTL, GLOW_SQUID, GOAT, ALLAY, FROG, CAMEL, SNIFFER
+    );
+
     public static final Random RANDOM = new Random();
     public static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+");
 

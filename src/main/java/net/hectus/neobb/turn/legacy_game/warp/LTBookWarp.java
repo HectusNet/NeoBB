@@ -12,8 +12,8 @@ import org.bukkit.World;
 import java.util.List;
 
 public class LTBookWarp extends LWarpTurn {
-    public LTBookWarp(World world) { super(world, "legacy-book"); }
-    public LTBookWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "legacy-book"); }
+    public LTBookWarp(World world) { super(world, "book"); }
+    public LTBookWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "book"); }
 
     @Override
     public void apply() {

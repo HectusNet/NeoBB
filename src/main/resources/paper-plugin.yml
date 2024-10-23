@@ -2,10 +2,10 @@
 name: NeoBB
 
 ### Plugin Description ###
-description: A reworked version of NeoBB with some interesting spins.
+description: A better version of Block Battles, where multiple players compete in a turn-based game, similar to chess or card games.
 
 ### Build Version ###
-version: '${version}'
+version: ${version}
 
 ### Main Class ###
 main: net.hectus.neobb.NeoBB
@@ -18,7 +18,7 @@ authors:
   - MarcPG
 
 ### Plugin Website ###
-website: https://hectus.net/blockbattles
+website: https://hectus.net/neobb
 
 ### Logging Prefix ###
 prefix: NBB

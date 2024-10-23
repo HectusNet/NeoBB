@@ -86,20 +86,28 @@ warps:
   void: [ -138, 22, 302 ]
   wood: [ -225, 22, 469 ]
 
-  legacy-default: [ 0, 0, 0 ]
-  legacy-aether-warp: [ 0, 0, 0 ]
-  legacy-amethyst-warp: [ 0, 0, 0 ]
-  legacy-book-warp: [ 0, 0, 0 ]
-  legacy-cliff-warp: [ 0, 0, 0 ]
-  legacy-end-warp: [ 0, 0, 0 ]
-  legacy-heaven-warp: [ 0, 0, 0 ]
-  legacy-hell-warp: [ 0, 0, 0 ]
-  legacy-ice-warp: [ 0, 0, 0 ]
-  legacy-mushroom-warp: [ 0, 0, 0 ]
-  legacy-nether-warp: [ 0, 0, 0 ]
-  legacy-redstone-warp: [ 0, 0, 0 ]
-  legacy-snow-warp: [ 0, 0, 0 ]
-  legacy-sun-warp: [ 0, 0, 0 ]
-  legacy-underwater-warp: [ 0, 0, 0 ]
-  legacy-void-warp: [ 0, 0, 0 ]
-  legacy-wood-warp: [ 0, 0, 0 ]
+  legacy-default: [ -280, 59, 144 ]
+  legacy-aether: [ 0, 0, 0 ] # TODO: Find out!
+  legacy-amethyst: [ -345, 62, 320 ]
+  legacy-book: [ -391, 22, 468 ]
+  legacy-cliff: [ 3, 30, 176 ]
+  legacy-end: [ -21, 29, 15 ]
+  legacy-heaven: [ 0, 0, 0 ] # TODO: Find out!
+  legacy-hell: [ 0, 0, 0 ] # TODO: Find out!
+  legacy-ice: [ -358, 13, 245 ] # TODO: Find out!
+  legacy-mushroom: [ -310, 16, 24 ]
+  legacy-nether: [ -203, 19, 142 ]
+  legacy-redstone: [ -182, 33, 345 ]
+  legacy-snow: [ -358, 13, 245 ]
+  legacy-sun: [ -349, 13, 144 ]
+  legacy-underwater: [ -86, 22, 182 ]
+  legacy-void: [ -138, 22, 302 ]
+  legacy-wood: [ -225, 22, 469 ]
+  legacy-desert: [ -58, 8, 516 ]
+
+  person-amethyst: [ -345, 62, 320 ] # TODO: Build this!
+  person-fire: [ -203, 19, 142 ] # TODO: Build this!
+  person-ice: [ -358, 13, 245 ] # TODO: Build this!
+  person-snow: [ -358, 13, 245 ] # TODO: Build this!
+  person-villager: [ 0, 0, 0 ] # TODO: Build this!
+  person-void: [ -138, 22, 302 ] # TODO: Build this!

@@ -9,8 +9,8 @@ import org.bukkit.World;
 import java.util.List;
 
 public class LTHeavenWarp extends LWarpTurn {
-    public LTHeavenWarp(World world) { super(world, "legacy-heaven"); }
-    public LTHeavenWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "legacy-heaven"); }
+    public LTHeavenWarp(World world) { super(world, "heaven"); }
+    public LTHeavenWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "heaven"); }
 
     @Override
     public void apply() {

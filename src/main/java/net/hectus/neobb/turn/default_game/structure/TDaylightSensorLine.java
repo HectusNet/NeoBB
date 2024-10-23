@@ -11,6 +11,7 @@ import net.hectus.neobb.turn.default_game.attributes.clazz.NatureClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.RedstoneClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.WaterClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.CounterbuffFunction;
+import net.hectus.neobb.util.MinecraftTime;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class TDaylightSensorLine extends StructureTurn implements CounterbuffFun
 
     @Override
     public void apply() {
-        player.game.world().setTime(1000); // 1000 should be midnight according to this: https://minecraft.wiki/w/Commands/time#Arguments
+        player.game.world().setTime(MinecraftTime.DAY);
     }
 
     @Override

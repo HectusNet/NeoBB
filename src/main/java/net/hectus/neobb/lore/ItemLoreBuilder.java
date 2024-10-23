@@ -6,9 +6,11 @@ import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.util.Colors;
 import net.hectus.neobb.util.Utilities;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -18,6 +20,15 @@ public abstract class ItemLoreBuilder {
     protected Turn<?> turn = null;
 
     public abstract List<Component> build(Locale l);
+
+    public List<Component> buildWithTooltips(Locale l) {
+        List<Component> lore = new ArrayList<>(build(l));
+        lore.add(SEPARATOR);
+        lore.add(Translation.component(l, "item-lore.sell", "DROP_KEY")
+                .replaceText(TextReplacementConfig.builder().match("DROP_KEY").replacement(Component.keybind("key.drop")).build())
+                .color(Colors.EXTRA));
+        return lore;
+    }
 
     public ItemLoreBuilder turn(Turn<?> turn) {
         this.turn = turn;

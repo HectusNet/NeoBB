@@ -31,7 +31,12 @@ public abstract class Buff {
     public abstract TextColor color();
 
     public Component line(Locale l) {
-        return Component.text("   | " + text(l) + (buffTarget == BuffTarget.YOU ? "" : " " + Translation.string(l, "item-lore.buff." + buffTarget.name().toLowerCase())), color());
+        return Component.text("   | " + text(l) + target(l), color());
+    }
+
+    public String target(Locale l) {
+        if (buffTarget == BuffTarget.YOU) return "";
+        return " " + Translation.string(l, "item-lore.buff." + buffTarget.name().toLowerCase());
     }
 
     public Target getTarget(NeoPlayer source) {

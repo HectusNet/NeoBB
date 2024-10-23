@@ -26,6 +26,14 @@ public record Cord(double x, double y, double z) implements Serializable {
         return new Cord(x + cord.x, y + cord.y, z + cord.z);
     }
 
+    /**
+     * Swaps the x and z values of this coordinate. Does not affect this object and creates a new one for the result.
+     * @return The swapped values as a new Cord.
+     */
+    public @NotNull Cord rotated() {
+        return new Cord(z, y, x);
+    }
+
     public boolean inBounds(@NotNull Cord lowCord, @NotNull Cord highCord) {
         return inBounds(lowCord.x, highCord.x, lowCord.y, highCord.y, lowCord.z, highCord.z);
     }

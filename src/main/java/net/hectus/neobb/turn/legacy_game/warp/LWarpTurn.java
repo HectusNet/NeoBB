@@ -9,16 +9,17 @@ import net.hectus.neobb.turn.default_game.warp.WarpTurn;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public abstract class LWarpTurn extends WarpTurn {
     public LWarpTurn(World world, String name) {
-        super(world, name);
+        super(world, "legacy-" + name);
     }
 
     public LWarpTurn(PlacedStructure data, World world, NeoPlayer player, String name) {
-        super(data, world, player, name);
+        super(data, world, player, "legacy-" + name);
     }
 
     public List<ItemStack> items() {
@@ -26,7 +27,7 @@ public abstract class LWarpTurn extends WarpTurn {
     }
 
     @Override
-    public Pair<Material, Material> materials() {
+    public final @NotNull Pair<Material, Material> materials() {
         return Pair.of(Material.BEDROCK, Material.BEDROCK); // This can be fully ignored!
     }
 

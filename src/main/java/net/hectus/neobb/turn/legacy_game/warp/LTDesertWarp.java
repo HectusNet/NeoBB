@@ -13,8 +13,8 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.List;
 
 public class LTDesertWarp extends LWarpTurn {
-    public LTDesertWarp(World world) { super(world, "legacy-desert"); }
-    public LTDesertWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "legacy-desert"); }
+    public LTDesertWarp(World world) { super(world, "desert"); }
+    public LTDesertWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "desert"); }
 
     @Override
     public void apply() {

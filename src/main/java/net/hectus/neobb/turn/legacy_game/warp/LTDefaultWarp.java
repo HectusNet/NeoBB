@@ -6,7 +6,7 @@ import org.bukkit.World;
 import java.util.List;
 
 public class LTDefaultWarp extends LWarpTurn {
-    public LTDefaultWarp(World world) { super(world, "legacy-default"); }
+    public LTDefaultWarp(World world) { super(world, "default"); }
 
     @Override
     public int chance() {

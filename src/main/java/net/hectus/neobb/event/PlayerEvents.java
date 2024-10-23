@@ -45,9 +45,9 @@ public class PlayerEvents implements Listener {
                     Component line = Objects.requireNonNull(Objects.requireNonNull(event.getCurrentItem()).lore()).get(1);
                     if (line == null) return;
                     int cost = Utilities.extractNumber(PlainTextComponentSerializer.plainText().serialize(line));
-                    p.inventory.setDeckSlot(event.getSlot(), null, null);
                     p.inventory.addCoins(cost);
                 } catch (Exception ignored) {}
+                p.inventory.setDeckSlot(event.getSlot(), null, null);
             });
     }
 

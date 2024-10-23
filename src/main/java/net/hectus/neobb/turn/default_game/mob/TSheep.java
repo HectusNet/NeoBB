@@ -1,10 +1,7 @@
 package net.hectus.neobb.turn.default_game.mob;
 
-import com.marcpg.libpg.util.Randomizer;
 import net.hectus.neobb.buff.Buff;
 import net.hectus.neobb.player.NeoPlayer;
-import net.hectus.neobb.shop.Shop;
-import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.turn.default_game.attributes.clazz.ColdClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.SupernaturalClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.BuffFunction;
@@ -28,10 +25,7 @@ public class TSheep extends MobTurn<Sheep> implements BuffFunction, Supernatural
             case LIGHT_GRAY -> new Buff.ExtraTurn().apply(player);
             case GRAY -> new Buff.Luck(Buff.BuffTarget.YOU, 25).apply(player);
             case BLACK -> new Buff.Luck(Buff.BuffTarget.OPPONENTS, -15).apply(player);
-            case BROWN -> {
-                Turn<?> turn = Shop.turn(Randomizer.fromCollection(player.shop.turns), player);
-                turn.items().forEach(item -> player.inventory.addToDeck(item, turn));
-            }
+            case BROWN -> player.inventory.addRandom();
             case null, default -> {
                 if (player.game.allowedClazzes().contains(ColdClazz.class))
                     new Buff.ExtraTurn().apply(player);

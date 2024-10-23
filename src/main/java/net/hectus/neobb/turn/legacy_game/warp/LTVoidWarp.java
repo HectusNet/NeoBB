@@ -14,8 +14,8 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.List;
 
 public class LTVoidWarp extends LWarpTurn {
-    public LTVoidWarp(World world) { super(world, "legacy-void"); }
-    public LTVoidWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "legacy-void"); }
+    public LTVoidWarp(World world) { super(world, "void"); }
+    public LTVoidWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "void"); }
 
     @Override
     public void apply() {

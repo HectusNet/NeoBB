@@ -9,8 +9,8 @@ import org.bukkit.World;
 import java.util.List;
 
 public class LTHellWarp extends LWarpTurn {
-    public LTHellWarp(World world) { super(world, "legacy-hell"); }
-    public LTHellWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "legacy-hell"); }
+    public LTHellWarp(World world) { super(world, "hell"); }
+    public LTHellWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "hell"); }
 
     @Override
     public void apply() {

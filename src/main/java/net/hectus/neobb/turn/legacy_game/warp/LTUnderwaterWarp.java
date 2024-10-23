@@ -9,8 +9,8 @@ import org.bukkit.World;
 import java.util.List;
 
 public class LTUnderwaterWarp extends LWarpTurn {
-    public LTUnderwaterWarp(World world) { super(world, "legacy-underwater"); }
-    public LTUnderwaterWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "legacy-underwater"); }
+    public LTUnderwaterWarp(World world) { super(world, "underwater"); }
+    public LTUnderwaterWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "underwater"); }
 
     @Override
     public void apply() {

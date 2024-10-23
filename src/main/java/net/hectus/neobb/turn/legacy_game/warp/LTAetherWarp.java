@@ -12,8 +12,8 @@ import org.bukkit.World;
 import java.util.List;
 
 public class LTAetherWarp extends LWarpTurn {
-    public LTAetherWarp(World world) { super(world, "legacy-aether"); }
-    public LTAetherWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "legacy-aether"); }
+    public LTAetherWarp(World world) { super(world, "aether"); }
+    public LTAetherWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "aether"); }
 
     @Override
     public void apply() {

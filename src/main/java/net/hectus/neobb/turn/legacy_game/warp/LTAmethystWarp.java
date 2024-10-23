@@ -11,8 +11,8 @@ import org.bukkit.World;
 import java.util.List;
 
 public class LTAmethystWarp extends LWarpTurn {
-    public LTAmethystWarp(World world) { super(world, "legacy-amethyst"); }
-    public LTAmethystWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "legacy-amethyst"); }
+    public LTAmethystWarp(World world) { super(world, "amethyst"); }
+    public LTAmethystWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "amethyst"); }
 
     @Override
     public void apply() {

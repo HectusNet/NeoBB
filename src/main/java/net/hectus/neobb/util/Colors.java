@@ -13,6 +13,13 @@ public final class Colors {
     public static final TextColor RED = color(0xE65C67);
     public static final TextColor BLUE = color(0x6CAAD9);
 
+    // Got these from screenshots of the original game.
+    public static final TextColor PERSON_0 = NamedTextColor.GRAY;
+    public static final TextColor PERSON_1 = color(0x328825);
+    public static final TextColor PERSON_2 = color(0x37BF1F);
+    public static final TextColor PERSON_3 = color(0x6AF95D);
+    public static final TextColor PERSON_4 = color(0x44D0B9);
+
     public static final TextColor POSITIVE = GREEN;
     public static final TextColor NEUTRAL = YELLOW;
     public static final TextColor NEGATIVE = RED;

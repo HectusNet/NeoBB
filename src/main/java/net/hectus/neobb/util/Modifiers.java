@@ -22,6 +22,13 @@ public class Modifiers {
     public static final String G_LEGACY_PORTAL_AWAIT = "portal-await";
     public static final String G_LEGACY_NO_ATTACK = "no-attack";
 
+    public static final String G_PERSON_FIRE_ENTITIES = "fire-entities";
+    public static final String G_PERSON_BLUE_ENTITIES = "blue-entities";
+    public static final String G_PERSON_WHITE_ENTITIES = "white-entities";
+    public static final String G_PERSON_VILLAGER_ENTITIES = "villager-entities";
+    public static final String G_PERSON_NO_WIN_CONS = "no-win-cons";
+    public static final String G_PERSON_SNOW_GOLEM = "snow-golem";
+
     public static abstract class Modifiable {
         protected final Set<String> modifiers = new HashSet<>();
 

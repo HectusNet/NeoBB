@@ -8,8 +8,8 @@ import org.bukkit.World;
 import java.util.List;
 
 public class LTSnowWarp extends LWarpTurn {
-    public LTSnowWarp(World world) { super(world, "legacy-snow"); }
-    public LTSnowWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "legacy-snow"); }
+    public LTSnowWarp(World world) { super(world, "snow"); }
+    public LTSnowWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "snow"); }
 
     @Override
     public int chance() {

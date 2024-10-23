@@ -4,7 +4,6 @@ import com.marcpg.libpg.lang.Translation;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.lore.ItemLoreBuilder;
 import net.hectus.neobb.player.NeoPlayer;
-import net.hectus.neobb.structure.StructureManager;
 import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.util.Colors;
 import org.bukkit.World;
@@ -16,11 +15,11 @@ public abstract class Shop {
     protected final NeoPlayer player;
     protected final ItemLoreBuilder loreBuilder;
 
-    public final List<Class<? extends Turn<?>>> turns;
+    public final List<? extends Turn<?>> dummyTurns;
 
-    protected Shop(@NotNull NeoPlayer player) {
+    public Shop(@NotNull NeoPlayer player) {
         this.player = player;
-        this.turns = player.game.info().turns();
+        this.dummyTurns = player.game.info().turns().stream().map(t -> turn(t, player)).toList();
         try {
             this.loreBuilder = player.game.info().loreBuilder().getConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
@@ -30,7 +29,7 @@ public abstract class Shop {
 
     public static Turn<?> turn(@NotNull Class<? extends Turn<?>> clazz, NeoPlayer player) {
         try {
-            if (StructureManager.WARPS.contains(clazz)) {
+            if (clazz.getName().toLowerCase().contains("warp")) {
                 return clazz.getConstructor(World.class).newInstance(player.game.world());
             } else {
                 return clazz.getConstructor(NeoPlayer.class).newInstance(player);

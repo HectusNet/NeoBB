@@ -5,10 +5,6 @@ import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.structure.Structure;
 import net.hectus.neobb.structure.StructureManager;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NeutralClazz;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.List;
 
 public class TGlassWall extends GlassWallTurn implements NeutralClazz {
     public TGlassWall(NeoPlayer player) { super(player); }

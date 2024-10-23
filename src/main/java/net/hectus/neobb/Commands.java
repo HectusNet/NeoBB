@@ -9,10 +9,13 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolver;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
+import net.hectus.neobb.cosmetic.PlaceParticle;
+import net.hectus.neobb.cosmetic.PlayerAnimation;
 import net.hectus.neobb.game.Game;
 import net.hectus.neobb.game.mode.DefaultGame;
 import net.hectus.neobb.game.mode.HereGame;
 import net.hectus.neobb.game.mode.LegacyGame;
+import net.hectus.neobb.game.mode.PersonGame;
 import net.hectus.neobb.game.util.GameManager;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.Structure;
@@ -20,6 +23,7 @@ import net.hectus.neobb.structure.StructureManager;
 import net.hectus.neobb.util.Colors;
 import net.hectus.neobb.util.Cord;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -27,10 +31,11 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class Commands {
-    private static final List<String> MODES = List.of("default", "herestudio", "legacy");
+    private static final List<String> MODES = List.of("default", "herestudio", "legacy", "person98");
 
     public static LiteralCommandNode<CommandSourceStack> startCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("games")
@@ -58,6 +63,7 @@ public final class Commands {
                                                     case "default" -> new DefaultGame(true, players.getFirst().getWorld(), players);
                                                     case "herestudio" -> new HereGame(false, players.getFirst().getWorld(), players);
                                                     case "legacy" -> new LegacyGame(false, players.getFirst().getWorld(), players);
+                                                    case "person98" -> new PersonGame(false, players.getFirst().getWorld(), players);
                                                     default -> source.sendMessage(Translation.component(l, "command.games.start.unknown_mode").color(Colors.NEGATIVE));
                                                 }
                                             } catch (Exception e) {
@@ -96,10 +102,10 @@ public final class Commands {
                             for (Game game : GameManager.GAMES) {
                                 source.sendMessage(Component.text("==== ", Colors.EXTRA).append(Component.text(game.id, Colors.ACCENT)).append(Component.text(" ====", Colors.EXTRA)));
                                 source.sendMessage(Component.text("> Players: ", Colors.EXTRA).append(Component.text(game.players().size() + "/" + game.initialPlayers().size(), Colors.SECONDARY)));
-                                source.sendMessage(Component.text("> Time: ", Colors.EXTRA).append(Component.text(game.timeLeft().getPreciselyFormatted(), Colors.SECONDARY)));
+                                if (game.timeLeft() != null) source.sendMessage(Component.text("> Time: ", Colors.EXTRA).append(Component.text(game.timeLeft().getPreciselyFormatted(), Colors.SECONDARY)));
                                 source.sendMessage(Component.text("> Ranked: ", Colors.EXTRA).append(Component.text(game.ranked, Colors.SECONDARY)));
-                                source.sendMessage(Component.text("> Played Turns: ", Colors.EXTRA).append(Component.text(game.history().size(), Colors.SECONDARY)));
-                                source.sendMessage(Component.text("> Turning: ", Colors.EXTRA).append(Component.text(game.currentPlayer().player.getName(), Colors.SECONDARY)));
+                                if (game.history() != null) source.sendMessage(Component.text("> Played Turns: ", Colors.EXTRA).append(Component.text(game.history().size(), Colors.SECONDARY)));
+                                if (game.currentPlayer() != null) source.sendMessage(Component.text("> Turning: ", Colors.EXTRA).append(Component.text(game.currentPlayer().player.getName(), Colors.SECONDARY)));
                             }
                             return 1;
                         })
@@ -181,6 +187,47 @@ public final class Commands {
                             }
                             return 1;
                         })
+                )
+                .build();
+    }
+
+    public static LiteralCommandNode<CommandSourceStack> debugCommand() {
+        return LiteralArgumentBuilder.<CommandSourceStack>literal("debug")
+                .requires(source -> source.getSender().hasPermission("neobb.debug"))
+                .then(LiteralArgumentBuilder.<CommandSourceStack>literal("test-effect")
+                        .then(LiteralArgumentBuilder.<CommandSourceStack>literal("player-animation")
+                                .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerSelectorArgumentResolver>argument("player", ArgumentTypes.player())
+                                        .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("animation", StringArgumentType.word())
+                                                .suggests((context, builder) -> {
+                                                    for (PlayerAnimation v : PlayerAnimation.values())
+                                                        builder.suggest(v.name().toLowerCase());
+                                                    return builder.buildFuture();
+                                                })
+                                                .executes(context -> {
+                                                    Player player = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).getFirst();
+                                                    PlayerAnimation.valueOf(context.getArgument("animation", String.class).toUpperCase()).action.accept(player, Cord.ofLocation(player.getLocation()).add(new Cord(-4, 0, -4)));
+                                                    return 1;
+                                                })
+                                        )
+                                )
+                        )
+                        .then(LiteralArgumentBuilder.<CommandSourceStack>literal("place-particle")
+                                .then(RequiredArgumentBuilder.<CommandSourceStack, BlockPositionResolver>argument("block", ArgumentTypes.blockPosition())
+                                        .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("particle", StringArgumentType.word())
+                                                .suggests((context, builder) -> {
+                                                    for (PlaceParticle v : PlaceParticle.values())
+                                                        builder.suggest(v.name().toLowerCase());
+                                                    return builder.buildFuture();
+                                                })
+                                                .executes(context -> {
+                                                    World world = context.getSource().getSender() instanceof Player player ? player.getWorld() : Objects.requireNonNull(Bukkit.getWorld("world"));
+                                                    Location block = context.getArgument("block", BlockPositionResolver.class).resolve(context.getSource()).toLocation(world);
+                                                    PlaceParticle.valueOf(context.getArgument("particle", String.class).toUpperCase()).spawn(block);
+                                                    return 1;
+                                                })
+                                        )
+                                )
+                        )
                 )
                 .build();
     }

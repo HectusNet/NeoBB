@@ -53,8 +53,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Source: <a href="https://docs.google.com/document/d/1bsNhDuQwWYMZ2S2rbVMgGOIqGsXPzPCjC8K-hDcorZU">Official Google Document</a>
+ */
 public class LegacyGame extends HectusGame {
-    public static final GameInfo INFO = new GameInfo(true, 64, 9, new Time(15, Time.Unit.MINUTES), 15, DefaultShop.class, LegacyItemLoreBuilder.class, List.of(
+    public static final GameInfo INFO = new GameInfo(true, 1.0, 64, 9, new Time(15, Time.Unit.MINUTES), 15, DefaultShop.class, LegacyItemLoreBuilder.class, List.of(
             TIronTrapdoor.class, TCampfire.class, TCauldron.class, TPackedIce.class, TLever.class, TOakStairs.class, TBlueBed.class,
             TPiston.class, TSponge.class, THayBlock.class, TDriedKelpBlock.class, TRepeater.class, TRedCarpet.class, TGreenWool.class,
             TFire.class, TStonecutter.class, TLava.class, TGreenBed.class, TRedBed.class, TCyanCarpet.class, TSeaLantern.class,

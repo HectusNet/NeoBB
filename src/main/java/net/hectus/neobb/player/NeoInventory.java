@@ -4,6 +4,7 @@ import com.marcpg.libpg.lang.Translation;
 import com.marcpg.libpg.util.Randomizer;
 import net.hectus.neobb.shop.Shop;
 import net.hectus.neobb.turn.Turn;
+import net.hectus.neobb.turn.person_game.categorization.Category;
 import net.hectus.neobb.util.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -11,6 +12,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.stream.IntStream;
 
 public class NeoInventory {
     private NeoPlayer player;
@@ -31,9 +34,24 @@ public class NeoInventory {
         this.player = player;
     }
 
+    public void clear() {
+        for (int i = 0; i < player.game.info().deckSize(); i++) {
+            this.deck[i] = null;
+            this.dummyTurnDeck[i] = null;
+        }
+        sync();
+    }
+
     public boolean isEmpty() {
         for (ItemStack i : deck) {
             if (i != null) return false;
+        }
+        return true;
+    }
+
+    public boolean isFull() {
+        for (ItemStack i : deck) {
+            if (i == null) return false;
         }
         return true;
     }
@@ -62,12 +80,26 @@ public class NeoInventory {
         throw new ArrayIndexOutOfBoundsException("Deck is already full!");
     }
 
+    public void addRandom() {
+        if (isFull()) return;
+        try {
+            Turn<?> turn = Randomizer.fromCollection(player.shop.dummyTurns);
+            turn.items().forEach(item -> addToDeck(item, turn));
+        } catch (ArrayIndexOutOfBoundsException ignored) {} // Skill issue I guess.
+    }
+
+    public void removeRandom() {
+        if (isEmpty()) return;
+        setDeckSlot(Randomizer.fromCollection(IntStream.range(0, deck.length)
+                .filter(i -> deck[i] != null)
+                .boxed()
+                .toList()
+        ), null, null);
+    }
+
     public void fillInRandomly() {
-        for (int i = 0; i < deck.length; i++) {
-            if (deck[i] == null) {
-                Turn<?> turn = Shop.turn(Randomizer.fromCollection(player.shop.turns), player);
-                setDeckSlot(i, turn.items().getFirst(), turn);
-            }
+        for (ItemStack item : deck) {
+            if (item == null) addRandom();
         }
     }
 
@@ -76,7 +108,7 @@ public class NeoInventory {
         for (ItemStack item : deck) {
             if (item != null && item.getType() == material) count++;
         }
-        return count < turn.maxAmount();
+        return count < (turn instanceof Category personTurn ? personTurn.categoryMaxPerDeck() :  turn.maxAmount());
     }
 
     public synchronized boolean removeCoins(int coins) {

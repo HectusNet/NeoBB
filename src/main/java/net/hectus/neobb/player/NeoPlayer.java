@@ -3,9 +3,12 @@ package net.hectus.neobb.player;
 import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.cosmetic.PlaceParticle;
+import net.hectus.neobb.cosmetic.PlayerAnimation;
 import net.hectus.neobb.game.BossBarGame;
 import net.hectus.neobb.game.Game;
+import net.hectus.neobb.game.mode.PersonGame;
 import net.hectus.neobb.shop.Shop;
+import net.hectus.neobb.util.MinecraftTime;
 import net.hectus.neobb.util.Modifiers;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
@@ -31,10 +34,14 @@ public class NeoPlayer extends Modifiers.Modifiable implements Target, Forwardin
     public NeoInventory inventory;
 
     private int luck = 20;
-    private double health = 50;
+    private double health;
+    private double armor;
 
-    private PlaceParticle cosmeticParticle;
+    private PlaceParticle cosmeticPlaceParticle;
+    private Sound cosmeticPlaceSound;
     private NamedTextColor cosmeticOutline;
+    private PlayerAnimation cosmeticWinAnimation;
+    private PlayerAnimation cosmeticDeathAnimation;
 
     private double elo;
     private double ratingDeviation;
@@ -49,6 +56,7 @@ public class NeoPlayer extends Modifiers.Modifiable implements Target, Forwardin
         this.player = player;
         this.game = game;
         this.inventory = new NeoInventory(this);
+        this.health = game.info().startingHealth();
         try {
             this.shop = game.info().shop().getConstructor(NeoPlayer.class).newInstance(this);
             this.shop.open();
@@ -125,16 +133,48 @@ public class NeoPlayer extends Modifiers.Modifiable implements Target, Forwardin
     }
 
     public void damage(double damage) {
+        if (armor > 0.0) {
+            if (armor >= damage) {
+                armor -= damage;
+                return;
+            } else {
+                damage = damage - armor;
+                armor = 0.0;
+            }
+        }
+
         health(health - damage);
         if (damage > 0.0) // Ensure that it's actually damage and not just weird healing.
             player.playSound(player, Sound.ENTITY_PLAYER_HURT, 0.5f, 1.0f);
     }
 
+    public void piercingDamage(double damage) {
+        health(health - damage);
+        if (damage > 0.0) // Ensure that it's actually damage and not just weird healing.
+            player.playSound(player, Sound.ENTITY_PLAYER_HURT, 0.5f, 1.0f);
+    }
+
+    public void heal(double health) {
+        if (game instanceof PersonGame && game.world().getGameTime() == MinecraftTime.MIDNIGHT) return;
+
+        health(this.health - health);
+        if (health > 0.0) // Ensure that it's actually healing and not just weird damage.
+            player.playSound(player, Sound.BLOCK_BEACON_AMBIENT, 0.5f, 1.0f);
+    }
+
     public void health(double health) {
         this.health = Math.max(0.0, health);
-        player.setHealth(Math.max(0.5, health / 5)); // "health / 5" is effectively the same as "health / 100 * 20".
+        player.setHealth(Math.clamp(this.health / game.info().startingHealth() * 20, 0.5, 20.0));
 
         if (health <= 0.0) game.eliminatePlayer(this);
+    }
+
+    public void addArmor(double armor) {
+        armor(this.armor + armor);
+    }
+
+    public void armor(double armor) {
+        this.armor = Math.max(0.0, armor);
     }
 
     public Locale locale() {
@@ -159,8 +199,11 @@ public class NeoPlayer extends Modifiers.Modifiable implements Target, Forwardin
         draws = (int) NeoBB.DATABASE.get(uuid(), "draws", 0);
         turns = (int) NeoBB.DATABASE.get(uuid(), "turns", 0);
 
-        cosmeticParticle = PlaceParticle.valueOf((String) NeoBB.DATABASE.get(uuid(), "cosmetic_particle", PlaceParticle.ENCHANTMENT.name()));
+        cosmeticPlaceParticle = PlaceParticle.valueOf((String) NeoBB.DATABASE.get(uuid(), "cosmetic_particle", PlaceParticle.ENCHANTMENT.name()));
+        cosmeticPlaceSound = Sound.valueOf((String) NeoBB.DATABASE.get(uuid(), "cosmetic_place_sound", PlaceParticle.ENCHANTMENT.name()));
         cosmeticOutline = NamedTextColor.namedColor((Integer) NeoBB.DATABASE.get(uuid(), "cosmetic_outline", NamedTextColor.WHITE.value()));
+        cosmeticWinAnimation = PlayerAnimation.valueOf((String) NeoBB.DATABASE.get(uuid(), "cosmetic_win_animation", NamedTextColor.WHITE.value()));
+        cosmeticDeathAnimation = PlayerAnimation.valueOf((String) NeoBB.DATABASE.get(uuid(), "cosmetic_death_animation", NamedTextColor.WHITE.value()));
     }
 
     // ====================================
@@ -215,6 +258,9 @@ public class NeoPlayer extends Modifiers.Modifiable implements Target, Forwardin
     // ======== DATABASE COSMETICS ========
     // ====================================
 
-    public PlaceParticle cosmeticParticle() { return cosmeticParticle; }
+    public PlaceParticle cosmeticPlaceParticle() { return cosmeticPlaceParticle; }
+    public Sound cosmeticPlaceSound() { return cosmeticPlaceSound; }
     public NamedTextColor cosmeticOutline() { return cosmeticOutline; }
+    public PlayerAnimation cosmeticWinAnimation() { return cosmeticWinAnimation; }
+    public PlayerAnimation cosmeticDeathAnimation() { return cosmeticDeathAnimation; }
 }

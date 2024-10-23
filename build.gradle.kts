@@ -5,8 +5,8 @@ plugins {
 }
 
 group = "net.hectus.neobb"
-version = "0.0.8"
-description = "A reworked version of NeoBB with some interesting spins."
+version = "0.0.9"
+description = "A better version of Block Battles, where multiple players compete in a turn-based game, similar to chess or card games."
 
 java.sourceCompatibility = JavaVersion.VERSION_21
 java.targetCompatibility = JavaVersion.VERSION_21
@@ -21,9 +21,9 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
     implementation("org.postgresql:postgresql:42.7.4")
-    implementation("xyz.xenondevs.invui:invui:1.37")
+    implementation("xyz.xenondevs.invui:invui:1.38")
     implementation("com.marcpg:libpg:0.1.2")
 }
 
@@ -33,7 +33,10 @@ tasks {
     }
     runServer {
         dependsOn(shadowJar)
-        minecraftVersion("1.21")
+        minecraftVersion("1.21.1")
+        downloadPlugins {
+            url("https://github.com/playit-cloud/playit-minecraft-plugin/releases/latest/download/playit-minecraft-plugin.jar")
+        }
     }
     shadowJar {
         archiveClassifier.set("")

@@ -1,4 +1,6 @@
-# NeoBB
+# NeoBB  
+  
+If you wanna use this plugin and are not here for helping with development, please read [our Modrinth page](https://modrinth.com/plugin/neobb).
 
 ## How to Compile & Use
 

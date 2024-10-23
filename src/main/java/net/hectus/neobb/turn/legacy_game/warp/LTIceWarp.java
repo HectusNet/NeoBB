@@ -9,8 +9,8 @@ import org.bukkit.World;
 import java.util.List;
 
 public class LTIceWarp extends LWarpTurn {
-    public LTIceWarp(World world) { super(world, "legacy-ice"); }
-    public LTIceWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "legacy-ice"); }
+    public LTIceWarp(World world) { super(world, "ice"); }
+    public LTIceWarp(PlacedStructure data, World world, NeoPlayer player) { super(data, world, player, "ice"); }
 
     @Override
     public void apply() {

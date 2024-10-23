@@ -166,16 +166,14 @@ public class DefaultShop extends Shop {
     public void open() {
         syncContent();
         Window.single().setTitle("=== Shop ===").addCloseHandler(() -> Bukkit.getScheduler().runTask(NeoBB.PLUGIN, () -> {
-            if (player.player.getOpenInventory().getTopInventory().getType() != InventoryType.CHEST)
-                done();
+            if (player.player.getOpenInventory().getTopInventory().getType() != InventoryType.CHEST) done();
         })).setGui(gui).open(player.player);
     }
 
     public void syncContent() {
-        gui.setContent(content(turns.stream()
-                .map(c -> turn(c, player))
+        gui.setContent(content(dummyTurns.stream()
                 .filter(t -> filters.values().stream().allMatch(p -> p.right().test(t)))
-                .flatMap(t -> t.items().stream().map(i -> Pair.of(new ItemBuilder(i).lore(loreBuilder.turn(t).build(player.locale())).build(), t)))
+                .flatMap(t -> t.items().stream().map(i -> Pair.of(new ItemBuilder(i).lore(loreBuilder.turn(t).buildWithTooltips(player.locale())).build(), t)))
                 .sorted(Comparator.comparing(p -> PlainTextComponentSerializer.plainText().serialize(p.left().displayName())))
                 .collect(Collectors.toMap(Pair::left, Pair::right, (e, r) -> e, LinkedHashMap::new))));
     }

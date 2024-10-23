@@ -8,6 +8,7 @@ import net.hectus.neobb.structure.StructureManager;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NatureClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.BuffFunction;
 import net.hectus.neobb.turn.default_game.structure.StructureTurn;
+import net.hectus.neobb.util.MinecraftTime;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -34,7 +35,7 @@ public class LTPumpkinWall extends StructureTurn implements BuffFunction, Nature
 
     @Override
     public void apply() {
-        player.game.world().setTime(18000); // 18000 should be midnight according to this: https://minecraft.wiki/w/Commands/time#Arguments
+        player.game.world().setTime(MinecraftTime.MIDNIGHT);
     }
 
     @Override
