@@ -1,12 +1,11 @@
 package net.hectus.neobb.turn.default_game.warp;
 
-import com.marcpg.libpg.storing.Pair;
 import com.marcpg.libpg.util.Randomizer;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.player.NeoPlayer;
-import net.hectus.neobb.structure.BlockInfo;
 import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.structure.Structure;
+import net.hectus.neobb.structure.StructureManager;
 import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
 import net.hectus.neobb.turn.default_game.attributes.function.WarpFunction;
 import net.hectus.neobb.turn.default_game.structure.StructureTurn;
@@ -14,9 +13,7 @@ import net.hectus.neobb.util.Cord;
 import net.hectus.neobb.util.Modifiers;
 import net.hectus.neobb.util.Utilities;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -41,26 +38,8 @@ public abstract class WarpTurn extends StructureTurn implements WarpFunction {
     public abstract int chance();
     public abstract List<Class<? extends Clazz>> allows();
 
-    /**
-     * @return {@code Pair<Main, Center>}
-     */
-    public abstract Pair<Material, Material> materials();
-
     public boolean canBePlayed() {
         return true;
-    }
-
-    @Override
-    public List<ItemStack> items() {
-        return List.of(new ItemStack(materials().left(), 4), new ItemStack(materials().right()));
-    }
-
-    /**
-     * Helper method, because Java doesn't have something like super.super.method()
-     * @return The same as {@link StructureTurn#items()}
-     */
-    public List<ItemStack> structureTurnItems() {
-        return super.items();
     }
 
     public enum Temperature { COLD, NORMAL, HOT }
@@ -101,21 +80,6 @@ public abstract class WarpTurn extends StructureTurn implements WarpFunction {
 
     @Override
     public Structure referenceStructure() {
-        Pair<Material, Material> materials = materials();
-        return new Structure(name + "-warp", new BlockInfo[][][] {
-                {
-                        {
-                                new BlockInfo(new Cord(0, 0, 1), materials.left())
-                        },
-                        {
-                                new BlockInfo(new Cord(1, 0, 0), materials.left()),
-                                new BlockInfo(new Cord(1, 0, 1), materials.right()),
-                                new BlockInfo(new Cord(1, 0, 2), materials.left())
-                        },
-                        {
-                                new BlockInfo(new Cord(2, 0, 1), materials.left())
-                        }
-                }
-        });
+        return StructureManager.structure(name + "-warp");
     }
 }

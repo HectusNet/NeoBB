@@ -17,9 +17,4 @@ public class LTDefaultWarp extends LWarpTurn {
     public List<Class<? extends Clazz>> allows() {
         return List.of(NeutralClazz.class, WaterClazz.class, NatureClazz.class, RedstoneClazz.class);
     }
-
-    @Override
-    public int cost() {
-        return 0;
-    }
 }

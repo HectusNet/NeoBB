@@ -1,6 +1,7 @@
 package net.hectus.neobb.turn.here_game;
 
 import net.hectus.neobb.player.NeoPlayer;
+import net.hectus.neobb.util.MinecraftTime;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -11,7 +12,7 @@ public class HTJackOLantern extends HereTurn {
 
     @Override
     public double damage() {
-        return player.game.world().isDayTime() ? 2 : 5;
+        return player.game.time() == MinecraftTime.MIDNIGHT ? 5 : 2;
     }
 
     @Override

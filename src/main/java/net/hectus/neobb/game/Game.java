@@ -13,6 +13,7 @@ import net.hectus.neobb.turn.DummyTurn;
 import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.turn.default_game.TTimeLimit;
 import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
+import net.hectus.neobb.turn.default_game.warp.TDefaultWarp;
 import net.hectus.neobb.turn.default_game.warp.WarpTurn;
 import net.hectus.neobb.turn.person_game.categorization.WinConCategory;
 import net.hectus.neobb.util.*;
@@ -45,11 +46,22 @@ public abstract class Game extends Modifiers.Modifiable {
     protected int turningIndex = 0;
 
     protected WarpTurn warp;
+    protected MinecraftTime time;
 
     protected Time timeLeft;
     protected int turnCountdown = info().turnTimer();
 
-    public Game(boolean ranked, World world, @NotNull List<Player> players, WarpTurn defaultWarp) {
+    protected Game(World world, Player player) {
+        this.ranked = false;
+        this.arena = new Arena(this, world);
+        this.warp = new TDefaultWarp(world);
+
+        NeoPlayer p = new NeoPlayer(player, this);
+        initialPlayers.add(p);
+        players.add(p);
+    }
+
+    protected Game(boolean ranked, World world, @NotNull List<Player> players, WarpTurn defaultWarp) {
         this.ranked = ranked;
         this.arena = new Arena(this, world);
         this.warp = defaultWarp;
@@ -177,11 +189,7 @@ public abstract class Game extends Modifiers.Modifiable {
      * @return {@code false} if the turn method should abort, {@code true} if it can continue.
      */
     public final boolean outOfBounds(@NotNull Location location, Cancellable event) {
-        if (!Cord.ofLocation(location.clone().subtract(warp.location())).inBounds(0, 9, 0, arena.currentPlacedBlocks()[0].length - 1, 0, 9)) {
-            event.setCancelled(true);
-            return true;
-        }
-        if (!Cord.ofLocation(location.clone()).inBounds(warp.lowCorner(), warp.highCorner())) {
+        if (Cord.ofLocation(location.clone()).outOfBounds(warp.lowCorner(), warp.highCorner())) {
             event.setCancelled(true);
             return true;
         }
@@ -275,6 +283,15 @@ public abstract class Game extends Modifiers.Modifiable {
         });
     }
 
+    public MinecraftTime time() {
+        return time;
+    }
+
+    public void time(@NotNull MinecraftTime time) {
+        this.time = time;
+        world().setTime(time.time);
+    }
+
     public boolean allows(Turn<?> turn) {
         for (Class<? extends Clazz> clazz : allowedClazzes) {
             if (clazz.isInstance(turn) && (!(turn instanceof WarpTurn) || !hasModifier(Modifiers.G_DEFAULT_WARP_PREVENT_PREFIX + Utilities.camelToSnake(Utilities.counterFilterName(clazz.getSimpleName())))))
@@ -358,7 +375,7 @@ public abstract class Game extends Modifiers.Modifiable {
             if (NeoBB.PRODUCTION) {
                 Bukkit.getServer().shutdown();
             } else {
-                arena.world.setTime(MinecraftTime.DAY);
+                time(MinecraftTime.DAY);
                 arena.clear();
             }
         }, 100); // 5 Seconds

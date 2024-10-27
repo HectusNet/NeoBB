@@ -155,7 +155,7 @@ public class NeoPlayer extends Modifiers.Modifiable implements Target, Forwardin
     }
 
     public void heal(double health) {
-        if (game instanceof PersonGame && game.world().getGameTime() == MinecraftTime.MIDNIGHT) return;
+        if (game instanceof PersonGame && game.time() == MinecraftTime.MIDNIGHT) return;
 
         health(this.health - health);
         if (health > 0.0) // Ensure that it's actually healing and not just weird damage.

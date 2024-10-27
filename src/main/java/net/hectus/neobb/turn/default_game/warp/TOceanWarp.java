@@ -1,12 +1,10 @@
 package net.hectus.neobb.turn.default_game.warp;
 
-import com.marcpg.libpg.storing.Pair;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NeutralClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.WaterClazz;
-import org.bukkit.Material;
 import org.bukkit.World;
 
 import java.util.List;
@@ -23,11 +21,6 @@ public class TOceanWarp extends WarpTurn {
     @Override
     public List<Class<? extends Clazz>> allows() {
         return List.of(NeutralClazz.class, WaterClazz.class);
-    }
-
-    @Override
-    public Pair<Material, Material> materials() {
-        return Pair.of(Material.DARK_PRISMARINE, Material.SEA_LANTERN);
     }
 
     @Override

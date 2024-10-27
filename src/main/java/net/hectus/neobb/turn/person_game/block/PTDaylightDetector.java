@@ -13,6 +13,6 @@ public class PTDaylightDetector extends BlockTurn implements CounterCategory {
     @Override
     public void apply() {
         super.apply();
-        player.game.world().setTime(MinecraftTime.NOON);
+        player.game.time(MinecraftTime.NOON);
     }
 }

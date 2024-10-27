@@ -20,6 +20,6 @@ public class PTPumpkinWall extends StructureTurn implements UtilityCategory {
     @Override
     public void apply() {
         super.apply();
-        player.game.world().setTime(MinecraftTime.MIDNIGHT);
+        player.game.time(MinecraftTime.MIDNIGHT);
     }
 }

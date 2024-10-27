@@ -14,8 +14,6 @@ import net.hectus.neobb.turn.default_game.attributes.function.BuffFunction;
 import net.hectus.neobb.turn.default_game.attributes.function.CounterFunction;
 import net.hectus.neobb.turn.default_game.structure.StructureTurn;
 import net.hectus.neobb.util.MinecraftTime;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -34,13 +32,8 @@ public class LTDaylightSensorStrip extends StructureTurn implements BuffFunction
     }
 
     @Override
-    public List<ItemStack> items() {
-        return List.of(new ItemStack(Material.DAYLIGHT_DETECTOR, 7));
-    }
-
-    @Override
     public void apply() {
-        player.game.world().setTime(MinecraftTime.DAY);
+        player.game.time(MinecraftTime.DAY);
     }
 
     @Override

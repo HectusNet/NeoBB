@@ -4,6 +4,7 @@ import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.default_game.block.BlockTurn;
 import net.hectus.neobb.turn.person_game.categorization.DefensiveCategory;
 import net.hectus.neobb.turn.person_game.warp.PTVillagerWarp;
+import net.hectus.neobb.util.MinecraftTime;
 import net.hectus.neobb.util.Modifiers;
 import org.bukkit.block.Block;
 
@@ -24,6 +25,6 @@ public class PTBrownStainedGlass extends BlockTurn implements DefensiveCategory 
 
     @Override
     public boolean unusable() {
-        return !player.game.world().isDayTime();
+        return player.game.time() == MinecraftTime.MIDNIGHT;
     }
 }

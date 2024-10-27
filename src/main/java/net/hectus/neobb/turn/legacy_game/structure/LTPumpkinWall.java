@@ -9,8 +9,6 @@ import net.hectus.neobb.turn.default_game.attributes.clazz.NatureClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.BuffFunction;
 import net.hectus.neobb.turn.default_game.structure.StructureTurn;
 import net.hectus.neobb.util.MinecraftTime;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -29,13 +27,8 @@ public class LTPumpkinWall extends StructureTurn implements BuffFunction, Nature
     }
 
     @Override
-    public List<ItemStack> items() {
-        return List.of(new ItemStack(Material.JACK_O_LANTERN, 14));
-    }
-
-    @Override
     public void apply() {
-        player.game.world().setTime(MinecraftTime.MIDNIGHT);
+        player.game.time(MinecraftTime.MIDNIGHT);
     }
 
     @Override

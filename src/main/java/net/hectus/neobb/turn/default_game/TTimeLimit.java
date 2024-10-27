@@ -23,9 +23,4 @@ public class TTimeLimit extends OtherTurn<Time> implements NeutralClazz {
     public ItemStack item() {
         return new ItemStack(Material.CLOCK);
     }
-
-    @Override
-    public int cost() {
-        return 0;
-    }
 }

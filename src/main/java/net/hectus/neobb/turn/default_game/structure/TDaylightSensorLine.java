@@ -31,7 +31,7 @@ public class TDaylightSensorLine extends StructureTurn implements CounterbuffFun
 
     @Override
     public void apply() {
-        player.game.world().setTime(MinecraftTime.DAY);
+        player.game.time(MinecraftTime.DAY);
     }
 
     @Override

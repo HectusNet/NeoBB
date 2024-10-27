@@ -10,9 +10,7 @@ import net.hectus.neobb.turn.default_game.other.OtherTurn;
 import net.hectus.neobb.util.Modifiers;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.BlockState;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -24,11 +22,6 @@ public class LTNetherPortal extends OtherTurn<List<BlockState>> implements HotCl
     @Override
     public int cost() {
         return 3;
-    }
-
-    @Override
-    public List<ItemStack> items() {
-        return List.of(new ItemStack(Material.OBSIDIAN, 14));
     }
 
     public static void await(@NotNull Game game) {

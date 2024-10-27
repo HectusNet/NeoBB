@@ -15,7 +15,6 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Arena {
     public final Game game;
@@ -25,6 +24,7 @@ public class Arena {
 
     private final Set<Material> placedMaterials = new HashSet<>();
     private BlockInfo[][][] placedBlocks = new BlockInfo[9][NeoBB.CONFIG.getInt("max-arena-height")][9];
+    private int placedBlocksAmount = 0;
 
     public Arena(Game game, World world) {
         this.game = game;
@@ -39,10 +39,20 @@ public class Arena {
         });
     }
 
+    public void scanBlocks() {
+        for (int x = 0; x < placedBlocks.length; x++) {
+            for (int y = 0; y < placedBlocks[0].length; y++) {
+                for (int z = 0; z < placedBlocks[0][0].length; z++) {
+                    Block block = game.warp().lowCorner().add(new Cord(x, y, z)).toLocation(world).getBlock();
+                    if (!block.isEmpty())
+                        addBlock(block);
+                }
+            }
+        }
+    }
+
     public int currentPlacedBlocksAmount() {
-        AtomicInteger blocks = new AtomicInteger();
-        Utilities.loop(placedBlocks, false, block -> blocks.incrementAndGet());
-        return blocks.get();
+        return placedBlocksAmount;
     }
 
     /**
@@ -63,15 +73,18 @@ public class Arena {
     public void resetCurrentBlocks() {
         placedBlocks = new BlockInfo[9][totalPlacedBlocks[0].length][9];
         placedMaterials.clear();
+        placedBlocksAmount = 0;
     }
 
-    public void setBlock(@Range(from = 0, to = 8) int x, int y, @Range(from = 0, to = 8) int z, BlockInfo block) {
+    public void setBlock(@Range(from = 0, to = 8) int x, int y, @Range(from = 0, to = 8) int z, @NotNull BlockInfo block) {
         totalPlacedBlocks[x][y][z] = block;
         placedBlocks[x][y][z] = block;
+        placedMaterials.add(block.material());
     }
 
     public void addBlock(@NotNull Block block) {
         Cord c = Cord.ofLocation(block.getLocation().clone().subtract(game.warp().location()));
         setBlock((int) c.x(), (int) c.y(), (int) c.z(), new BlockInfo(c, block.getType()));
+        placedBlocksAmount++;
     }
 }

@@ -11,6 +11,7 @@ import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolv
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import net.hectus.neobb.cosmetic.PlaceParticle;
 import net.hectus.neobb.cosmetic.PlayerAnimation;
+import net.hectus.neobb.game.DummyGame;
 import net.hectus.neobb.game.Game;
 import net.hectus.neobb.game.mode.DefaultGame;
 import net.hectus.neobb.game.mode.HereGame;
@@ -165,6 +166,10 @@ public final class Commands {
                 )
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("remove")
                         .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("name", StringArgumentType.word())
+                                .suggests((context, builder) -> {
+                                    StructureManager.getStructures().forEach(s -> builder.suggest(s.name));
+                                    return builder.buildFuture();
+                                })
                                 .executes(context -> {
                                     String name = context.getArgument("name", String.class);
                                     Structure structure = StructureManager.structure(name);
@@ -184,6 +189,44 @@ public final class Commands {
                             CommandSender source = context.getSource().getSender();
                             for (Structure structure : StructureManager.getStructures()) {
                                 source.sendMessage(Component.text("- " + structure.name + "(" + structure.materials.size() + ")"));
+                            }
+                            return 1;
+                        })
+                )
+                .then(LiteralArgumentBuilder.<CommandSourceStack>literal("place")
+                        .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("name", StringArgumentType.word())
+                                .suggests((context, builder) -> {
+                                    StructureManager.getStructures().forEach(s -> builder.suggest(s.name));
+                                    return builder.buildFuture();
+                                })
+                                .then(RequiredArgumentBuilder.<CommandSourceStack, BlockPositionResolver>argument("location", ArgumentTypes.blockPosition())
+                                        .executes(context -> {
+                                            String name = context.getArgument("name", String.class);
+                                            Location location = context.getArgument("location", BlockPositionResolver.class).resolve(context.getSource()).toLocation(context.getSource().getLocation().getWorld());
+
+                                            Structure structure = StructureManager.structure(name);
+                                            if (structure != null) {
+                                                structure.place(location);
+                                            } else {
+                                                context.getSource().getSender().sendMessage(Component.text("Could not find structure with name: " + name, Colors.NEGATIVE));
+                                            }
+                                            return 1;
+                                        })
+                                )
+                        )
+                )
+                .then(LiteralArgumentBuilder.<CommandSourceStack>literal("check")
+                        .requires(source -> source.getSender() instanceof Player)
+                        .executes(context -> {
+                            Player player = (Player) context.getSource().getSender();
+                            Game game = new DummyGame(player);
+                            game.arena.scanBlocks();
+
+                            Structure structure = StructureManager.match(game.arena);
+                            if (structure == null) {
+                                player.sendMessage(Component.text("No structure found!", Colors.NEGATIVE));
+                            } else {
+                                player.sendMessage(Component.text("Found structure: " + structure.name, Colors.POSITIVE));
                             }
                             return 1;
                         })

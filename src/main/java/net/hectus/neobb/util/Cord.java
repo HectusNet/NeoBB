@@ -34,12 +34,12 @@ public record Cord(double x, double y, double z) implements Serializable {
         return new Cord(z, y, x);
     }
 
-    public boolean inBounds(@NotNull Cord lowCord, @NotNull Cord highCord) {
-        return inBounds(lowCord.x, highCord.x, lowCord.y, highCord.y, lowCord.z, highCord.z);
+    public boolean outOfBounds(@NotNull Cord lowCord, @NotNull Cord highCord) {
+        return outOfBounds(lowCord.x, highCord.x, lowCord.y, highCord.y, lowCord.z, highCord.z);
     }
 
-    public boolean inBounds(double lowX, double highX, double lowY, double highY, double lowZ, double highZ) {
-        return x >= lowX && x <= highX && y >= lowY && y <= highY && z >= lowZ && z <= highZ;
+    public boolean outOfBounds(double lowX, double highX, double lowY, double highY, double lowZ, double highZ) {
+        return !(x >= lowX) || !(x <= highX) || !(y >= lowY) || !(y <= highY) || !(z >= lowZ) || !(z <= highZ);
     }
 
     /**
@@ -59,7 +59,7 @@ public record Cord(double x, double y, double z) implements Serializable {
      *         {@code Pair<Lowest XYZ, Highest XYZ>}
      */
     public static @NotNull Pair<Cord, Cord> corners(@NotNull Cord corner1, @NotNull Cord corner2) {
-        return new Pair<Cord, Cord>(
+        return new Pair<>(
                 new Cord(Math.min(corner1.x(), corner2.x()), Math.min(corner1.y(), corner2.y()), Math.min(corner1.z(), corner2.z())),
                 new Cord(Math.max(corner1.x(), corner2.x()), Math.max(corner1.y(), corner2.y()), Math.max(corner1.z(), corner2.z()))
         );

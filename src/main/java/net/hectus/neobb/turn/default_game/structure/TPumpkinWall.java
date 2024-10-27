@@ -27,7 +27,7 @@ public class TPumpkinWall extends StructureTurn implements BuffFunction, NatureC
 
     @Override
     public void apply() {
-        player.game.world().setTime(MinecraftTime.MIDNIGHT);
+        player.game.time(MinecraftTime.MIDNIGHT);
     }
 
     @Override

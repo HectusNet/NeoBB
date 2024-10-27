@@ -45,7 +45,7 @@ public class PTPainting extends OtherTurn<Painting> implements BuffCategory {
                 p.inventory.clear();
                 p.inventory.fillInRandomly();
             });
-            case COURBET -> player.game.world().setTime(MinecraftTime.MIDNIGHT);
+            case COURBET -> player.game.time(MinecraftTime.MIDNIGHT);
             case POOL -> player.addLuck(99);
             case SEA, BUST -> player.game.eliminatePlayer(player);
             case CREEBET -> {

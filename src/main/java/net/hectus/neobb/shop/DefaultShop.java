@@ -129,7 +129,7 @@ public class DefaultShop extends Shop {
                             "glass-wall", Pair.of(Material.PURPLE_STAINED_GLASS, GlassWallTurn.class),
                             "other", Pair.of(Material.STRUCTURE_BLOCK, OtherTurn.class)
                     ), "usage"))))
-                    .addIngredient('2', new Items.ClickItem(filter(Material.LAVA_BUCKET, "clazz"), (p, e) -> Bukkit.getScheduler().runTask(NeoBB.PLUGIN, () -> filterUsageMenu(Map.of(
+                    .addIngredient('2', new Items.ClickItem(filter(Material.LAVA_BUCKET, "class"), (p, e) -> Bukkit.getScheduler().runTask(NeoBB.PLUGIN, () -> filterUsageMenu(Map.of(
                             "neutral", Pair.of(Material.DIRT, NeutralClazz.class),
                             "hot", Pair.of(Material.MAGMA_BLOCK, HotClazz.class),
                             "cold", Pair.of(Material.BLUE_ICE, ColdClazz.class),
@@ -235,9 +235,9 @@ public class DefaultShop extends Shop {
 
     public ItemStack filter(Material item, String name) {
         return new ItemBuilder(item)
-                .name(Translation.component(player.locale(), "info." + name + "." + name).color(Colors.ACCENT)
+                .name(Translation.component(player.locale(), "shop.filter").color(Colors.ACCENT)
                         .append(Component.text(" - ", Colors.EXTRA))
-                        .append(Translation.component(player.locale(), "shop.filter." + name).color(Colors.SECONDARY)))
+                        .append(Translation.component(player.locale(), "info." + name + "." + name).color(Colors.SECONDARY)))
                 .build();
     }
 

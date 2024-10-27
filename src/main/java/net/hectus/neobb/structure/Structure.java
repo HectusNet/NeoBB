@@ -5,6 +5,8 @@ import com.marcpg.libpg.storing.Pair;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.util.Arena;
 import net.hectus.neobb.util.Cord;
+import net.hectus.neobb.util.Utilities;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -79,26 +81,35 @@ public class Structure implements Serializable {
             Cord cord = oldBlock.cord().rotated();
             newBlocks[(int) cord.x()][(int) cord.y()][(int) cord.z()] = new BlockInfo(cord, oldBlock.material());
         }
-        return new Structure(name, newBlocks);
+        rotated = new Structure(name, newBlocks);
+        return rotated;
+    }
+
+    public void place(Location location) {
+        Utilities.loop(blocks, false, block -> {
+            Cord cord = block.cord();
+            location.clone().add(cord.x(), cord.y(), cord.z()).getBlock().setType(block.material());
+        });
     }
 
     public boolean isInArena(@NotNull Arena arena) {
-        return matchMaterials(arena.currentPlacedMaterials(), materials) && isInRegion(arena.currentPlacedBlocks());
+        return matchMaterials(arena.currentPlacedMaterials(), materials) && isInRegion(arena.currentPlacedBlocks(), arena.currentPlacedBlocksAmount());
     }
 
-    public boolean matchMaterials(Collection<Material> reference, @NotNull Collection<Material> comparison) {
-        for (Material material : comparison) {
-            if (!reference.contains(material))
+    public boolean matchMaterials(@NotNull Collection<Material> reference, @NotNull Collection<Material> comparison) {
+        for (Material material : reference) {
+            if (!comparison.contains(material))
                 return false;
         }
         return true;
     }
 
-    public boolean isInRegion(BlockInfo @NotNull [][][] region) {
+    public boolean isInRegion(BlockInfo @NotNull [][][] region, int regionBlockAmount) {
+        if (countElements(blocks) != regionBlockAmount) return false;
         for (int startX = 0; startX <= region.length - blocksX; startX++) {
             for (int startY = 0; startY <= region[0].length - blocksY; startY++) {
                 for (int startZ = 0; startZ <= region[0][0].length - blocksZ; startZ++) {
-                    if (matchesStructure(region, startX, startY, startZ))
+                    if (matchesAtPosition(region, startX, startY, startZ))
                         return true;
                 }
             }
@@ -106,17 +117,33 @@ public class Structure implements Serializable {
         return false;
     }
 
-    private boolean matchesStructure(BlockInfo[][][] region, int startX, int startY, int startZ) {
+    private boolean matchesAtPosition(BlockInfo[][][] region, int offsetX, int offsetY, int offsetZ) {
         for (int x = 0; x < blocksX; x++) {
             for (int y = 0; y < blocksY; y++) {
                 for (int z = 0; z < blocksZ; z++) {
                     BlockInfo structureBlock = blocks[x][y][z];
-                    if (structureBlock != null && !structureBlock.equals(region[startX + x][startY + y][startZ + z]))
-                        return false;
+                    if (structureBlock != null) {
+                        BlockInfo regionBlock = region[offsetX + x][offsetY + y][offsetZ + z];
+                        if (regionBlock == null || !regionBlock.material().equals(structureBlock.material()))
+                            return false;
+                    }
                 }
             }
         }
         return true;
+    }
+
+    public static int countElements(Object @NotNull [][][] array) {
+        int count = 0;
+        for (Object[][] x : array) {
+            for (Object[] y : x) {
+                for (Object z : y) {
+                    if (z != null)
+                        count++;
+                }
+            }
+        }
+        return count;
     }
 
     public static BlockInfo @NotNull [][][] blocks(World world, @NotNull Cord corner1, @NotNull Cord corner2) {

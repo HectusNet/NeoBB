@@ -4,6 +4,7 @@ import com.destroystokyo.paper.event.server.ServerTickEndEvent;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.HectusGame;
 import net.hectus.neobb.game.util.GameManager;
+import net.hectus.neobb.util.Cord;
 import net.hectus.neobb.util.Modifiers;
 import net.hectus.neobb.util.Utilities;
 import org.bukkit.GameMode;
@@ -45,11 +46,10 @@ public class GameEvents implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerMove(@NotNull PlayerMoveEvent event) {
         Utilities.playerEventAction(event.getPlayer(), true, p -> true, p -> {
-            // TODO: Re-add this and make it properly kill players when moving out of the arena, instead of just all the time.
-//            if (event.hasChangedBlock()) {
-//                if (!Cord.ofLocation(p.player.getLocation()).inBounds(Cord.ofLocation(p.game.warp().lowCorner()), Cord.ofLocation(p.game.warp().highCorner())))
-//                    p.game.eliminatePlayer(p);
-//            }
+            if (event.hasChangedBlock()) {
+                if (Cord.ofLocation(p.player.getLocation()).outOfBounds(p.game.warp().lowCorner(), p.game.warp().highCorner()))
+                    p.game.eliminatePlayer(p);
+            }
 
             if (p.hasModifier(Modifiers.P_NO_MOVE) && event.hasChangedPosition()) {
                 event.setCancelled(true);
@@ -73,6 +73,7 @@ public class GameEvents implements Listener {
         Utilities.playerEventAction(event.getPlayer(), true, p -> true, p -> {
             try {
                 p.game.arena.addBlock(event.getBlock());
+                NeoBB.LOG.info("Added block to arena!");
             } catch (IndexOutOfBoundsException e) {
                 NeoBB.LOG.warn("Placed blocks out of bounds: {}", e.getMessage());
                 event.setCancelled(true);

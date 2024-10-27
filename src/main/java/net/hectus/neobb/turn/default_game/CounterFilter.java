@@ -5,6 +5,7 @@ import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
 import net.hectus.neobb.util.Utilities;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
@@ -15,7 +16,7 @@ public interface CounterFilter {
     String text(Locale l);
 
     default Component line(Locale l) {
-        return Component.text("   | " + text(l));
+        return Component.text("   | " + text(l)).decoration(TextDecoration.ITALIC, false);
     }
 
     static @NotNull CounterFilter of(Predicate<Turn<?>> doCounter, String name) {

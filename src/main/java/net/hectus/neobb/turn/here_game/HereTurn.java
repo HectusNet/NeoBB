@@ -26,11 +26,6 @@ public abstract class HereTurn extends Turn<Block> {
     }
 
     @Override
-    public int cost() {
-        return 0;
-    }
-
-    @Override
     public boolean goodChoice(NeoPlayer player) {
         return false; // Prevent the suggestion system from doing anything.
     }

@@ -57,6 +57,7 @@ import org.bukkit.block.data.type.SeaPickle;
 import org.bukkit.entity.*;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -78,7 +79,7 @@ import java.util.Objects;
 
 @SuppressWarnings("DataFlowIssue")
 public class TurnEvents implements Listener {
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockPlace(@NotNull BlockPlaceEvent event) {
         if (event.getBlock().getType() == Material.BLACK_STAINED_GLASS_PANE)
             event.setCancelled(true);
@@ -228,7 +229,7 @@ public class TurnEvents implements Listener {
         }
     }
 
-    private void handleStructure(BlockPlaceEvent event, Block block, @NotNull NeoPlayer player) {
+    private void handleStructure(BlockPlaceEvent event, @NotNull Block block, @NotNull NeoPlayer player) {
         NeoBB.LOG.info("Handling a structure turn for {} by {}!", block.getType(), player.player.getName());
 
         Structure structure = StructureManager.match(player.game.arena);
@@ -283,6 +284,7 @@ public class TurnEvents implements Listener {
                 case "legacy-pumpkin_wall" -> player.game.turn(new LTPumpkinWall(s, player), event);
                 case "legacy-daylight_sensor_strip" -> player.game.turn(new LTDaylightSensorStrip(s, player), event);
                 case "legacy-redstone_block_wall" -> player.game.turn(new LTRedstoneBlockWall(s, player), event);
+                case "legacy-nether_portal" -> LTNetherPortal.await(player.game);
 
                 case "white_glass_wall" -> player.game.turn(new TWhiteGlassWall(s, player), event);
                 case "light_blue_glass_wall" -> player.game.turn(new LTLightBlueGlassWall(s, player), event);
@@ -348,6 +350,7 @@ public class TurnEvents implements Listener {
                         case PUFFERFISH_SPAWN_EGG -> player.game.turn(new TPufferfish(loc.getWorld().spawn(loc, PufferFish.class), player), event);
                         case SHEEP_SPAWN_EGG -> player.game.turn(new TSheep(loc.getWorld().spawn(loc, Sheep.class), player), event);
                     }
+                    event.setCancelled(true);
                 } else if (event.getClickedBlock() != null && event.getClickedBlock().getBlockData() instanceof NoteBlock noteBlock) {
                     player.game.turn(new TNoteBlock(noteBlock, event.getClickedBlock().getLocation(), player), event);
                 }
@@ -405,6 +408,8 @@ public class TurnEvents implements Listener {
         if (event.getItem().getType() == Material.CHORUS_FRUIT) {
             NeoPlayer player = GameManager.player(event.getPlayer(), true);
             if (unusable(event.getPlayer(), player, true, event, "You cannot consume chorus fruits right now!")) return;
+
+            event.setCancelled(true); // Prevent vanilla teleportation!
 
             if (player.game instanceof DefaultGame)
                 player.game.turn(new TChorusFruit(event.getItem(), event.getPlayer().getLocation(), player), event);

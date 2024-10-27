@@ -10,8 +10,8 @@ public abstract class InteractableHereTurn extends HereTurn {
     public InteractableHereTurn(NeoPlayer player) { super(player); }
     public InteractableHereTurn(Block data, NeoPlayer player) { super(data, player); }
 
-    public abstract int maxInteractions();
-    public abstract long interactionIntervalMs();
+    public int maxInteractions() { return 3; }
+    public long interactionIntervalMs() { return 1000; }
 
     public synchronized void interact() {
         if (interactions <= maxInteractions() && System.currentTimeMillis() - lastInteraction <= interactionIntervalMs()) {

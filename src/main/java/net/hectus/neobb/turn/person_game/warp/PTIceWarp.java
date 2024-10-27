@@ -15,7 +15,7 @@ public class PTIceWarp extends PWarpTurn {
         super.apply();
         player.game.addModifier(Modifiers.G_PERSON_BLUE_ENTITIES);
         player.game.turnScheduler.runTaskTimer("icing", () -> player.game.players().forEach(p -> p.damage(1.0)), () -> true, 1);
-        player.game.world().setTime(MinecraftTime.NOON);
+        player.game.time(MinecraftTime.NOON);
     }
 
     @Override

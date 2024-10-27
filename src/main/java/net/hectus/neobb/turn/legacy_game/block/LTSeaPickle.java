@@ -15,11 +15,6 @@ public class LTSeaPickle extends BlockTurn implements AttackFunction, BuffFuncti
     public LTSeaPickle(Block data, NeoPlayer player) { super(data, player); }
 
     @Override
-    public int cost() {
-        return 0;
-    }
-
-    @Override
     public List<Buff> buffs() {
         return List.of(new Buff.ExtraTurn(Buff.BuffTarget.NEXT, 2));
     }
