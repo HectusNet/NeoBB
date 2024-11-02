@@ -37,7 +37,7 @@ import java.util.Locale;
  * Source: <a href="https://docs.google.com/document/d/1SOp-fDTZqx2l3XJoT0zqf4CDuTNCffU2pTejKrzEGO4">Semi-Official Google Document</a>
  */
 public class PersonGame extends Game {
-    public static final GameInfo INFO = new GameInfo(true, 10.0, 0, 9, new Time(10, Time.Unit.MINUTES), 10, PersonShop.class, PersonItemLoreBuilder.class, List.of(
+    public static final GameInfo INFO = new GameInfo(true, true, 10.0, 0, 9, new Time(10, Time.Unit.MINUTES), 10, PersonShop.class, PersonItemLoreBuilder.class, List.of(
             PTLightBlueCarpet.class, PTRedWool.class, PTBeeNest.class, PTCherryPressurePlate.class, PTLever.class,
             PTDaylightDetector.class, PTDiamondBlock.class, PTPinkCarpet.class, PTBirchLog.class, PTCake.class,
             PTBambooButton.class, PTOrangeWool.class, PTBrainCoral.class, PTGlowstone.class, PTRedStainedGlass.class,

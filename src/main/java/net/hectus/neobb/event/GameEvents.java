@@ -4,9 +4,9 @@ import com.destroystokyo.paper.event.server.ServerTickEndEvent;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.HectusGame;
 import net.hectus.neobb.game.util.GameManager;
-import net.hectus.neobb.util.Cord;
 import net.hectus.neobb.util.Modifiers;
 import net.hectus.neobb.util.Utilities;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -18,6 +18,7 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.jetbrains.annotations.NotNull;
@@ -46,16 +47,15 @@ public class GameEvents implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerMove(@NotNull PlayerMoveEvent event) {
         Utilities.playerEventAction(event.getPlayer(), true, p -> true, p -> {
-            if (event.hasChangedBlock()) {
-                if (Cord.ofLocation(p.player.getLocation()).outOfBounds(p.game.warp().lowCorner(), p.game.warp().highCorner()))
-                    p.game.eliminatePlayer(p);
-            }
-
             if (p.hasModifier(Modifiers.P_NO_MOVE) && event.hasChangedPosition()) {
                 event.setCancelled(true);
+                return;
             } else if (p.game instanceof HectusGame && event.getTo().clone().subtract(0, 1, 0).getBlock().getType() == Material.MAGMA_BLOCK) {
                 p.game.eliminatePlayer(p);
             }
+
+            if (event.hasChangedBlock() && p.game.outOfBounds(p.player.getLocation(), event))
+                p.game.outOfBoundsAction(p);
         });
     }
 
@@ -64,6 +64,18 @@ public class GameEvents implements Listener {
         if (event.getEntered() instanceof Player eventPlayer)
             Utilities.playerEventAction(eventPlayer, true, p -> true, p -> p.removeModifier(Modifiers.P_DEFAULT_BOAT_DAMAGE));
     }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerDeath(@NotNull PlayerDeathEvent event) {
+        Utilities.playerEventAction(event.getPlayer(), true, p -> true, p -> {
+            Bukkit.getScheduler().runTaskLater(NeoBB.PLUGIN, () -> {
+                if (p.game.players().contains(p)) { // Ensure the death is not from the animation.
+                    p.game.eliminatePlayer(p);
+                }
+            }, 10); // Half a second, in case death animation takes longer.
+        });
+    }
+
 
     // ========== BLOCK EVENTS ==========
 

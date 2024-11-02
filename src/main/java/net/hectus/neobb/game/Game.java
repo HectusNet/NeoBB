@@ -5,8 +5,12 @@ import com.marcpg.libpg.lang.Translation;
 import com.marcpg.libpg.util.Randomizer;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.Rating;
+import net.hectus.neobb.cosmetic.EffectManager;
 import net.hectus.neobb.event.custom.CancellableImpl;
-import net.hectus.neobb.game.util.*;
+import net.hectus.neobb.game.util.Arena;
+import net.hectus.neobb.game.util.GameInfo;
+import net.hectus.neobb.game.util.GameManager;
+import net.hectus.neobb.game.util.TurnScheduler;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.player.TargetObj;
 import net.hectus.neobb.turn.DummyTurn;
@@ -196,6 +200,10 @@ public abstract class Game extends Modifiers.Modifiable {
         return false;
     }
 
+    public void outOfBoundsAction(NeoPlayer player) {
+        eliminatePlayer(player);
+    }
+
     public @Nullable List<Component> scoreboard(NeoPlayer player) { return null; }
     public @Nullable Component actionbar(NeoPlayer player) { return null; }
 
@@ -357,6 +365,12 @@ public abstract class Game extends Modifiers.Modifiable {
         timeLeft.setAllowNegatives(true);
         NeoBB.LOG.info("{}: Started the game.", id);
         setStarted(true);
+
+        if (info().showIntro()) {
+            NeoPlayer current = players.getFirst();
+            current.showTitle(Title.title(Component.text("You go first!", Colors.POSITIVE), Component.text("Good Luck!", Colors.NEUTRAL)));
+            current.opponents(false).forEach(p -> p.showTitle(Title.title(Component.text(current.player.getName() + " goes first!", Colors.RED), Component.text("Good Luck!", Colors.NEUTRAL))));
+        }
     }
 
     public void end(boolean force) {

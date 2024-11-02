@@ -5,12 +5,12 @@ import com.marcpg.libpg.lang.Translation;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.Game;
 import net.hectus.neobb.game.util.GameInfo;
-import net.hectus.neobb.lore.HereItemLoreBuilder;
+import net.hectus.neobb.lore.CardItemLoreBuilder;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.shop.RandomizedShop;
 import net.hectus.neobb.turn.Turn;
+import net.hectus.neobb.turn.card_game.*;
 import net.hectus.neobb.turn.default_game.warp.TDefaultWarp;
-import net.hectus.neobb.turn.here_game.*;
 import net.hectus.neobb.util.Colors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -25,14 +25,15 @@ import java.util.Locale;
 
 /**
  * Source: <a href="https://github.com/TiagoFar78/BlockBattles">Source Code on GitHub</a>
+ * <p>Originally named HereGame, because it was based on HereStudio, but renamed to CardGame.
  */
-public class HereGame extends Game {
-    public static final GameInfo INFO = new GameInfo(false, 50.0, 0, 5, new Time(10, Time.Unit.MINUTES), 15, RandomizedShop.class, HereItemLoreBuilder.class, List.of(
-            HTChest.class, HTDaylightDetector.class, HTFlowerPot.class, HTJackOLantern.class, HTOakDoor.class, HTOakFenceGate.class,
-            HTPointedDripstone.class, HTRedstoneLamp.class, HTTorch.class, HTWaxedExposedCutCopperStairs.class
+public class CardGame extends Game {
+    public static final GameInfo INFO = new GameInfo(true, false, 50.0, 0, 5, new Time(10, Time.Unit.MINUTES), 15, RandomizedShop.class, CardItemLoreBuilder.class, List.of(
+            CTChest.class, CTDaylightDetector.class, CTFlowerPot.class, CTJackOLantern.class, CTOakDoor.class, CTOakFenceGate.class,
+            CTPointedDripstone.class, CTRedstoneLamp.class, CTTorch.class, CTWaxedExposedCutCopperStairs.class
     ));
 
-    public HereGame(boolean ranked, World world, @NotNull List<Player> players) {
+    public CardGame(boolean ranked, World world, @NotNull List<Player> players) {
         super(ranked, world, players, new TDefaultWarp(world));
     }
 

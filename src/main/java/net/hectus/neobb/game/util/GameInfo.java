@@ -7,4 +7,4 @@ import net.hectus.neobb.turn.Turn;
 
 import java.util.List;
 
-public record GameInfo(boolean hasStructures, double startingHealth, int coins, int deckSize, Time totalTime, int turnTimer, Class<? extends Shop> shop, Class<? extends ItemLoreBuilder> loreBuilder, List<Class<? extends Turn<?>>> turns) {}
+public record GameInfo(boolean showIntro, boolean hasStructures, double startingHealth, int coins, int deckSize, Time totalTime, int turnTimer, Class<? extends Shop> shop, Class<? extends ItemLoreBuilder> loreBuilder, List<Class<? extends Turn<?>>> turns) {}

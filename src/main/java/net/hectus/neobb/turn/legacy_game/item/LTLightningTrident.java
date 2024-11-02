@@ -2,13 +2,13 @@ package net.hectus.neobb.turn.legacy_game.item;
 
 import net.hectus.neobb.buff.Buff;
 import net.hectus.neobb.player.NeoPlayer;
+import net.hectus.neobb.shop.util.ItemBuilder;
 import net.hectus.neobb.turn.default_game.CounterFilter;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NeutralClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.BuffFunction;
 import net.hectus.neobb.turn.default_game.attributes.function.CounterFunction;
 import net.hectus.neobb.turn.default_game.block.TLightningRod;
 import net.hectus.neobb.turn.default_game.item.ItemTurn;
-import net.hectus.neobb.util.ItemBuilder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;

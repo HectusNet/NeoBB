@@ -17,9 +17,7 @@ public class LTEndWarp extends LWarpTurn {
     public void apply() {
         super.apply();
         new Buff.Luck(Buff.BuffTarget.YOU, 10);
-
-        TEnderPearl pearl = new TEnderPearl(player);
-        player.inventory.addToDeck(pearl.item(), pearl);
+        player.inventory.addToDeck(new TEnderPearl(player));
     }
 
     @Override

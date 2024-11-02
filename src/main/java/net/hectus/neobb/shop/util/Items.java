@@ -1,4 +1,4 @@
-package net.hectus.neobb.shop;
+package net.hectus.neobb.shop.util;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -20,9 +20,9 @@ import java.io.IOException;
 import java.util.function.BiConsumer;
 
 public class Items {
-    public static final ItemStack WHITE_BACKGROUND = new net.hectus.neobb.util.ItemBuilder(Material.WHITE_STAINED_GLASS).name(Component.empty()).build();
-    public static final ItemStack GRAY_BACKGROUND = new net.hectus.neobb.util.ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name(Component.empty()).build();
-    public static final ItemStack BLACK_BACKGROUND = new net.hectus.neobb.util.ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).name(Component.empty()).build();
+    public static final ItemStack WHITE_BACKGROUND = new net.hectus.neobb.shop.util.ItemBuilder(Material.WHITE_STAINED_GLASS).name(Component.empty()).build();
+    public static final ItemStack GRAY_BACKGROUND = new net.hectus.neobb.shop.util.ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name(Component.empty()).build();
+    public static final ItemStack BLACK_BACKGROUND = new net.hectus.neobb.shop.util.ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).name(Component.empty()).build();
 
     public static class ClickItem extends AbstractItem {
         protected final ItemStack item;

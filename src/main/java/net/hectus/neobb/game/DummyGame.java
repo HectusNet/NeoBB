@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class DummyGame extends Game {
-    public static final GameInfo INFO = new GameInfo(false, 1.0, 1, 1, new Time(1), 1, DummyShop.class, DefaultItemLoreBuilder.class, List.of());
+    public static final GameInfo INFO = new GameInfo(false, false, 1.0, 1, 1, new Time(1), 1, DummyShop.class, DefaultItemLoreBuilder.class, List.of());
 
     public DummyGame(@NotNull Player player) {
         super(player.getWorld(), player);

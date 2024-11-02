@@ -1,5 +1,6 @@
-package net.hectus.neobb.util;
+package net.hectus.neobb.shop.util;
 
+import net.hectus.neobb.util.Colors;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 

@@ -1,4 +1,4 @@
-package net.hectus.neobb.turn.here_game;
+package net.hectus.neobb.turn.card_game;
 
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.Turn;
@@ -8,9 +8,9 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
-public abstract class HereTurn extends Turn<Block> {
-    public HereTurn(NeoPlayer player) { super(player); }
-    public HereTurn(Block data, NeoPlayer player) { super(data, data.getLocation(), player); }
+public abstract class CardTurn extends Turn<Block> {
+    public CardTurn(NeoPlayer player) { super(player); }
+    public CardTurn(Block data, NeoPlayer player) { super(data, data.getLocation(), player); }
 
     @Override
     public abstract double damage(); // Change it to be abstract instead of concrete.

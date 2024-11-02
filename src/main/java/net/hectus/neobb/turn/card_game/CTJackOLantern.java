@@ -1,4 +1,4 @@
-package net.hectus.neobb.turn.here_game;
+package net.hectus.neobb.turn.card_game;
 
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.util.MinecraftTime;
@@ -6,9 +6,9 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
-public class HTJackOLantern extends HereTurn {
-    public HTJackOLantern(NeoPlayer player) { super(player); }
-    public HTJackOLantern(Block data, NeoPlayer player) { super(data, player); }
+public class CTJackOLantern extends CardTurn {
+    public CTJackOLantern(NeoPlayer player) { super(player); }
+    public CTJackOLantern(Block data, NeoPlayer player) { super(data, player); }
 
     @Override
     public double damage() {

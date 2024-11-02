@@ -6,8 +6,8 @@ import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.event.custom.CancellableImpl;
 import net.hectus.neobb.game.Game;
 import net.hectus.neobb.game.HectusGame;
+import net.hectus.neobb.game.mode.CardGame;
 import net.hectus.neobb.game.mode.DefaultGame;
-import net.hectus.neobb.game.mode.HereGame;
 import net.hectus.neobb.game.mode.LegacyGame;
 import net.hectus.neobb.game.mode.PersonGame;
 import net.hectus.neobb.game.util.GameManager;
@@ -15,6 +15,7 @@ import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.structure.Structure;
 import net.hectus.neobb.structure.StructureManager;
+import net.hectus.neobb.turn.card_game.*;
 import net.hectus.neobb.turn.default_game.block.*;
 import net.hectus.neobb.turn.default_game.item.TChorusFruit;
 import net.hectus.neobb.turn.default_game.item.TIronShovel;
@@ -25,7 +26,6 @@ import net.hectus.neobb.turn.default_game.structure.*;
 import net.hectus.neobb.turn.default_game.structure.glass_wall.*;
 import net.hectus.neobb.turn.default_game.throwable.*;
 import net.hectus.neobb.turn.default_game.warp.*;
-import net.hectus.neobb.turn.here_game.*;
 import net.hectus.neobb.turn.legacy_game.block.LTPurpleWool;
 import net.hectus.neobb.turn.legacy_game.block.LTSeaPickle;
 import net.hectus.neobb.turn.legacy_game.block.LTTnt;
@@ -110,19 +110,19 @@ public class TurnEvents implements Listener {
     private void blockTurn(BlockPlaceEvent event, Block block, @NotNull NeoPlayer player) {
         NeoBB.LOG.info("Handling a block turn for {} by {}!", block.getType(), player.player.getName());
         switch (player.game) {
-            case HereGame ignored -> {
+            case CardGame ignored -> {
                 switch (block.getType()) {
-                    case CHEST -> player.game.turn(new HTChest(block, player), event);
-                    case DAYLIGHT_DETECTOR -> player.game.turn(new HTDaylightDetector(block, player), event);
-                    case FLOWER_POT -> player.game.turn(new HTFlowerPot(block, player), event);
-                    case JACK_O_LANTERN -> player.game.turn(new HTJackOLantern(block, player), event);
-                    case OAK_DOOR -> player.game.turn(new HTOakDoor(block, player), event);
-                    case OAK_FENCE_GATE -> player.game.turn(new HTOakFenceGate(block, player), event);
-                    case OAK_TRAPDOOR -> player.game.turn(new HTOakTrapdoor(block, player), event);
-                    case POINTED_DRIPSTONE -> player.game.turn(new HTPointedDripstone(block, player), event);
-                    case REDSTONE_LAMP -> player.game.turn(new HTRedstoneLamp(block, player), event);
-                    case TORCH -> player.game.turn(new HTTorch(block, player), event);
-                    case WAXED_EXPOSED_CUT_COPPER_STAIRS -> player.game.turn(new HTWaxedExposedCutCopperStairs(block, player), event);
+                    case CHEST -> player.game.turn(new CTChest(block, player), event);
+                    case DAYLIGHT_DETECTOR -> player.game.turn(new CTDaylightDetector(block, player), event);
+                    case FLOWER_POT -> player.game.turn(new CTFlowerPot(block, player), event);
+                    case JACK_O_LANTERN -> player.game.turn(new CTJackOLantern(block, player), event);
+                    case OAK_DOOR -> player.game.turn(new CTOakDoor(block, player), event);
+                    case OAK_FENCE_GATE -> player.game.turn(new CTOakFenceGate(block, player), event);
+                    case OAK_TRAPDOOR -> player.game.turn(new CTOakTrapdoor(block, player), event);
+                    case POINTED_DRIPSTONE -> player.game.turn(new CTPointedDripstone(block, player), event);
+                    case REDSTONE_LAMP -> player.game.turn(new CTRedstoneLamp(block, player), event);
+                    case TORCH -> player.game.turn(new CTTorch(block, player), event);
+                    case WAXED_EXPOSED_CUT_COPPER_STAIRS -> player.game.turn(new CTWaxedExposedCutCopperStairs(block, player), event);
                     default -> event.setCancelled(true);
                 }
             }
@@ -179,6 +179,7 @@ public class TurnEvents implements Listener {
                     case VERDANT_FROGLIGHT -> player.game.turn(new TVerdantFroglight(block, player), event);
                     case WATER -> player.game.turn(new TWater(block, player), event);
                     case WHITE_WOOL -> player.game.turn(new TWhiteWool(block, player), event);
+                    case DIRT, FLOWER_POT -> {} // Do nothing, but don't cancel!
                     default -> event.setCancelled(true);
                 }
             }
@@ -355,9 +356,9 @@ public class TurnEvents implements Listener {
                     player.game.turn(new TNoteBlock(noteBlock, event.getClickedBlock().getLocation(), player), event);
                 }
             }
-            case HereGame ignored -> {
+            case CardGame ignored -> {
                 if (player.game.history().isEmpty()) return;
-                if (player.game.history().getLast() instanceof InteractableHereTurn interactable &&
+                if (player.game.history().getLast() instanceof InteractableCardTurn interactable &&
                         player == interactable.player() && interactable.data().getLocation().equals(event.getClickedBlock().getLocation())) {
                     interactable.interact();
                 }

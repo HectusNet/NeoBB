@@ -2,9 +2,9 @@ package net.hectus.neobb.player;
 
 import com.marcpg.libpg.lang.Translation;
 import com.marcpg.libpg.util.Randomizer;
+import net.hectus.neobb.shop.util.ItemBuilder;
 import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.turn.person_game.categorization.Category;
-import net.hectus.neobb.util.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -69,6 +69,12 @@ public class NeoInventory {
         sync();
     }
 
+    public void addToDeck(@NotNull Turn<?> turn) {
+        turn.items().forEach(item -> addToDeck(new ItemBuilder(item)
+                .lore(player.shop.loreBuilder.turn(turn).buildWithTooltips(player.locale()))
+                .build(), turn));
+    }
+
     public void addToDeck(ItemStack item, Turn<?> turn) {
         for (int i = 0; i < deck.length; i++) {
             if (deck[i] == null) {
@@ -82,8 +88,7 @@ public class NeoInventory {
     public void addRandom() {
         if (isFull()) return;
         try {
-            Turn<?> turn = Randomizer.fromCollection(player.shop.dummyTurns);
-            turn.items().forEach(item -> addToDeck(item, turn));
+            addToDeck(Randomizer.fromCollection(player.shop.dummyTurns));
         } catch (ArrayIndexOutOfBoundsException ignored) {} // Skill issue I guess.
     }
 

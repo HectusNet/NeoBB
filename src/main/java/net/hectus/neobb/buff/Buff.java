@@ -204,9 +204,9 @@ public abstract class Buff {
         public void apply(NeoPlayer source) {
             Target target = getTarget(source);
             if (target instanceof NeoPlayer player) {
-                turn.items().forEach(i -> player.inventory.addToDeck(i, turn));
+                player.inventory.addToDeck(turn);
             } else if (target instanceof TargetObj targetObj) {
-                turn.items().forEach(i -> targetObj.players().forEach(p -> p.inventory.addToDeck(i, turn)));
+                targetObj.players().forEach(p -> p.inventory.addToDeck(turn));
             }
         }
 

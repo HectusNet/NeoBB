@@ -13,8 +13,8 @@ import net.hectus.neobb.cosmetic.PlaceParticle;
 import net.hectus.neobb.cosmetic.PlayerAnimation;
 import net.hectus.neobb.game.DummyGame;
 import net.hectus.neobb.game.Game;
+import net.hectus.neobb.game.mode.CardGame;
 import net.hectus.neobb.game.mode.DefaultGame;
-import net.hectus.neobb.game.mode.HereGame;
 import net.hectus.neobb.game.mode.LegacyGame;
 import net.hectus.neobb.game.mode.PersonGame;
 import net.hectus.neobb.game.util.GameManager;
@@ -36,7 +36,7 @@ import java.util.Objects;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class Commands {
-    private static final List<String> MODES = List.of("default", "herestudio", "legacy", "person98");
+    private static final List<String> MODES = List.of("default", "card", "legacy", "person98");
 
     public static LiteralCommandNode<CommandSourceStack> startCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal("games")
@@ -62,7 +62,7 @@ public final class Commands {
                                             try {
                                                 switch (context.getArgument("mode", String.class)) {
                                                     case "default" -> new DefaultGame(true, players.getFirst().getWorld(), players);
-                                                    case "herestudio" -> new HereGame(false, players.getFirst().getWorld(), players);
+                                                    case "card" -> new CardGame(false, players.getFirst().getWorld(), players);
                                                     case "legacy" -> new LegacyGame(false, players.getFirst().getWorld(), players);
                                                     case "person98" -> new PersonGame(false, players.getFirst().getWorld(), players);
                                                     default -> source.sendMessage(Translation.component(l, "command.games.start.unknown_mode").color(Colors.NEGATIVE));

@@ -1,4 +1,4 @@
-package net.hectus.neobb.game.util;
+package net.hectus.neobb.cosmetic;
 
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.Turn;

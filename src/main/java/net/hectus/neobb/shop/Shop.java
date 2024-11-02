@@ -12,8 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public abstract class Shop {
-    protected final NeoPlayer player;
-    protected final ItemLoreBuilder loreBuilder;
+    public final NeoPlayer player;
+    public final ItemLoreBuilder loreBuilder;
 
     public final List<? extends Turn<?>> dummyTurns;
 

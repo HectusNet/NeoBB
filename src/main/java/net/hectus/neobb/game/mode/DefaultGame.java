@@ -36,7 +36,7 @@ import java.util.Locale;
  * Source: <a href="https://docs.google.com/document/d/1y05rFNz7QcvB7yoyqvYnPgb925Leq2P-HV-NKBuJUNg">Official Google Document</a>
  */
 public class DefaultGame extends HectusGame {
-    public static final GameInfo INFO = new GameInfo(true, 1.0, 25, 9, new Time(3, Time.Unit.MINUTES), 5, DefaultShop.class, DefaultItemLoreBuilder.class, List.of(
+    public static final GameInfo INFO = new GameInfo(false, true, 1.0, 25, 9, new Time(3, Time.Unit.MINUTES), 5, DefaultShop.class, DefaultItemLoreBuilder.class, List.of(
             TIronTrapdoor.class, TCampfire.class, TCauldron.class, TPackedIce.class, TLever.class, TOakStairs.class, TBlueBed.class,
             TPiston.class, TSponge.class, THayBlock.class, TDriedKelpBlock.class, TRepeater.class, TRedCarpet.class, TGreenWool.class,
             TFire.class, TStonecutter.class, TLava.class, TPurpleWool.class, TGreenBed.class, TRedBed.class, TCyanCarpet.class,
@@ -63,6 +63,11 @@ public class DefaultGame extends HectusGame {
     @Override
     public GameInfo info() {
         return INFO;
+    }
+
+    @Override
+    public void outOfBoundsAction(@NotNull NeoPlayer player) {
+        player.player.damage(2.0);
     }
 
     @Override
