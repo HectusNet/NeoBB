@@ -142,7 +142,7 @@ public class NeoInventory {
             ItemStack item = deck[i] == null ? new ItemStack(Material.BLACK_STAINED_GLASS_PANE) : deck[i].clone();
             Turn<?> dummyTurn = dummyTurnDeck[i] == null ? Turn.DUMMY : dummyTurnDeck[i];
 
-            if (dummyTurn.goodChoice(player))
+            if (player.game.difficulty.suggestions && dummyTurn.goodChoice(player))
                 item.addUnsafeEnchantment(Enchantment.MENDING, 1);
 
             inv.setItem(i, item);

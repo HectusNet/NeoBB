@@ -5,6 +5,7 @@ import com.marcpg.libpg.lang.Translation;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.buff.Buff;
 import net.hectus.neobb.game.Game;
+import net.hectus.neobb.game.util.Difficulty;
 import net.hectus.neobb.game.util.GameInfo;
 import net.hectus.neobb.lore.PersonItemLoreBuilder;
 import net.hectus.neobb.player.NeoPlayer;
@@ -51,8 +52,8 @@ public class PersonGame extends Game {
             PTIceWarp.class, PTSnowWarp.class, PTVillagerWarp.class, PTVoidWarp.class
     ));
 
-    public PersonGame(boolean ranked, World world, @NotNull List<Player> players) {
-        super(ranked, world, players, new TDefaultWarp(world));
+    public PersonGame(Difficulty difficulty, World world, @NotNull List<Player> players) {
+        super(difficulty, world, players, new TDefaultWarp(world));
     }
 
     @Override
@@ -111,10 +112,5 @@ public class PersonGame extends Game {
         }
 
         return true;
-    }
-
-    @Override
-    public void postTurn(Turn<?> turn, boolean skipped) {
-        super.postTurn(turn, skipped);
     }
 }

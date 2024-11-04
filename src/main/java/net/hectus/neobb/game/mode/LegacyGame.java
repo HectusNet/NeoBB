@@ -3,6 +3,7 @@ package net.hectus.neobb.game.mode;
 import com.marcpg.libpg.data.time.Time;
 import com.marcpg.libpg.lang.Translation;
 import net.hectus.neobb.game.HectusGame;
+import net.hectus.neobb.game.util.Difficulty;
 import net.hectus.neobb.game.util.GameInfo;
 import net.hectus.neobb.lore.LegacyItemLoreBuilder;
 import net.hectus.neobb.player.NeoPlayer;
@@ -79,8 +80,8 @@ public class LegacyGame extends HectusGame {
             LTRedstoneWarp.class, LTSnowWarp.class, LTSunWarp.class, LTUnderwaterWarp.class, LTVoidWarp.class, LTWoodWarp.class
     ));
 
-    public LegacyGame(boolean ranked, World world, @NotNull List<Player> players) {
-        super(ranked, world, players, new LTDefaultWarp(world));
+    public LegacyGame(Difficulty difficulty, World world, @NotNull List<Player> players) {
+        super(difficulty, world, players, new LTDefaultWarp(world));
     }
 
     @Override
@@ -94,7 +95,7 @@ public class LegacyGame extends HectusGame {
             eliminatePlayer(turn.player());
             return true;
         }
-        if (history.isEmpty() && (turn instanceof AttackFunction || turn instanceof WarpTurn)) {
+        if (!difficulty.usageRules && history.isEmpty() && (turn instanceof AttackFunction || turn instanceof WarpTurn)) {
             turn.player().sendMessage(Component.text("You cannot use attacks or warps as the first turn.", Colors.NEGATIVE));
             turn.player().player.playSound(turn.player().player, Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
             return true;

@@ -39,7 +39,7 @@ public interface CounterCategory extends Category {
         if (turn.player().game.history().isEmpty()) return true;
         Turn<?> last = turn.player().game.history().getLast();
 
-        if (last instanceof AttackCategory attack && properlyPlaced(turn.location(), last.location()) && attack.counteredBy().contains(turn.getClass())) {
+        if (last instanceof AttackCategory attack && (!turn.player().game.difficulty.usageRules || properlyPlaced(turn.location(), last.location())) && attack.counteredBy().contains(turn.getClass())) {
             counter(turn.player(), last);
         } else {
             turn.player().showTitle(Title.title(Translation.component(turn.player().locale(), "gameplay.info.misplace").color(Colors.NEGATIVE), Component.empty()));

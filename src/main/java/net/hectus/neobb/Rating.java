@@ -6,26 +6,26 @@ import org.jetbrains.annotations.NotNull;
 // Glicko-2 rating system -> http://www.glicko.net/glicko/glicko2.pdf
 public final class Rating {
 
-    public static void updateRankingsWin(@NotNull NeoPlayer winner, @NotNull NeoPlayer loser) {
-        updateRankings(winner, loser, WIN_FACTOR, LOSS_FACTOR);
+    public static void updateRankingsWin(@NotNull NeoPlayer winner, @NotNull NeoPlayer loser, double overallFactor) {
+        updateRankings(winner, loser, WIN_FACTOR, LOSS_FACTOR, overallFactor);
 
         winner.addWin();
         loser.addLoss();
     }
 
-    public static void updateRankingsDraw(@NotNull NeoPlayer player1, @NotNull NeoPlayer player2) {
-        updateRankings(player1, player2, DRAW_FACTOR, DRAW_FACTOR);
+    public static void updateRankingsDraw(@NotNull NeoPlayer player1, @NotNull NeoPlayer player2, double overallFactor) {
+        updateRankings(player1, player2, DRAW_FACTOR, DRAW_FACTOR, overallFactor);
 
         player1.addDraw();
         player2.addDraw();
     }
 
-    private static void updateRankings(@NotNull NeoPlayer player1, @NotNull NeoPlayer player2, double result1, double result2) {
+    private static void updateRankings(@NotNull NeoPlayer player1, @NotNull NeoPlayer player2, double overallFactor, double result1, double result2) {
         Rating rating1 = new Rating(player1.elo(), player1.ratingDeviation(), player1.volatility(), player1.lastMatchTimeMillis());
         Rating rating2 = new Rating(player2.elo(), player2.ratingDeviation(), player2.volatility(), player2.lastMatchTimeMillis());
 
-        rating1.updateRating(rating2, result1);
-        rating2.updateRating(rating1, result2);
+        rating1.updateRating(rating2, result1 * overallFactor);
+        rating2.updateRating(rating1, result2 * overallFactor);
 
         apply(player1, rating1);
         apply(player2, rating2);

@@ -4,6 +4,7 @@ import com.marcpg.libpg.data.time.Time;
 import com.marcpg.libpg.lang.Translation;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.Game;
+import net.hectus.neobb.game.util.Difficulty;
 import net.hectus.neobb.game.util.GameInfo;
 import net.hectus.neobb.lore.CardItemLoreBuilder;
 import net.hectus.neobb.player.NeoPlayer;
@@ -33,8 +34,8 @@ public class CardGame extends Game {
             CTPointedDripstone.class, CTRedstoneLamp.class, CTTorch.class, CTWaxedExposedCutCopperStairs.class
     ));
 
-    public CardGame(boolean ranked, World world, @NotNull List<Player> players) {
-        super(ranked, world, players, new TDefaultWarp(world));
+    public CardGame(Difficulty difficulty, World world, @NotNull List<Player> players) {
+        super(difficulty, world, players, new TDefaultWarp(world));
     }
 
     @Override

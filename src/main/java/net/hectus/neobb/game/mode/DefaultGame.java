@@ -4,6 +4,7 @@ import com.marcpg.libpg.data.time.Time;
 import com.marcpg.libpg.lang.Translation;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.HectusGame;
+import net.hectus.neobb.game.util.Difficulty;
 import net.hectus.neobb.game.util.GameInfo;
 import net.hectus.neobb.lore.DefaultItemLoreBuilder;
 import net.hectus.neobb.player.NeoPlayer;
@@ -56,8 +57,8 @@ public class DefaultGame extends HectusGame {
             TOakDoorTurtling.class, TPumpkinWall.class, TRedstoneWall.class, TDirt.class, TFlowerPot.class, TNoteBlock.class
     ));
 
-    public DefaultGame(boolean ranked, World world, @NotNull List<Player> players) {
-        super(ranked, world, players, new TDefaultWarp(world));
+    public DefaultGame(Difficulty difficulty, World world, @NotNull List<Player> players) {
+        super(difficulty, world, players, new TDefaultWarp(world));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package net.hectus.neobb.game;
 
+import net.hectus.neobb.game.util.Difficulty;
 import net.hectus.neobb.turn.default_game.warp.WarpTurn;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
@@ -12,8 +13,8 @@ import java.util.List;
 public abstract class BossBarGame extends Game {
     protected BossBar bossBar;
 
-    public BossBarGame(boolean ranked, World world, @NotNull List<Player> players, WarpTurn defaultWarp) {
-        super(ranked, world, players, defaultWarp);
+    public BossBarGame(Difficulty difficulty, World world, @NotNull List<Player> players, WarpTurn defaultWarp) {
+        super(difficulty, world, players, defaultWarp);
     }
 
     public BossBar initialBossBar() {

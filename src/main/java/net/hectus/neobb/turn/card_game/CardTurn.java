@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class CardTurn extends Turn<Block> {
     public CardTurn(NeoPlayer player) { super(player); }
@@ -26,7 +27,7 @@ public abstract class CardTurn extends Turn<Block> {
     }
 
     @Override
-    public boolean goodChoice(NeoPlayer player) {
+    public boolean goodChoice(@NotNull NeoPlayer player) {
         return false; // Prevent the suggestion system from doing anything.
     }
 }

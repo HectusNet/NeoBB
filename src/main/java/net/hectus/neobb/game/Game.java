@@ -7,10 +7,8 @@ import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.Rating;
 import net.hectus.neobb.cosmetic.EffectManager;
 import net.hectus.neobb.event.custom.CancellableImpl;
-import net.hectus.neobb.game.util.Arena;
-import net.hectus.neobb.game.util.GameInfo;
-import net.hectus.neobb.game.util.GameManager;
-import net.hectus.neobb.game.util.TurnScheduler;
+import net.hectus.neobb.game.util.Difficulty;
+import net.hectus.neobb.game.util.*;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.player.TargetObj;
 import net.hectus.neobb.turn.DummyTurn;
@@ -39,7 +37,7 @@ public abstract class Game extends Modifiers.Modifiable {
     public final Arena arena;
     public final EffectManager effectManager = new EffectManager();
     public final TurnScheduler turnScheduler = new TurnScheduler();
-    public final boolean ranked;
+    public final Difficulty difficulty;
 
     protected final List<NeoPlayer> initialPlayers = new ArrayList<>();
     protected final List<NeoPlayer> players = new ArrayList<>();
@@ -53,23 +51,25 @@ public abstract class Game extends Modifiers.Modifiable {
     protected MinecraftTime time;
 
     protected Time timeLeft;
-    protected int turnCountdown = info().turnTimer();
+    protected int turnCountdown;
 
     protected Game(World world, Player player) {
-        this.ranked = false;
+        this.difficulty = Difficulty.NORMAL;
         this.arena = new Arena(this, world);
         this.warp = new TDefaultWarp(world);
+        resetTurnCountdown();
 
         NeoPlayer p = new NeoPlayer(player, this);
         initialPlayers.add(p);
         players.add(p);
     }
 
-    protected Game(boolean ranked, World world, @NotNull List<Player> players, WarpTurn defaultWarp) {
-        this.ranked = ranked;
+    protected Game(Difficulty difficulty, World world, @NotNull List<Player> players, WarpTurn defaultWarp) {
+        this.difficulty = difficulty;
         this.arena = new Arena(this, world);
         this.warp = defaultWarp;
         this.allowedClazzes.addAll(warp.allows());
+        resetTurnCountdown();
 
         players.forEach(p -> {
             cleanPlayer(p);
@@ -114,7 +114,7 @@ public abstract class Game extends Modifiers.Modifiable {
             return;
         }
 
-        if (turn.unusable()) {
+        if (difficulty.usageRules && turn.unusable()) {
             NeoBB.LOG.info("{}: {} used {} incorrectly.", id, player.player.getName(), turn.getClass().getName().replace("net.hectus.neobb.turn.", ""));
             player.sendMessage(Component.text("That is not quite how to use this turn...", Colors.NEGATIVE));
             player.player.playSound(player.player, Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
@@ -329,7 +329,7 @@ public abstract class Game extends Modifiers.Modifiable {
     }
 
     public final void resetTurnCountdown() {
-        turnCountdown = info().turnTimer();
+        turnCountdown = (int) (info().turnTimer() * difficulty.timeMultiplier);
     }
 
     public final void moveToNextPlayer() {
@@ -361,8 +361,10 @@ public abstract class Game extends Modifiers.Modifiable {
     }
 
     public void start() {
-        timeLeft = new Time(info().totalTime());
+        timeLeft = new Time((long) (info().totalTime().get() * difficulty.timeMultiplier));
         timeLeft.setAllowNegatives(true);
+        resetTurnCountdown();
+
         NeoBB.LOG.info("{}: Started the game.", id);
         setStarted(true);
 
@@ -405,7 +407,8 @@ public abstract class Game extends Modifiers.Modifiable {
         player.cosmeticWinAnimation().play(player);
 
         end(false);
-        if (ranked) Rating.updateRankingsWin(player, player.opponents(false).getFirst()); // TODO: Support multiple losers!
+        if (difficulty.allowRanking)
+            Rating.updateRankingsWin(player, player.opponents(false).getFirst(), difficulty.rankingMultiplier); // TODO: Support multiple losers!
     }
 
     public final void draw(boolean force) {
@@ -414,7 +417,8 @@ public abstract class Game extends Modifiers.Modifiable {
         NeoBB.LOG.info("{}: The game resulted in a draw.", id);
 
         end(force);
-        if (ranked) Rating.updateRankingsDraw(initialPlayers.get(0), initialPlayers.get(1)); // TODO: Support multiple winners/losers!
+        if (difficulty.allowRanking)
+            Rating.updateRankingsDraw(initialPlayers.get(0), initialPlayers.get(1), difficulty.rankingMultiplier); // TODO: Support multiple winners/losers!
     }
 
     public final void giveUp(@NotNull NeoPlayer player) {
@@ -425,7 +429,8 @@ public abstract class Game extends Modifiers.Modifiable {
         player.opponents(true).forEach(p -> p.cosmeticWinAnimation().play(p));
 
         end(false);
-        if (ranked) Rating.updateRankingsWin(player.opponents(false).getFirst(), player); // TODO: Support multiple winners!
+        if (difficulty.allowRanking)
+            Rating.updateRankingsWin(player.opponents(false).getFirst(), player, difficulty.rankingMultiplier); // TODO: Support multiple winners!
     }
 
     private static void cleanPlayer(@NotNull Player player) {

@@ -3,6 +3,7 @@ package net.hectus.neobb.event;
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.mode.DefaultGame;
+import net.hectus.neobb.game.util.Difficulty;
 import net.hectus.neobb.game.util.GameManager;
 import net.hectus.neobb.turn.default_game.warp.TDefaultWarp;
 import net.hectus.neobb.util.Modifiers;
@@ -75,7 +76,7 @@ public class PlayerEvents implements Listener {
                 .collect(Collectors.toList());
 
         if (NeoBB.PRODUCTION && available.size() >= NeoBB.CONFIG.getInt("starting-players")) {
-            new DefaultGame(true, player.getWorld(), available);
+            new DefaultGame(Difficulty.NORMAL, player.getWorld(), available);
         } else {
             player.teleport(new TDefaultWarp(player.getWorld()).location().clone());
         }

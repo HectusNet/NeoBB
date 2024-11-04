@@ -2,6 +2,7 @@ package net.hectus.neobb.game;
 
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.buff.Buff;
+import net.hectus.neobb.game.util.Difficulty;
 import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.turn.default_game.attributes.function.*;
 import net.hectus.neobb.turn.default_game.mob.TPhantom;
@@ -14,8 +15,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public abstract class HectusGame extends BossBarGame {
-    public HectusGame(boolean ranked, World world, @NotNull List<Player> players, WarpTurn defaultWarp) {
-        super(ranked, world, players, defaultWarp);
+    public HectusGame(Difficulty difficulty, World world, @NotNull List<Player> players, WarpTurn defaultWarp) {
+        super(difficulty, world, players, defaultWarp);
     }
 
     @Override

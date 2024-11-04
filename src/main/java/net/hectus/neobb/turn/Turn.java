@@ -3,9 +3,12 @@ package net.hectus.neobb.turn;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.default_game.attributes.function.AttackFunction;
 import net.hectus.neobb.turn.default_game.attributes.function.CounterFunction;
+import net.hectus.neobb.turn.person_game.categorization.AttackCategory;
+import net.hectus.neobb.turn.person_game.categorization.CounterCategory;
 import net.hectus.neobb.util.Modifiers;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -49,11 +52,19 @@ public abstract class Turn<T> {
         return player;
     }
 
-    public boolean goodChoice(NeoPlayer player) {
-        if (unusable() || !player.game.allows(this)) return false;
+    public boolean goodChoice(@NotNull NeoPlayer player) {
+        if (!player.game.difficulty.usageRules && (unusable() || !player.game.allows(this))) return false;
 
-        if ((player.hasModifier(Modifiers.P_DEFAULT_ATTACKED) || player.game.turnScheduler.hasTask("freeze")) && !player.hasModifier(Modifiers.P_DEFAULT_DEFENDED))
-            return this instanceof CounterFunction counter && counter.counters().stream().anyMatch(filter -> filter.doCounter(player.game.history().getLast()));
+        if ((player.hasModifier(Modifiers.P_DEFAULT_ATTACKED) || player.game.turnScheduler.hasTask("freeze")) && !player.hasModifier(Modifiers.P_DEFAULT_DEFENDED)) {
+            if (player.game.history().isEmpty()) return true;
+            Turn<?> last = player.game.history().getLast();
+
+            if (this instanceof CounterFunction counter) {
+                return counter.counters().stream().anyMatch(filter -> filter.doCounter(last));
+            } else if (this instanceof CounterCategory counter) {
+                return last instanceof AttackCategory attack && attack.counteredBy().contains(counter.getClass());
+            }
+        }
 
         return !(this instanceof AttackFunction) || !player.nextPlayer().hasModifier(Modifiers.P_DEFAULT_DEFENDED);
     }
@@ -64,6 +75,6 @@ public abstract class Turn<T> {
 
     public static final Turn<Void> DUMMY = new Turn<>(null) {
         @Override public int cost() { return 10; }
-        @Override public boolean goodChoice(NeoPlayer player) { return false; }
+        @Override public boolean goodChoice(@NotNull NeoPlayer player) { return false; }
     };
 }

@@ -17,6 +17,7 @@ import net.hectus.neobb.game.mode.CardGame;
 import net.hectus.neobb.game.mode.DefaultGame;
 import net.hectus.neobb.game.mode.LegacyGame;
 import net.hectus.neobb.game.mode.PersonGame;
+import net.hectus.neobb.game.util.Difficulty;
 import net.hectus.neobb.game.util.GameManager;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.Structure;
@@ -47,34 +48,44 @@ public final class Commands {
                                     MODES.forEach(builder::suggest);
                                     return builder.buildFuture();
                                 })
-                                .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerSelectorArgumentResolver>argument("players", ArgumentTypes.players())
-                                        .executes(context -> {
-                                            CommandSender source = context.getSource().getSender();
-                                            Locale l = source instanceof Player p ? p.locale() : Locale.getDefault();
-
-                                            List<Player> players = context.getArgument("players", PlayerSelectorArgumentResolver.class).resolve(context.getSource());
-                                            if (players.size() < 2) {
-                                                source.sendMessage(Translation.component(l, "command.games.start.not_enough_players").color(Colors.NEGATIVE));
-                                                return 1;
+                                .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("difficulty", StringArgumentType.word())
+                                        .suggests((context, builder) -> {
+                                            for (Difficulty v : Difficulty.values()) {
+                                                builder.suggest(v.name());
                                             }
-
-                                            source.sendMessage(Translation.component(l, "command.games.start.starting", players.size()).color(Colors.POSITIVE));
-                                            try {
-                                                switch (context.getArgument("mode", String.class)) {
-                                                    case "default" -> new DefaultGame(true, players.getFirst().getWorld(), players);
-                                                    case "card" -> new CardGame(false, players.getFirst().getWorld(), players);
-                                                    case "legacy" -> new LegacyGame(false, players.getFirst().getWorld(), players);
-                                                    case "person98" -> new PersonGame(false, players.getFirst().getWorld(), players);
-                                                    default -> source.sendMessage(Translation.component(l, "command.games.start.unknown_mode").color(Colors.NEGATIVE));
-                                                }
-                                            } catch (Exception e) {
-                                                source.sendMessage(Translation.component(l, "command.games.start.error").color(Colors.NEGATIVE));
-                                                NeoBB.LOG.error("Could not start match!", e);
-                                            }
-                                            return 1;
+                                            return builder.buildFuture();
                                         })
+                                        .then(RequiredArgumentBuilder.<CommandSourceStack, PlayerSelectorArgumentResolver>argument("players", ArgumentTypes.players())
+                                                .executes(context -> {
+                                                    CommandSender source = context.getSource().getSender();
+                                                    Locale l = source instanceof Player p ? p.locale() : Locale.getDefault();
+
+                                                    List<Player> players = context.getArgument("players", PlayerSelectorArgumentResolver.class).resolve(context.getSource());
+                                                    if (players.size() < 2) {
+                                                        source.sendMessage(Translation.component(l, "command.games.start.not_enough_players").color(Colors.NEGATIVE));
+                                                        return 1;
+                                                    }
+                                                    Difficulty difficulty = Difficulty.valueOf(context.getArgument("difficulty", String.class));
+
+                                                    source.sendMessage(Translation.component(l, "command.games.start.starting", players.size()).color(Colors.POSITIVE));
+                                                    try {
+                                                        switch (context.getArgument("mode", String.class)) {
+                                                            case "default" -> new DefaultGame(difficulty, players.getFirst().getWorld(), players);
+                                                            case "card" -> new CardGame(difficulty, players.getFirst().getWorld(), players);
+                                                            case "legacy" -> new LegacyGame(difficulty, players.getFirst().getWorld(), players);
+                                                            case "person98" -> new PersonGame(difficulty, players.getFirst().getWorld(), players);
+                                                            default -> source.sendMessage(Translation.component(l, "command.games.start.unknown_mode").color(Colors.NEGATIVE));
+                                                        }
+                                                    } catch (Exception e) {
+                                                        source.sendMessage(Translation.component(l, "command.games.start.error").color(Colors.NEGATIVE));
+                                                        NeoBB.LOG.error("Could not start match!", e);
+                                                    }
+                                                    return 1;
+                                                })
+                                        )
                                 )
-                ))
+                        )
+                )
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("stop")
                         .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("id", StringArgumentType.word())
                                 .suggests((context, builder) -> {
@@ -104,7 +115,7 @@ public final class Commands {
                                 source.sendMessage(Component.text("==== ", Colors.EXTRA).append(Component.text(game.id, Colors.ACCENT)).append(Component.text(" ====", Colors.EXTRA)));
                                 source.sendMessage(Component.text("> Players: ", Colors.EXTRA).append(Component.text(game.players().size() + "/" + game.initialPlayers().size(), Colors.SECONDARY)));
                                 if (game.timeLeft() != null) source.sendMessage(Component.text("> Time: ", Colors.EXTRA).append(Component.text(game.timeLeft().getPreciselyFormatted(), Colors.SECONDARY)));
-                                source.sendMessage(Component.text("> Ranked: ", Colors.EXTRA).append(Component.text(game.ranked, Colors.SECONDARY)));
+                                source.sendMessage(Component.text("> Difficulty: ", Colors.EXTRA).append(Component.text(game.difficulty.name(), Colors.SECONDARY)));
                                 if (game.history() != null) source.sendMessage(Component.text("> Played Turns: ", Colors.EXTRA).append(Component.text(game.history().size(), Colors.SECONDARY)));
                                 if (game.currentPlayer() != null) source.sendMessage(Component.text("> Turning: ", Colors.EXTRA).append(Component.text(game.currentPlayer().player.getName(), Colors.SECONDARY)));
                             }
