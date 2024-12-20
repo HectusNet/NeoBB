@@ -1,10 +1,10 @@
 package net.hectus.neobb.structure;
 
 import com.google.gson.GsonBuilder;
+import com.marcpg.libpg.storing.Cord;
 import com.marcpg.libpg.storing.Pair;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.util.Arena;
-import net.hectus.neobb.util.Cord;
 import net.hectus.neobb.util.Utilities;
 import org.bukkit.Location;
 import org.bukkit.Material;

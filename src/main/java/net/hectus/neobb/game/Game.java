@@ -2,6 +2,7 @@ package net.hectus.neobb.game;
 
 import com.marcpg.libpg.data.time.Time;
 import com.marcpg.libpg.lang.Translation;
+import com.marcpg.libpg.storing.CordMinecraftAdapter;
 import com.marcpg.libpg.util.Randomizer;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.Rating;
@@ -18,7 +19,10 @@ import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
 import net.hectus.neobb.turn.default_game.warp.TDefaultWarp;
 import net.hectus.neobb.turn.default_game.warp.WarpTurn;
 import net.hectus.neobb.turn.person_game.categorization.WinConCategory;
-import net.hectus.neobb.util.*;
+import net.hectus.neobb.util.Colors;
+import net.hectus.neobb.util.MinecraftTime;
+import net.hectus.neobb.util.Modifiers;
+import net.hectus.neobb.util.Utilities;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.bukkit.*;
@@ -102,9 +106,10 @@ public abstract class Game extends Modifiers.Modifiable {
 
     public final void turn(@NotNull Turn<?> turn, Cancellable event) {
         NeoPlayer player = turn.player();
+        String turnClass = turn.getClass().getName().replace("net.hectus.neobb.turn.", "");
 
         if (outOfBounds(turn.location(), event)) {
-            NeoBB.LOG.info("{}: {} used {} out of bounds.", id, player.player.getName(), turn.getClass().getName().replace("net.hectus.neobb.turn.", ""));
+            NeoBB.LOG.info("{}: {} used {} out of bounds.", id, player.name(), turnClass);
             event.setCancelled(true);
             return;
         }
@@ -115,9 +120,9 @@ public abstract class Game extends Modifiers.Modifiable {
         }
 
         if (difficulty.usageRules && turn.unusable()) {
-            NeoBB.LOG.info("{}: {} used {} incorrectly.", id, player.player.getName(), turn.getClass().getName().replace("net.hectus.neobb.turn.", ""));
+            NeoBB.LOG.info("{}: {} used {} incorrectly.", id, player.name(), turnClass);
             player.sendMessage(Component.text("That is not quite how to use this turn...", Colors.NEGATIVE));
-            player.player.playSound(player.player, Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+            player.playSound(Sound.ENTITY_VILLAGER_NO, 1.0f);
             nextTurn(turn);
         }
 
@@ -140,9 +145,9 @@ public abstract class Game extends Modifiers.Modifiable {
             }
 
             effectManager.applyEffects(turn);
-            player.player.playSound(player.player, player.cosmeticPlaceSound(), 0.5f, 1.0f);
+            player.playSound(player.cosmeticPlaceSound(), 1.0f);
             initialPlayers.forEach(p -> p.sendMessage(Translation.component(p.locale(), "gameplay.info.turn-used",
-                    player.player.getName(), Utilities.turnName(turn.getClass().getName().replace("net.hectus.neobb.turn.", ""), p.locale())).color(Colors.EXTRA)));
+                    player.name(), Utilities.turnName(turnClass, p.locale())).color(Colors.EXTRA)));
         }
 
         nextTurn(turn);
@@ -165,7 +170,7 @@ public abstract class Game extends Modifiers.Modifiable {
         }
         turn.player().validate();
 
-        NeoBB.LOG.info("{}: {} used {}.", id, turn.player().player.getName(), turn.getClass().getName().replace("net.hectus.neobb.turn.", ""));
+        NeoBB.LOG.info("{}: {} used {}.", id, turn.player().name(), turn.getClass().getName().replace("net.hectus.neobb.turn.", ""));
     }
 
     /**
@@ -193,7 +198,7 @@ public abstract class Game extends Modifiers.Modifiable {
      * @return {@code false} if the turn method should abort, {@code true} if it can continue.
      */
     public final boolean outOfBounds(@NotNull Location location, Cancellable event) {
-        if (Cord.ofLocation(location.clone()).outOfBounds(warp.lowCorner(), warp.highCorner())) {
+        if (!CordMinecraftAdapter.ofLocation(location.clone()).inBounds(warp.cord(), warp.highCorner())) {
             event.setCancelled(true);
             return true;
         }
@@ -231,7 +236,7 @@ public abstract class Game extends Modifiers.Modifiable {
         if (player.hasModifier(Modifiers.P_REVIVE)) {
             player.player.playEffect(EntityEffect.TOTEM_RESURRECT);
             player.sendMessage(Translation.component(player.locale(), "gameplay.info.revive.use").color(Colors.POSITIVE));
-            NeoBB.LOG.info("{}: {} used a revive.", id, player.player.getName());
+            NeoBB.LOG.info("{}: {} used a revive.", id, player.name());
             player.removeModifier(Modifiers.P_REVIVE);
             return;
         }
@@ -240,13 +245,13 @@ public abstract class Game extends Modifiers.Modifiable {
 
         player.cosmeticDeathAnimation().play(player);
         player.player.setHealth(0.0);
-        NeoBB.LOG.info("{}: {} got eliminated.", id, player.player.getName());
+        NeoBB.LOG.info("{}: {} got eliminated.", id, player.name());
 
         Bukkit.getScheduler().runTaskLater(NeoBB.PLUGIN, () -> {
             if (players.size() == 1) {
                 win(players.getFirst());
             }
-            player.player.teleport(warp.center);
+            player.teleport(CordMinecraftAdapter.ofLocation(warp.center));
             player.player.setGameMode(GameMode.SPECTATOR);
         }, 20);
     }
@@ -276,7 +281,7 @@ public abstract class Game extends Modifiers.Modifiable {
     }
 
     public void warp(@NotNull WarpTurn warp) {
-        NeoBB.LOG.info("{}: {} warped from {} to {}.", id, warp.player().player.getName(), this.warp.name, warp.name);
+        NeoBB.LOG.info("{}: {} warped from {} to {}.", id, warp.player().name(), this.warp.name, warp.name);
 
         this.warp = warp;
         allowedClazzes.clear();
@@ -371,7 +376,7 @@ public abstract class Game extends Modifiers.Modifiable {
         if (info().showIntro()) {
             NeoPlayer current = players.getFirst();
             current.showTitle(Title.title(Component.text("You go first!", Colors.POSITIVE), Component.text("Good Luck!", Colors.NEUTRAL)));
-            current.opponents(false).forEach(p -> p.showTitle(Title.title(Component.text(current.player.getName() + " goes first!", Colors.RED), Component.text("Good Luck!", Colors.NEUTRAL))));
+            current.opponents(false).forEach(p -> p.showTitle(Title.title(Component.text(current.name() + " goes first!", Colors.RED), Component.text("Good Luck!", Colors.NEUTRAL))));
         }
     }
 
@@ -402,7 +407,7 @@ public abstract class Game extends Modifiers.Modifiable {
                 Translation.component(player.locale(), "gameplay.info.ending.win-sub").color(Colors.NEUTRAL)));
         player.opponents(false).forEach(p -> p.showTitle(Title.title(Translation.component(p.locale(), "gameplay.info.ending.lose").color(Colors.NEGATIVE),
                 Translation.component(p.locale(), "gameplay.info.ending.lose-sub").color(Colors.NEUTRAL))));
-        NeoBB.LOG.info("{}: {} won the game.", id, player.player.getName());
+        NeoBB.LOG.info("{}: {} won the game.", id, player.name());
 
         player.cosmeticWinAnimation().play(player);
 
@@ -422,9 +427,9 @@ public abstract class Game extends Modifiers.Modifiable {
     }
 
     public final void giveUp(@NotNull NeoPlayer player) {
-        players.forEach(p -> p.showTitle(Title.title(Translation.component(p.locale(), "gameplay.info.ending.giveup", player.player.getName()).color(Colors.NEUTRAL),
-                Translation.component(p.locale(), "gameplay.info.ending.giveup-sub", player.player.getName()).color(Colors.EXTRA))));
-        NeoBB.LOG.info("{}: {} gave up.", id, player.player.getName());
+        players.forEach(p -> p.showTitle(Title.title(Translation.component(p.locale(), "gameplay.info.ending.giveup", player.name()).color(Colors.NEUTRAL),
+                Translation.component(p.locale(), "gameplay.info.ending.giveup-sub", player.name()).color(Colors.EXTRA))));
+        NeoBB.LOG.info("{}: {} gave up.", id, player.name());
 
         player.opponents(true).forEach(p -> p.cosmeticWinAnimation().play(p));
 

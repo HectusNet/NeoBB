@@ -1,9 +1,10 @@
 package net.hectus.neobb.cosmetic;
 
+import com.marcpg.libpg.storing.Cord;
+import com.marcpg.libpg.storing.CordMinecraftAdapter;
 import com.marcpg.libpg.util.Randomizer;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.player.NeoPlayer;
-import net.hectus.neobb.util.Cord;
 import net.hectus.neobb.util.Utilities;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
@@ -34,7 +35,7 @@ public enum PlayerAnimation {
         Bukkit.getScheduler().runTaskTimer(NeoBB.PLUGIN, r -> {
             if (mobsLeft.decrementAndGet() <= 0) r.cancel();
 
-            Location loc = c.add(new Cord(ThreadLocalRandom.current().nextDouble(9), 5, ThreadLocalRandom.current().nextDouble(9))).toLocation(p.getWorld());
+            Location loc = CordMinecraftAdapter.toLocation(c.add(new Cord(ThreadLocalRandom.current().nextDouble(9), 5, ThreadLocalRandom.current().nextDouble(9))), p.getWorld());
             loc.getWorld().spawnEntity(loc, Randomizer.fromCollection(Utilities.ENTITY_TYPES), true);
         }, 0, 20);
     });
@@ -46,6 +47,6 @@ public enum PlayerAnimation {
     }
 
     public void play(@NotNull NeoPlayer player) {
-        action.accept(player.player, player.game.warp().lowCorner());
+        action.accept(player.player, player.game.warp().cord());
     }
 }

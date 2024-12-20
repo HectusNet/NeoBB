@@ -1,6 +1,8 @@
 package net.hectus.neobb;
 
 import com.marcpg.libpg.lang.Translation;
+import com.marcpg.libpg.storing.Cord;
+import com.marcpg.libpg.storing.CordMinecraftAdapter;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -23,7 +25,6 @@ import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.Structure;
 import net.hectus.neobb.structure.StructureManager;
 import net.hectus.neobb.util.Colors;
-import net.hectus.neobb.util.Cord;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -117,7 +118,7 @@ public final class Commands {
                                 if (game.timeLeft() != null) source.sendMessage(Component.text("> Time: ", Colors.EXTRA).append(Component.text(game.timeLeft().getPreciselyFormatted(), Colors.SECONDARY)));
                                 source.sendMessage(Component.text("> Difficulty: ", Colors.EXTRA).append(Component.text(game.difficulty.name(), Colors.SECONDARY)));
                                 if (game.history() != null) source.sendMessage(Component.text("> Played Turns: ", Colors.EXTRA).append(Component.text(game.history().size(), Colors.SECONDARY)));
-                                if (game.currentPlayer() != null) source.sendMessage(Component.text("> Turning: ", Colors.EXTRA).append(Component.text(game.currentPlayer().player.getName(), Colors.SECONDARY)));
+                                if (game.currentPlayer() != null) source.sendMessage(Component.text("> Turning: ", Colors.EXTRA).append(Component.text(game.currentPlayer().name(), Colors.SECONDARY)));
                             }
                             return 1;
                         })
@@ -163,7 +164,7 @@ public final class Commands {
                                                             Location corner1 = context.getArgument("corner1", BlockPositionResolver.class).resolve(context.getSource()).toLocation(world);
                                                             Location corner2 = context.getArgument("corner2", BlockPositionResolver.class).resolve(context.getSource()).toLocation(world);
 
-                                                            Structure structure = new Structure(name, world, Cord.ofLocation(corner1), Cord.ofLocation(corner2));
+                                                            Structure structure = new Structure(name, world, CordMinecraftAdapter.ofLocation(corner1), CordMinecraftAdapter.ofLocation(corner2));
                                                             structure.save();
                                                             StructureManager.add(structure);
                                                             context.getSource().getSender().sendMessage(Component.text("Successfully saved structure with name: " + structure.name, Colors.POSITIVE));
@@ -210,10 +211,10 @@ public final class Commands {
                                     StructureManager.getStructures().forEach(s -> builder.suggest(s.name));
                                     return builder.buildFuture();
                                 })
-                                .then(RequiredArgumentBuilder.<CommandSourceStack, BlockPositionResolver>argument("location", ArgumentTypes.blockPosition())
+                                .then(RequiredArgumentBuilder.<CommandSourceStack, BlockPositionResolver>argument("cord", ArgumentTypes.blockPosition())
                                         .executes(context -> {
                                             String name = context.getArgument("name", String.class);
-                                            Location location = context.getArgument("location", BlockPositionResolver.class).resolve(context.getSource()).toLocation(context.getSource().getLocation().getWorld());
+                                            Location location = context.getArgument("cord", BlockPositionResolver.class).resolve(context.getSource()).toLocation(context.getSource().getLocation().getWorld());
 
                                             Structure structure = StructureManager.structure(name);
                                             if (structure != null) {
@@ -259,7 +260,7 @@ public final class Commands {
                                                 })
                                                 .executes(context -> {
                                                     Player player = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).getFirst();
-                                                    PlayerAnimation.valueOf(context.getArgument("animation", String.class).toUpperCase()).action.accept(player, Cord.ofLocation(player.getLocation()).add(new Cord(-4, 0, -4)));
+                                                    PlayerAnimation.valueOf(context.getArgument("animation", String.class).toUpperCase()).action.accept(player, CordMinecraftAdapter.ofLocation(player.getLocation()).add(new Cord(-4, 0, -4)));
                                                     return 1;
                                                 })
                                         )

@@ -3,9 +3,7 @@ package net.hectus.neobb.util;
 import com.marcpg.libpg.lang.Translation;
 import net.hectus.neobb.game.util.GameManager;
 import net.hectus.neobb.player.NeoPlayer;
-import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -54,10 +52,6 @@ public final class Utilities {
         return 0;
     }
 
-    public static @NotNull Location listToLocation(World world, @NotNull List<Integer> list) {
-        return new Location(world, list.get(0), list.get(1), list.get(2));
-    }
-
     public static <T> void loop(T @NotNull [][][] array, boolean allowNull, Consumer<T> action) {
         for (T[][] vX : array) {
             for (T[] vY : vX) {
@@ -71,7 +65,7 @@ public final class Utilities {
     public static void cancelEvent(@NotNull Cancellable event, Player eventPlayer, boolean started, Predicate<NeoPlayer> additionalPredicate) {
         playerEventAction(eventPlayer, started, additionalPredicate, p -> {
             event.setCancelled(true);
-            p.player.playSound(p.player, Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
+            p.playSound(Sound.ENTITY_VILLAGER_NO, 0.5f);
         });
     }
 

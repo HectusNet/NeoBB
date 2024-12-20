@@ -55,7 +55,7 @@ public class CardGame extends Game {
             return List.of(
                     MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"),
                     Translation.component(l, "scoreboard.turning").color(Colors.BLUE)
-                            .append(Component.text(currentPlayer() == player ? "You" : currentPlayer().player.getName(), Colors.RESET)),
+                            .append(Component.text(currentPlayer() == player ? "You" : currentPlayer().name(), Colors.RESET)),
                     Translation.component(l, "scoreboard.time").color(Colors.BLUE)
                             .append(Component.text(player.game.timeLeft().getPreciselyFormatted(), Colors.RESET)),
                     Translation.component(l, "scoreboard.health").color(Colors.BLUE)

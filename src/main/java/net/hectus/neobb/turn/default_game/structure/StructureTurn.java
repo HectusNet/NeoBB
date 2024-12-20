@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class StructureTurn extends Turn<PlacedStructure> {
-    public StructureTurn(NeoPlayer player) { super(null, null, player); }
+    public StructureTurn(NeoPlayer player) { super(player); }
     public StructureTurn(PlacedStructure data, NeoPlayer player) { super(data, data.lastBlock().getLocation(), player); }
 
     public abstract Structure referenceStructure();

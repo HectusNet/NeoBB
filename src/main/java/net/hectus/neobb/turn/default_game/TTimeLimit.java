@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class TTimeLimit extends OtherTurn<Time> implements NeutralClazz {
     public TTimeLimit(NeoPlayer player) { super(player); }
-    public TTimeLimit(Time data, NeoPlayer player) { super(data, player.player.getLocation(), player); }
+    public TTimeLimit(Time data, NeoPlayer player) { super(data, player.location(), player); }
 
     @Override
     public void apply() {

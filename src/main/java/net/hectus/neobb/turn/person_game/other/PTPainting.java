@@ -69,7 +69,7 @@ public class PTPainting extends OtherTurn<Painting> implements BuffCategory {
             case MATCH -> player.addLuck(20);
             case SKULL_AND_ROSES -> player.game.arena.clear();
             case STAGE -> player.opponents(true).forEach(p -> {
-                p.player.getLocation().getBlock().setType(Material.COBWEB);
+                p.location().getBlock().setType(Material.COBWEB);
                 if (Randomizer.boolByChance(20))
                     p.game.eliminatePlayer(p);
             });

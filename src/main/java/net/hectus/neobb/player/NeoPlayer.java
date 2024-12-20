@@ -1,5 +1,7 @@
 package net.hectus.neobb.player;
 
+import com.marcpg.libpg.storing.Cord;
+import com.marcpg.libpg.storing.CordMinecraftAdapter;
 import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.cosmetic.PlaceParticle;
@@ -15,6 +17,7 @@ import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
@@ -109,6 +112,42 @@ public class NeoPlayer extends Modifiers.Modifiable implements Target, Forwardin
                 .filter(p -> p != this)
                 .toList();
     }
+    @Override
+    public String name() {
+        return player.getName();
+    }
+
+    @Override
+    public UUID uuid() {
+        return player.getUniqueId();
+    }
+
+    @Override
+    public Locale locale() {
+        return player.locale();
+    }
+
+    @Override
+    public void playSound(Sound sound, float volume) {
+        player.playSound(player, sound, volume, 1.0f);
+    }
+
+    @Override
+    public void teleport(Cord cord) {
+        player.teleport(CordMinecraftAdapter.toLocation(cord, player.getWorld()));
+    }
+
+    public Cord cord() {
+        return CordMinecraftAdapter.ofLocation(player.getLocation());
+    }
+
+    public Location location() {
+        return player.getLocation();
+    }
+
+    public void closeInv() {
+        player.closeInventory();
+    }
 
     @Override
     public @NotNull Audience audience() {
@@ -175,14 +214,6 @@ public class NeoPlayer extends Modifiers.Modifiable implements Target, Forwardin
 
     public void armor(double armor) {
         this.armor = Math.max(0.0, armor);
-    }
-
-    public Locale locale() {
-        return player.locale();
-    }
-
-    public UUID uuid() {
-        return player.getUniqueId();
     }
 
     public void fetchDatabase() {

@@ -1,4 +1,3 @@
 package net.hectus.neobb.turn.default_game.attributes.clazz;
 
-public interface ColdClazz extends Clazz {
-}
+public interface ColdClazz extends Clazz {}

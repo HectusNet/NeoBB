@@ -19,9 +19,9 @@ public class TIronBarJail extends StructureTurn implements BuffFunction, Neutral
     protected NeoPlayer trapped = null;
 
     public TIronBarJail(NeoPlayer player) { super(player); }
-    public TIronBarJail(PlacedStructure data, NeoPlayer player, NeoPlayer trapped) {
+    public TIronBarJail(PlacedStructure data, NeoPlayer player) {
         super(data, player);
-        this.trapped = trapped;
+        this.trapped = player.nextPlayer();
     }
 
     @Override
@@ -36,7 +36,8 @@ public class TIronBarJail extends StructureTurn implements BuffFunction, Neutral
 
     @Override
     public void apply() {
-        if (trapped == null) return;
+        // This is not actually checking if the player is INSIDE it, but this is easier and works good enough.
+        if (trapped == null || trapped.location().distance(data.lastBlock().getLocation()) > 1.5) return;
 
         trapped.addModifier(Modifiers.P_NO_MOVE);
         trapped.addModifier(Modifiers.P_DEFAULT_NO_ATTACK);

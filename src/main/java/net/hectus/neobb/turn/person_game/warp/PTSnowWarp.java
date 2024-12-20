@@ -16,7 +16,7 @@ public class PTSnowWarp extends PWarpTurn implements Category {
         super.apply();
         player.game.addModifier(Modifiers.G_PERSON_WHITE_ENTITIES);
 
-        player.game.world().spawn(player.player.getLocation(), Snowman.class);
+        player.game.world().spawn(player.location(), Snowman.class);
         player.game.addModifier(Modifiers.G_PERSON_SNOW_GOLEM);
         player.game.turnScheduler.runTaskTimer("snow_golem", () -> player.opponents(true).forEach(p -> p.damage(1.0)),
                 () -> player.game.hasModifier(Modifiers.G_PERSON_SNOW_GOLEM), 1);

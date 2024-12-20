@@ -6,9 +6,9 @@
 ##____________________ |_| \_| \___| \___/ |____/ |____/  _____________________##
 ##                                Configuration                                ##
 ##                                                                             ##
-##      WEBSITE:       https://hectus.net/neobb                                ##
-##      SOURCE-CODE:   https://github.com/HectusNet/NeoBlockBattles            ##
-##      BUGS & ISSUES: https://github.com/HectusNet/NeoBlockBattles/issues     ##
+##          WEBSITE:       https://hectus.net/neobb                            ##
+##          SOURCE-CODE:   https://github.com/HectusNet/NeoBB                  ##
+##          BUGS & ISSUES: https://github.com/HectusNet/NeoBB/issues           ##
 ##                                                                             ##
 #################################################################################
 
@@ -66,7 +66,7 @@ database:
   passwd: password
 
 
-## The warp location on the map. ##
+## The warp cord on the map. ##
 # The default values assume the Hectus edition of the map
 # and are likely not applicable to your own server.
 warps:

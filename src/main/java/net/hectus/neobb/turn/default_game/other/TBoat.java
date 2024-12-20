@@ -32,7 +32,7 @@ public class TBoat extends OtherTurn<Boat> implements EventFunction, WaterClazz 
         player.nextPlayer().addModifier(Modifiers.P_DEFAULT_BOAT_DAMAGE);
         Bukkit.getScheduler().runTaskTimer(NeoBB.PLUGIN, r -> {
             if (player.nextPlayer().hasModifier(Modifiers.P_DEFAULT_BOAT_DAMAGE)) {
-                player.nextPlayer().player.damage(1.0);
+                player.nextPlayer().damage(1.0);
             } else {
                 r.cancel();
             }

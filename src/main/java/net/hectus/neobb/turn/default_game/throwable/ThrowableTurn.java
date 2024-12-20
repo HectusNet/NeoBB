@@ -9,7 +9,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.inventory.ItemStack;
 
 public abstract class ThrowableTurn extends Turn<Projectile> {
-    public ThrowableTurn(NeoPlayer player) { super(null, null, player); }
+    public ThrowableTurn(NeoPlayer player) { super(player); }
     public ThrowableTurn(Projectile data, Location impact, NeoPlayer player) { super(data, impact, player); }
 
     @Override

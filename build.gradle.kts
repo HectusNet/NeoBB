@@ -24,7 +24,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
     implementation("org.postgresql:postgresql:42.7.4")
     implementation("xyz.xenondevs.invui:invui:1.38")
-    implementation("com.marcpg:libpg:0.1.2")
+    implementation("com.marcpg:libpg:0.1.3")
 }
 
 tasks {

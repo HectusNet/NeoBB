@@ -49,9 +49,9 @@ public class PersonShop extends Shop {
         gui = PagedGui.items().setStructure(
                         "# 0 1 2 3 4 5 6 #", // # = Border
                         "# 7 8 9 a . . . #", // 0-a = Categories
-                        "# # # # # # # # #", // I = Items
-                        "I I I I I I I I I", // D = Done Button
-                        "I I I I I I I I I", // < = Last Page
+                        "# # # # # # # # #", // * = Items
+                        "* * * * * * * * *", // D = Done Button
+                        "* * * * * * * * *", // < = Last Page
                         "< # # # D # # # >") // > = Next Page
                 .setBackground(Items.GRAY_BACKGROUND).addIngredient('#', Items.WHITE_BACKGROUND)
 
@@ -71,7 +71,7 @@ public class PersonShop extends Shop {
                         .name(Translation.component(l, "shop.done.name").color(Colors.ACCENT).decorate(TextDecoration.BOLD))
                         .addLore(Translation.component(l, "shop.done.lore.1").color(Colors.NEUTRAL).decoration(TextDecoration.ITALIC, false))
                         .addLore(Translation.component(l, "shop.done.lore.2").color(Colors.NEUTRAL).decoration(TextDecoration.ITALIC, false))
-                        .build(), (p, e) -> player.player.closeInventory()))
+                        .build(), (p, e) -> player.closeInv()))
                 .addIngredient('<', new Items.PageItem(false))
                 .addIngredient('>', new Items.PageItem(true))
 

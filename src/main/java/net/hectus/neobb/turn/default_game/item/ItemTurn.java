@@ -8,7 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 public abstract class ItemTurn extends Turn<ItemStack> {
-    public ItemTurn(NeoPlayer player) { super(null, null, player); }
+    public ItemTurn(NeoPlayer player) { super(player); }
     public ItemTurn(ItemStack data, Location location, NeoPlayer player) { super(data, location, player); }
 
     @Override

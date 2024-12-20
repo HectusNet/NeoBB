@@ -1,9 +1,10 @@
 package net.hectus.neobb.game.util;
 
+import com.marcpg.libpg.storing.Cord;
+import com.marcpg.libpg.storing.CordMinecraftAdapter;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.Game;
 import net.hectus.neobb.structure.BlockInfo;
-import net.hectus.neobb.util.Cord;
 import net.hectus.neobb.util.Utilities;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -32,7 +33,7 @@ public class Arena {
     }
 
     public void clear() {
-        Utilities.loop(totalPlacedBlocks, false, b -> game.warp().lowCorner().add(b.cord()).toLocation(world).getBlock().setType(Material.AIR));
+        Utilities.loop(totalPlacedBlocks, false, b -> CordMinecraftAdapter.toLocation(game.warp().cord().add(b.cord()), world).getBlock().setType(Material.AIR));
         game.history().forEach(t -> {
             if (t.data() instanceof Entity entity)
                 entity.remove();
@@ -43,7 +44,7 @@ public class Arena {
         for (int x = 0; x < placedBlocks.length; x++) {
             for (int y = 0; y < placedBlocks[0].length; y++) {
                 for (int z = 0; z < placedBlocks[0][0].length; z++) {
-                    Block block = game.warp().lowCorner().add(new Cord(x, y, z)).toLocation(world).getBlock();
+                    Block block = CordMinecraftAdapter.toLocation(game.warp().cord().add(new Cord(x, y, z)), world).getBlock();
                     if (!block.isEmpty())
                         addBlock(block);
                 }
@@ -83,7 +84,7 @@ public class Arena {
     }
 
     public void addBlock(@NotNull Block block) {
-        Cord c = Cord.ofLocation(block.getLocation().clone().subtract(game.warp().location()));
+        Cord c = CordMinecraftAdapter.ofLocation(block.getLocation()).subtract(game.warp().cord());
         setBlock((int) c.x(), (int) c.y(), (int) c.z(), new BlockInfo(c, block.getType()));
         placedBlocksAmount++;
     }

@@ -37,7 +37,7 @@ import java.util.Locale;
  * Source: <a href="https://docs.google.com/document/d/1y05rFNz7QcvB7yoyqvYnPgb925Leq2P-HV-NKBuJUNg">Official Google Document</a>
  */
 public class DefaultGame extends HectusGame {
-    public static final GameInfo INFO = new GameInfo(false, true, 1.0, 25, 9, new Time(3, Time.Unit.MINUTES), 5, DefaultShop.class, DefaultItemLoreBuilder.class, List.of(
+    public static final GameInfo INFO = new GameInfo(false, true, 20.0, 25, 9, new Time(3, Time.Unit.MINUTES), 5, DefaultShop.class, DefaultItemLoreBuilder.class, List.of(
             TIronTrapdoor.class, TCampfire.class, TCauldron.class, TPackedIce.class, TLever.class, TOakStairs.class, TBlueBed.class,
             TPiston.class, TSponge.class, THayBlock.class, TDriedKelpBlock.class, TRepeater.class, TRedCarpet.class, TGreenWool.class,
             TFire.class, TStonecutter.class, TLava.class, TPurpleWool.class, TGreenBed.class, TRedBed.class, TCyanCarpet.class,
@@ -68,7 +68,7 @@ public class DefaultGame extends HectusGame {
 
     @Override
     public void outOfBoundsAction(@NotNull NeoPlayer player) {
-        player.player.damage(2.0);
+        player.damage(2.0);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class DefaultGame extends HectusGame {
             return List.of(
                     MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"),
                     Translation.component(l, "scoreboard.turning").color(Colors.ACCENT)
-                            .append(Component.text(currentPlayer() == player ? Translation.string(l, "scoreboard.turning.you") : currentPlayer().player.getName(), Colors.RESET)),
+                            .append(Component.text(currentPlayer() == player ? Translation.string(l, "scoreboard.turning.you") : currentPlayer().name(), Colors.RESET)),
                     Translation.component(l, "scoreboard.time").color(Colors.ACCENT)
                             .append(Component.text(player.game.timeLeft().getPreciselyFormatted(), Colors.RESET)),
                     Translation.component(l, "scoreboard.luck").color(Colors.ACCENT)
@@ -106,7 +106,7 @@ public class DefaultGame extends HectusGame {
                 return Translation.component(l, "actionbar.you_turning").color(Colors.POSITIVE);
             }
         } else {
-            return Translation.component(l, "actionbar.other_turning", currentPlayer().player.getName()).color(Colors.NEUTRAL);
+            return Translation.component(l, "actionbar.other_turning", currentPlayer().name()).color(Colors.NEUTRAL);
         }
     }
 }

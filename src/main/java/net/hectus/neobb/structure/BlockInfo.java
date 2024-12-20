@@ -1,6 +1,6 @@
 package net.hectus.neobb.structure;
 
-import net.hectus.neobb.util.Cord;
+import com.marcpg.libpg.storing.Cord;
 import org.bukkit.Material;
 
 import java.io.Serializable;

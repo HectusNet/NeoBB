@@ -11,7 +11,7 @@ import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.PagedGui;
 import xyz.xenondevs.invui.gui.ScrollGui;
 import xyz.xenondevs.invui.item.ItemProvider;
-import xyz.xenondevs.invui.item.builder.ItemBuilder;
+import xyz.xenondevs.invui.item.ItemWrapper;
 import xyz.xenondevs.invui.item.builder.SkullBuilder;
 import xyz.xenondevs.invui.item.impl.AbstractItem;
 import xyz.xenondevs.invui.util.MojangApiUtils;
@@ -20,9 +20,9 @@ import java.io.IOException;
 import java.util.function.BiConsumer;
 
 public class Items {
-    public static final ItemStack WHITE_BACKGROUND = new net.hectus.neobb.shop.util.ItemBuilder(Material.WHITE_STAINED_GLASS).name(Component.empty()).build();
-    public static final ItemStack GRAY_BACKGROUND = new net.hectus.neobb.shop.util.ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name(Component.empty()).build();
-    public static final ItemStack BLACK_BACKGROUND = new net.hectus.neobb.shop.util.ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).name(Component.empty()).build();
+    public static final ItemStack WHITE_BACKGROUND = new ItemBuilder(Material.WHITE_STAINED_GLASS).name(Component.empty()).build();
+    public static final ItemStack GRAY_BACKGROUND = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name(Component.empty()).build();
+    public static final ItemStack BLACK_BACKGROUND = new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).name(Component.empty()).build();
 
     public static class ClickItem extends AbstractItem {
         protected final ItemStack item;
@@ -35,7 +35,7 @@ public class Items {
 
         @Override
         public ItemProvider getItemProvider() {
-            return new ItemBuilder(item);
+            return new ItemWrapper(item);
         }
 
         @Override

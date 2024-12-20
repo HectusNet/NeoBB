@@ -1,5 +1,7 @@
 package net.hectus.neobb.turn;
 
+import com.marcpg.libpg.storing.Cord;
+import com.marcpg.libpg.storing.CordMinecraftAdapter;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.default_game.attributes.function.AttackFunction;
 import net.hectus.neobb.turn.default_game.attributes.function.CounterFunction;
@@ -14,15 +16,21 @@ import java.util.List;
 
 public abstract class Turn<T> {
     protected final T data;
-    protected Location location;
+    protected Cord cord;
     protected final NeoPlayer player;
 
     /** Used to create a dummy turn for usage in the shop. */
-    public Turn(NeoPlayer player) { this(null, null, player); }
+    public Turn(NeoPlayer player) { this(null, (Cord) null, player); }
 
-    public Turn(T data, Location location, NeoPlayer player) {
+    public Turn(T data, Cord cord, NeoPlayer player) {
         this.data = data;
-        this.location = location;
+        this.cord = cord;
+        this.player = player;
+    }
+
+    protected Turn(T data, Location location, NeoPlayer player) {
+        this.data = data;
+        this.cord = CordMinecraftAdapter.ofLocation(location);
         this.player = player;
     }
 
@@ -44,8 +52,12 @@ public abstract class Turn<T> {
         return data;
     }
 
+    public Cord cord() {
+        return cord;
+    }
+
     public Location location() {
-        return location.clone();
+        return CordMinecraftAdapter.toLocation(cord, player.game.world());
     }
 
     public NeoPlayer player() {

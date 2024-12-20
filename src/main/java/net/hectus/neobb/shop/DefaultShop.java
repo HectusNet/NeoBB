@@ -53,7 +53,7 @@ public class DefaultShop extends Shop {
             } catch (IndexOutOfBoundsException ignored) {}
             player.inventory.addCoins(turn.cost());
         }
-        player.player.playSound(player.player, Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+        player.playSound(Sound.ENTITY_VILLAGER_NO, 1.0f);
     };
 
     private final Map<String, Pair<FilterState, Predicate<Turn<?>>>> filters = new HashMap<>();
@@ -67,10 +67,10 @@ public class DefaultShop extends Shop {
         if (player.game instanceof LegacyGame) {
             gui = ScrollGui.items().setStructure(
                             "1 # # # # # # # ^", // # = Border
-                            "2 # I I I I I I #", // F = Filters
-                            "3 # I I I I I I #", // I = Items
-                            "4 # I I I I I I #", // D = Done Button
-                            "5 # I I I I I I #", // ^ = Scroll Up
+                            "2 # * * * * * * #", // F = Filters
+                            "3 # * * * * * * #", // * = Items
+                            "4 # * * * * * * #", // D = Done Button
+                            "5 # * * * * * * #", // ^ = Scroll Up
                             "6 # # # D # # # v") // v = Scroll Down
                     .setBackground(Items.BLACK_BACKGROUND).addIngredient('#', Items.GRAY_BACKGROUND)
 
@@ -104,19 +104,19 @@ public class DefaultShop extends Shop {
                             .name(Translation.component(l, "shop.done.name").color(Colors.ACCENT).decorate(TextDecoration.BOLD))
                             .addLore(Translation.component(l, "shop.done.lore.1").color(Colors.NEUTRAL).decoration(TextDecoration.ITALIC, false))
                             .addLore(Translation.component(l, "shop.done.lore.2").color(Colors.NEUTRAL).decoration(TextDecoration.ITALIC, false))
-                            .build(), (p, e) -> player.player.closeInventory()))
+                            .build(), (p, e) -> player.closeInv()))
                     .addIngredient('^', new Items.ScrollItem(true))
                     .addIngredient('v', new Items.ScrollItem(false))
 
-                    .addIngredient('I', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+                    .addIngredient('*', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                     .build();
         } else {
             gui = ScrollGui.items().setStructure(
                             "1 # # # # # # # ^", // # = Border
-                            "2 # I I I I I I #", // F = Filters
-                            "3 # I I I I I I #", // I = Items
-                            "4 # I I I I I I #", // D = Done Button
-                            "5 # I I I I I I #", // ^ = Scroll Up
+                            "2 # * * * * * * #", // F = Filters
+                            "3 # * * * * * * #", // * = Items
+                            "4 # * * * * * * #", // D = Done Button
+                            "5 # * * * * * * #", // ^ = Scroll Up
                             "6 # # # D # # # v") // v = Scroll Down
                     .setBackground(Items.BLACK_BACKGROUND).addIngredient('#', Items.GRAY_BACKGROUND)
 
@@ -154,11 +154,11 @@ public class DefaultShop extends Shop {
                             .name(Translation.component(l, "shop.done.name").color(Colors.ACCENT).decorate(TextDecoration.BOLD))
                             .addLore(Translation.component(l, "shop.done.lore.1").color(Colors.NEUTRAL).decoration(TextDecoration.ITALIC, false))
                             .addLore(Translation.component(l, "shop.done.lore.2").color(Colors.NEUTRAL).decoration(TextDecoration.ITALIC, false))
-                            .build(), (p, e) -> player.player.closeInventory()))
+                            .build(), (p, e) -> player.closeInv()))
                     .addIngredient('^', new Items.ScrollItem(true))
                     .addIngredient('v', new Items.ScrollItem(false))
 
-                    .addIngredient('I', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+                    .addIngredient('*', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                     .build();
         }
     }
@@ -190,7 +190,7 @@ public class DefaultShop extends Shop {
                 .addIngredient('D', new Items.ClickItem(new ItemBuilder(Material.LIME_DYE)
                         .name(Translation.component(l, "shop.done.name").color(Colors.ACCENT).decorate(TextDecoration.BOLD))
                         .build(), (p, e) -> {
-                    player.player.closeInventory();
+                    player.closeInv();
                     open();
                 }));
 
@@ -202,12 +202,12 @@ public class DefaultShop extends Shop {
                 gui.addIngredient((char) ('0' + i + offset), new ItemBuilder(f.getValue().left()).name(Translation.component(l, "info." + category + "." + f.getKey()).color(Colors.ACCENT)).build());
                 gui.addIngredient((char) ('a' + i + offset), state(category + "." + f.getKey(), f.getValue().right(), filters));
             } catch (Exception e) {
-                NeoBB.LOG.warn("Could not add filter to inventory: {}", e.getMessage());
+                NeoBB.LOG.warn("{} - \"{}\": Could not add filter to inventory: {}", player.game.id, player.name(), e.getMessage());
             }
         }
 
         Window.single().setTitle("=== Filter ===").addCloseHandler(() -> {
-            player.player.closeInventory();
+            player.closeInv();
             open();
         }).setGui(gui.build()).open(player.player);
     }
@@ -229,7 +229,7 @@ public class DefaultShop extends Shop {
             } else {
                 filters.remove(name);
             }
-            player.player.closeInventory();
+            player.closeInv();
             filterUsageMenu(f, name.split("\\.")[0]);
         });
     }

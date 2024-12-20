@@ -54,7 +54,7 @@ public class GameEvents implements Listener {
                 p.game.eliminatePlayer(p);
             }
 
-            if (event.hasChangedBlock() && p.game.outOfBounds(p.player.getLocation(), event))
+            if (event.hasChangedBlock() && p.game.outOfBounds(p.location(), event))
                 p.game.outOfBoundsAction(p);
         });
     }

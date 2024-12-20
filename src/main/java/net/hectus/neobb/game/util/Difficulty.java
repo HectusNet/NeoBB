@@ -1,10 +1,9 @@
 package net.hectus.neobb.game.util;
 
 public enum Difficulty {
-    PEACEFUL(false, 0.0, false, true, 2.0),
-    EASY(false, 0.0, false, true, 1.0),
+    EASY(false, 0.0, false, true, 2.0),
     NORMAL(true, 0.75, true, true, 1.0),
-    HARD(true, 1.0, true, false, 1.0),
+    HARD(true, 1.0, true, false, 0.8),
     CHAMP(true, 1.5, true, false, 0.4);
 
     public final boolean allowRanking;

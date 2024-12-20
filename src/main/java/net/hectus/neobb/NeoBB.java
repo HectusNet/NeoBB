@@ -50,7 +50,7 @@ public final class NeoBB extends JavaPlugin {
 
         PLUGIN = this;
         LOG = getSLF4JLogger();
-        DATA_DIR = getDataFolder().toPath();
+        DATA_DIR = getDataPath();
         CONFIG = getConfig();
 
         try {

@@ -108,7 +108,6 @@ public class TurnEvents implements Listener {
     }
 
     private void blockTurn(BlockPlaceEvent event, Block block, @NotNull NeoPlayer player) {
-        NeoBB.LOG.info("Handling a block turn for {} by {}!", block.getType(), player.player.getName());
         switch (player.game) {
             case CardGame ignored -> {
                 switch (block.getType()) {
@@ -231,21 +230,14 @@ public class TurnEvents implements Listener {
     }
 
     private void handleStructure(BlockPlaceEvent event, @NotNull Block block, @NotNull NeoPlayer player) {
-        NeoBB.LOG.info("Handling a structure turn for {} by {}!", block.getType(), player.player.getName());
-
         Structure structure = StructureManager.match(player.game.arena);
-        if (structure == null) {
-            NeoBB.LOG.info("Did not match any structure!");
-            return;
-        } else {
-            NeoBB.LOG.info("Matched structure: {}", structure.name);
-        }
+        if (structure == null) return;
 
         PlacedStructure s = new PlacedStructure(structure, block);
         World w = block.getWorld();
         if (player.game instanceof HectusGame) {
             switch (structure.name) {
-                case "iron_bar_jail" -> player.game.turn(new TIronBarJail(s, player, player.nextPlayer()), event); // TODO: Make the trapped player actually be checked.
+                case "iron_bar_jail" -> player.game.turn(new TIronBarJail(s, player), event);
                 case "oak_door_turtling" -> player.game.turn(new TOakDoorTurtling(s, player), event);
 
                 case "glass_wall" -> player.game.turn(new TGlassWall(s, player), event);

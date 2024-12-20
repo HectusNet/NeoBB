@@ -69,7 +69,7 @@ public abstract class Buff {
 
                 if (turns > 1) { // Not nice, but works. Too lazy to create a proper way.
                     for (int i = 1; i < turns; i++)
-                        player.game.turnScheduler.runTaskLater("extra-turn-" + player.player.getName(), () -> player.addModifier(Modifiers.P_EXTRA_TURN), i);
+                        player.game.turnScheduler.runTaskLater("extra-turn-" + player.name(), () -> player.addModifier(Modifiers.P_EXTRA_TURN), i);
                 }
             } else if (target instanceof TargetObj players) {
                 players.players().forEach(p -> p.addModifier(Modifiers.P_EXTRA_TURN));
@@ -172,13 +172,7 @@ public abstract class Buff {
         @Override
         public void apply(@NotNull NeoPlayer source) {
             if (source.game.history().isEmpty()) return; // Should not happen in any case.
-
-            Target target = getTarget(source);
-            if (target instanceof NeoPlayer player) {
-                player.player.teleport(source.game.history().getLast().location());
-            } else if (target instanceof TargetObj targetObj) {
-                targetObj.players().forEach(p -> p.player.teleport(source.game.history().getLast().location()));
-            }
+            getTarget(source).teleport(source.game.history().getLast().cord());
         }
 
         @Override

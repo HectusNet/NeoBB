@@ -1,9 +1,9 @@
 package net.hectus.neobb.turn.card_game;
 
+import com.marcpg.libpg.storing.Cord;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.Turn;
 import net.hectus.neobb.util.Utilities;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -22,8 +22,8 @@ public abstract class CardTurn extends Turn<Block> {
     }
 
     @Override
-    public Location location() {
-        return location.clone().add(0.5, 0.5, 0.5);
+    public Cord cord() {
+        return cord.add(new Cord(0.5, 0.5, 0.5));
     }
 
     @Override

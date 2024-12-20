@@ -58,7 +58,7 @@ import java.util.Locale;
  * Source: <a href="https://docs.google.com/document/d/1bsNhDuQwWYMZ2S2rbVMgGOIqGsXPzPCjC8K-hDcorZU">Official Google Document</a>
  */
 public class LegacyGame extends HectusGame {
-    public static final GameInfo INFO = new GameInfo(true, true, 1.0, 64, 9, new Time(15, Time.Unit.MINUTES), 15, DefaultShop.class, LegacyItemLoreBuilder.class, List.of(
+    public static final GameInfo INFO = new GameInfo(true, true, 20.0, 64, 9, new Time(15, Time.Unit.MINUTES), 15, DefaultShop.class, LegacyItemLoreBuilder.class, List.of(
             TIronTrapdoor.class, TCampfire.class, TCauldron.class, TPackedIce.class, TLever.class, TOakStairs.class, TBlueBed.class,
             TPiston.class, TSponge.class, THayBlock.class, TDriedKelpBlock.class, TRepeater.class, TRedCarpet.class, TGreenWool.class,
             TFire.class, TStonecutter.class, TLava.class, TGreenBed.class, TRedBed.class, TCyanCarpet.class, TSeaLantern.class,
@@ -97,7 +97,7 @@ public class LegacyGame extends HectusGame {
         }
         if (!difficulty.usageRules && history.isEmpty() && (turn instanceof AttackFunction || turn instanceof WarpTurn)) {
             turn.player().sendMessage(Component.text("You cannot use attacks or warps as the first turn.", Colors.NEGATIVE));
-            turn.player().player.playSound(turn.player().player, Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+            turn.player().playSound(Sound.ENTITY_VILLAGER_NO, 1.0f);
             return true;
         }
         return false;
@@ -117,10 +117,10 @@ public class LegacyGame extends HectusGame {
             return List.of(
                     MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"),
                     Component.empty(),
-                    Component.text(player.player.getName(), Colors.EXTRA),
+                    Component.text(player.name(), Colors.EXTRA),
                     Component.empty(),
                     Translation.component(l, "scoreboard.turning").color(Colors.EXTRA)
-                            .append(Component.text(currentPlayer().player.getName())),
+                            .append(Component.text(currentPlayer().name())),
                     Component.empty(),
                     Translation.component(l, "scoreboard.luck").color(Colors.EXTRA)
                             .append(Component.text(player.luck(), Colors.RESET)),

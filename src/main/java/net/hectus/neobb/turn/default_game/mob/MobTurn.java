@@ -8,7 +8,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 
 public abstract class MobTurn<T extends LivingEntity> extends Turn<T> {
-    public MobTurn(NeoPlayer player) { super(null, null, player); }
+    public MobTurn(NeoPlayer player) { super(player); }
     public MobTurn(T data, NeoPlayer player) { super(data, data.getLocation(), player); }
 
     @Override
