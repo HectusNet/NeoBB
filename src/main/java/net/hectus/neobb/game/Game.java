@@ -323,7 +323,7 @@ public abstract class Game extends Modifiers.Modifiable {
 
     public final void turnCountdownTick() {
         turnCountdown--;
-        if (turnCountdown <= 0) {
+        if (turnCountdown == 0) { // Not <=
             if (history.size() >= players.size() && history.subList(history.size() - players.size(), history.size()).stream().allMatch(t -> t instanceof TTimeLimit)) {
                 players.forEach(p -> p.sendMessage(Translation.component(p.locale(), "gameplay.info.ending.too-slow").color(Colors.NEUTRAL)));
                 draw(false);

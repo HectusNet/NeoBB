@@ -231,7 +231,7 @@ public class NeoPlayer extends Modifiers.Modifiable implements Target, Forwardin
         turns = (int) NeoBB.DATABASE.get(uuid(), "turns", 0);
 
         cosmeticPlaceParticle = PlaceParticle.valueOf((String) NeoBB.DATABASE.get(uuid(), "cosmetic_particle", PlaceParticle.ENCHANTMENT.name()));
-        cosmeticPlaceSound = Sound.valueOf((String) NeoBB.DATABASE.get(uuid(), "cosmetic_place_sound", PlaceParticle.ENCHANTMENT.name()));
+        cosmeticPlaceSound = Sound.valueOf((String) NeoBB.DATABASE.get(uuid(), "cosmetic_place_sound", Sound.BLOCK_NOTE_BLOCK_BELL.name()));
         cosmeticOutline = NamedTextColor.namedColor((Integer) NeoBB.DATABASE.get(uuid(), "cosmetic_outline", NamedTextColor.WHITE.value()));
         cosmeticWinAnimation = PlayerAnimation.valueOf((String) NeoBB.DATABASE.get(uuid(), "cosmetic_win_animation", NamedTextColor.WHITE.value()));
         cosmeticDeathAnimation = PlayerAnimation.valueOf((String) NeoBB.DATABASE.get(uuid(), "cosmetic_death_animation", NamedTextColor.WHITE.value()));
