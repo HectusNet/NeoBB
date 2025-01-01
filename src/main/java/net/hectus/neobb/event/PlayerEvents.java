@@ -78,7 +78,7 @@ public class PlayerEvents implements Listener {
         if (NeoBB.PRODUCTION && available.size() >= NeoBB.CONFIG.getInt("starting-players")) {
             new DefaultGame(Difficulty.NORMAL, player.getWorld(), available);
         } else {
-            player.teleport(new TDefaultWarp(player.getWorld()).location().clone());
+            player.teleport(new TDefaultWarp(player.getWorld()).center.clone());
         }
     }
 
