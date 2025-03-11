@@ -1,12 +1,12 @@
 package net.hectus.neobb.turn.person_game.structure;
 
+import com.marcpg.libpg.util.MinecraftTime;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.structure.Structure;
 import net.hectus.neobb.structure.StructureManager;
 import net.hectus.neobb.turn.default_game.structure.StructureTurn;
 import net.hectus.neobb.turn.person_game.categorization.UtilityCategory;
-import net.hectus.neobb.util.MinecraftTime;
 
 public class PTPumpkinWall extends StructureTurn implements UtilityCategory {
     public PTPumpkinWall(NeoPlayer player) { super(player); }

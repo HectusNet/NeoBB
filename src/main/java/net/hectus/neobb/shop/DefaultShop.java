@@ -2,11 +2,11 @@ package net.hectus.neobb.shop;
 
 import com.marcpg.libpg.lang.Translation;
 import com.marcpg.libpg.storing.Pair;
+import com.marcpg.libpg.util.ItemBuilder;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.mode.LegacyGame;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.shop.util.FilterState;
-import net.hectus.neobb.shop.util.ItemBuilder;
 import net.hectus.neobb.shop.util.Items;
 import net.hectus.neobb.turn.DummyTurn;
 import net.hectus.neobb.turn.Turn;
@@ -102,8 +102,8 @@ public class DefaultShop extends Shop {
 
                     .addIngredient('D', new Items.ClickItem(new ItemBuilder(Material.LIME_DYE)
                             .name(Translation.component(l, "shop.done.name").color(Colors.ACCENT).decorate(TextDecoration.BOLD))
-                            .addLore(Translation.component(l, "shop.done.lore.1").color(Colors.NEUTRAL).decoration(TextDecoration.ITALIC, false))
-                            .addLore(Translation.component(l, "shop.done.lore.2").color(Colors.NEUTRAL).decoration(TextDecoration.ITALIC, false))
+                            .addLore(Translation.component(l, "shop.done.lore.1").color(Colors.NEUTRAL))
+                            .addLore(Translation.component(l, "shop.done.lore.2").color(Colors.NEUTRAL))
                             .build(), (p, e) -> player.closeInv()))
                     .addIngredient('^', new Items.ScrollItem(true))
                     .addIngredient('v', new Items.ScrollItem(false))
@@ -152,8 +152,8 @@ public class DefaultShop extends Shop {
 
                     .addIngredient('D', new Items.ClickItem(new ItemBuilder(Material.LIME_DYE)
                             .name(Translation.component(l, "shop.done.name").color(Colors.ACCENT).decorate(TextDecoration.BOLD))
-                            .addLore(Translation.component(l, "shop.done.lore.1").color(Colors.NEUTRAL).decoration(TextDecoration.ITALIC, false))
-                            .addLore(Translation.component(l, "shop.done.lore.2").color(Colors.NEUTRAL).decoration(TextDecoration.ITALIC, false))
+                            .addLore(Translation.component(l, "shop.done.lore.1").color(Colors.NEUTRAL))
+                            .addLore(Translation.component(l, "shop.done.lore.2").color(Colors.NEUTRAL))
                             .build(), (p, e) -> player.closeInv()))
                     .addIngredient('^', new Items.ScrollItem(true))
                     .addIngredient('v', new Items.ScrollItem(false))

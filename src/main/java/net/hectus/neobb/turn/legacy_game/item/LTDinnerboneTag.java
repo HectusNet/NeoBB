@@ -1,7 +1,7 @@
 package net.hectus.neobb.turn.legacy_game.item;
 
+import com.marcpg.libpg.util.ItemBuilder;
 import net.hectus.neobb.player.NeoPlayer;
-import net.hectus.neobb.shop.util.ItemBuilder;
 import net.hectus.neobb.turn.default_game.CounterFilter;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NeutralClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.CounterFunction;

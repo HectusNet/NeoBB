@@ -1,11 +1,11 @@
 package net.hectus.neobb.turn.person_game.other;
 
+import com.marcpg.libpg.util.MinecraftTime;
 import com.marcpg.libpg.util.Randomizer;
 import net.hectus.neobb.buff.Buff;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.default_game.other.OtherTurn;
 import net.hectus.neobb.turn.person_game.categorization.BuffCategory;
-import net.hectus.neobb.util.MinecraftTime;
 import net.hectus.neobb.util.Modifiers;
 import org.bukkit.Material;
 import org.bukkit.entity.Painting;
@@ -32,23 +32,23 @@ public class PTPainting extends OtherTurn<Painting> implements BuffCategory {
     @Override
     public void apply() {
         super.apply();
-        switch (data.getArt()) {
-            case ALBAN -> new Buff.Luck(Buff.BuffTarget.YOU, 30).apply(player);
-            case AZTEC, AZTEC2 -> {
+        switch (data.getArt().assetId().asMinimalString()) {
+            case "alban" -> new Buff.Luck(Buff.BuffTarget.YOU, 30).apply(player);
+            case "aztec", "aztec2" -> {
                 player.inventory.removeRandom();
                 player.inventory.removeRandom();
             }
-            case BOMB -> player.game.players().forEach(p -> p.damage(5.0));
-            case KEBAB -> player.inventory.removeRandom();
-            case PLANT -> new Buff.ExtraTurn(Buff.BuffTarget.YOU, Randomizer.boolByChance(25) ? 2 : 1).apply(player);
-            case WASTELAND -> player.game.players().forEach(p -> {
+            case "bomb" -> player.game.players().forEach(p -> p.damage(5.0));
+            case "kebab" -> player.inventory.removeRandom();
+            case "plant" -> new Buff.ExtraTurn(Buff.BuffTarget.YOU, Randomizer.boolByChance(25) ? 2 : 1).apply(player);
+            case "wasteland" -> player.game.players().forEach(p -> {
                 p.inventory.clear();
                 p.inventory.fillInRandomly();
             });
-            case COURBET -> player.game.time(MinecraftTime.MIDNIGHT);
-            case POOL -> player.addLuck(99);
-            case SEA, BUST -> player.game.eliminatePlayer(player);
-            case CREEBET -> {
+            case "courbet" -> player.game.time(MinecraftTime.MIDNIGHT);
+            case "pool" -> player.addLuck(99);
+            case "sea", "bust" -> player.game.eliminatePlayer(player);
+            case "creebet" -> {
                 Gui.Builder.Normal gui = Gui.normal().setStructure("0 1 2 3 4 5 6 7 8");
                 ItemStack[] deck = player.nextPlayer().inventory.deck();
                 for (int i = 0; i < deck.length; i++)
@@ -56,7 +56,7 @@ public class PTPainting extends OtherTurn<Painting> implements BuffCategory {
 
                 Window.single().setTitle("Opponent Deck").setGui(gui.build()).open(player.player);
             }
-            case SUNSET -> {
+            case "sunset" -> {
                 List<NeoPlayer> players = player.game.players();
                 double temp = players.getFirst().health();
                 for (int i = 0; i < players.size() - 1; i++) {
@@ -64,20 +64,20 @@ public class PTPainting extends OtherTurn<Painting> implements BuffCategory {
                 }
                 players.getLast().health(temp);
             }
-            case GRAHAM -> player.addModifier(Modifiers.P_NO_MOVE);
-            case WANDERER -> player.game.addModifier(Modifiers.G_PERSON_NO_WIN_CONS);
-            case MATCH -> player.addLuck(20);
-            case SKULL_AND_ROSES -> player.game.arena.clear();
-            case STAGE -> player.opponents(true).forEach(p -> {
+            case "graham" -> player.addModifier(Modifiers.P_NO_MOVE);
+            case "wanderer" -> player.game.addModifier(Modifiers.G_PERSON_NO_WIN_CONS);
+            case "match" -> player.addLuck(20);
+            case "skull_and_roses" -> player.game.arena.clear();
+            case "stage" -> player.opponents(true).forEach(p -> {
                 p.location().getBlock().setType(Material.COBWEB);
                 if (Randomizer.boolByChance(20))
                     p.game.eliminatePlayer(p);
             });
-            case VOID -> {
+            case "void" -> {
                 new Buff.ExtraTurn().apply(player);
                 player.addArmor(1);
             }
-            case WITHER -> player.game.eliminatePlayer(Randomizer.boolByChance(20) ? player.nextPlayer() : player);
+            case "wither" -> player.game.eliminatePlayer(Randomizer.boolByChance(20) ? player.nextPlayer() : player);
         }
     }
 }

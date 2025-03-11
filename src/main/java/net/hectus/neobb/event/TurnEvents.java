@@ -1,9 +1,10 @@
 package net.hectus.neobb.event;
 
+import com.marcpg.libpg.event.CancellableImpl;
+import com.marcpg.libpg.event.PlayerEvent;
 import com.marcpg.libpg.util.Randomizer;
 import io.papermc.paper.event.player.PlayerNameEntityEvent;
 import net.hectus.neobb.NeoBB;
-import net.hectus.neobb.event.custom.CancellableImpl;
 import net.hectus.neobb.game.Game;
 import net.hectus.neobb.game.HectusGame;
 import net.hectus.neobb.game.mode.CardGame;
@@ -61,7 +62,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.TNTPrimeEvent;
 import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -320,7 +320,7 @@ public class TurnEvents implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler
     public void onPlayerInteract(@NotNull PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
@@ -368,7 +368,7 @@ public class TurnEvents implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onHangingPlace(HangingPlaceEvent event) {
+    public void onHangingPlace(@NotNull HangingPlaceEvent event) {
         if (event.getEntity() instanceof Painting painting) {
             NeoPlayer player = GameManager.player(event.getPlayer(), true);
             if (unusable(event.getPlayer(), player, false, event, "You cannot place paintings right now!")) return;
@@ -377,7 +377,6 @@ public class TurnEvents implements Listener {
                 player.game.turn(new PTPainting(painting, player), event);
         }
     }
-
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityPlace(@NotNull EntityPlaceEvent event) {
@@ -500,26 +499,23 @@ public class TurnEvents implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onTNTPrime(@NotNull TNTPrimeEvent event) {
-        if (event.getPrimingEntity() instanceof Player p) {
-            NeoPlayer player = GameManager.player(p, true);
-            if (unusable(p, player, true, event, "You cannot prime tnt right now!")) return;
+    public void onPlayerTNTPrime(PlayerEvent.@NotNull PlayerTNTPrimeEvent event) {
+        NeoPlayer player = GameManager.player(event.player(), true);
+        if (unusable(event.player(), player, true, event, "You cannot prime tnt right now!")) return;
 
-            player.game.turn(new LTTnt(event.getBlock(), player), event);
-        }
+        player.game.turn(new LTTnt(event.getBlock(), player), event);
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPortalCreate(@NotNull PortalCreateEvent event) {
-        if (event.getReason() == PortalCreateEvent.CreateReason.FIRE && event.getEntity() instanceof Player p) {
-            NeoPlayer player = GameManager.player(p, true);
-            if (unusable(p, player, false, event, "You cannot ignite portals right now!")) return;
+    public void onPlayerPortalCreate(PlayerEvent.@NotNull PlayerPortalCreateEvent event) {
+        if (event.getReason() == PortalCreateEvent.CreateReason.FIRE) {
+            NeoPlayer player = GameManager.player(event.player(), true);
+            if (unusable(event.player(), player, false, event, "You cannot ignite portals right now!")) return;
 
             if (player.game.hasModifier(Modifiers.G_LEGACY_PORTAL_AWAIT))
                 player.game.turn(new LTNetherPortal(event.getBlocks(), event.getEntity().getLocation(), player), event);
         }
     }
-
 
     private boolean unusable(Player fallbackPlayer, NeoPlayer player, boolean requireTurning, Cancellable event, String message) {
         if (player == null) {

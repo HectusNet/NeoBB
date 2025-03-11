@@ -1,7 +1,7 @@
 package net.hectus.neobb.turn.card_game;
 
+import com.marcpg.libpg.util.MinecraftTime;
 import net.hectus.neobb.player.NeoPlayer;
-import net.hectus.neobb.util.MinecraftTime;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;

@@ -2,6 +2,7 @@ package net.hectus.neobb.player;
 
 import com.marcpg.libpg.storing.Cord;
 import com.marcpg.libpg.storing.CordMinecraftAdapter;
+import com.marcpg.libpg.util.MinecraftTime;
 import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.cosmetic.PlaceParticle;
@@ -10,23 +11,17 @@ import net.hectus.neobb.game.BossBarGame;
 import net.hectus.neobb.game.Game;
 import net.hectus.neobb.game.mode.PersonGame;
 import net.hectus.neobb.shop.Shop;
-import net.hectus.neobb.util.MinecraftTime;
 import net.hectus.neobb.util.Modifiers;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class NeoPlayer extends Modifiers.Modifiable implements Target, ForwardingAudience.Single {
     private static final ScoreboardManager SCOREBOARD_MANAGER = Bukkit.getScoreboardManager();
@@ -230,11 +225,17 @@ public class NeoPlayer extends Modifiers.Modifiable implements Target, Forwardin
         draws = (int) NeoBB.DATABASE.get(uuid(), "draws", 0);
         turns = (int) NeoBB.DATABASE.get(uuid(), "turns", 0);
 
-        cosmeticPlaceParticle = PlaceParticle.valueOf((String) NeoBB.DATABASE.get(uuid(), "cosmetic_particle", PlaceParticle.ENCHANTMENT.name()));
-        cosmeticPlaceSound = Sound.valueOf((String) NeoBB.DATABASE.get(uuid(), "cosmetic_place_sound", Sound.BLOCK_NOTE_BLOCK_BELL.name()));
-        cosmeticOutline = NamedTextColor.namedColor((Integer) NeoBB.DATABASE.get(uuid(), "cosmetic_outline", NamedTextColor.WHITE.value()));
-        cosmeticWinAnimation = PlayerAnimation.valueOf((String) NeoBB.DATABASE.get(uuid(), "cosmetic_win_animation", NamedTextColor.WHITE.value()));
-        cosmeticDeathAnimation = PlayerAnimation.valueOf((String) NeoBB.DATABASE.get(uuid(), "cosmetic_death_animation", NamedTextColor.WHITE.value()));
+        String cosmeticPlaceParticleValue  = (String) NeoBB.DATABASE.get(uuid(), "cosmetic_particle",        PlaceParticle.ENCHANTMENT.name());
+        String cosmeticPlaceSoundValue     = (String) NeoBB.DATABASE.get(uuid(), "cosmetic_place_sound",     Objects.requireNonNull(Registry.SOUNDS.getKey(Sound.BLOCK_NOTE_BLOCK_BELL)).asString());
+        Integer cosmeticOutlineValue      = (Integer) NeoBB.DATABASE.get(uuid(), "cosmetic_outline",         NamedTextColor.WHITE.value());
+        String cosmeticWinAnimationValue   = (String) NeoBB.DATABASE.get(uuid(), "cosmetic_win_animation",   PlayerAnimation.NONE.name());
+        String cosmeticDeathAnimationValue = (String) NeoBB.DATABASE.get(uuid(), "cosmetic_death_animation", PlayerAnimation.NONE.name());
+
+        cosmeticPlaceParticle = PlaceParticle.valueOf(cosmeticPlaceParticleValue);
+        cosmeticPlaceSound = Registry.SOUNDS.get(Objects.requireNonNull(NamespacedKey.fromString(cosmeticPlaceSoundValue)));
+        cosmeticOutline = NamedTextColor.namedColor(cosmeticOutlineValue);
+        cosmeticWinAnimation = PlayerAnimation.valueOf(cosmeticWinAnimationValue);
+        cosmeticDeathAnimation = PlayerAnimation.valueOf(cosmeticDeathAnimationValue);
     }
 
     // ====================================

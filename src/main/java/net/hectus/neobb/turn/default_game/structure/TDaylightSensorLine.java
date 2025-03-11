@@ -1,5 +1,6 @@
 package net.hectus.neobb.turn.default_game.structure;
 
+import com.marcpg.libpg.util.MinecraftTime;
 import net.hectus.neobb.buff.Buff;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.PlacedStructure;
@@ -11,7 +12,6 @@ import net.hectus.neobb.turn.default_game.attributes.clazz.NatureClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.RedstoneClazz;
 import net.hectus.neobb.turn.default_game.attributes.clazz.WaterClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.CounterbuffFunction;
-import net.hectus.neobb.util.MinecraftTime;
 
 import java.util.List;
 

@@ -1,7 +1,8 @@
 plugins {
     id("java")
-    id("com.gradleup.shadow") version "8.3.0"
-    id("xyz.jpenilla.run-paper") version "2.2.3"
+    id("com.gradleup.shadow") version "8.3.6"
+    id("xyz.jpenilla.run-paper") version "2.3.1"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.14"
 }
 
 group = "net.hectus.neobb"
@@ -12,38 +13,39 @@ java.sourceCompatibility = JavaVersion.VERSION_21
 java.targetCompatibility = JavaVersion.VERSION_21
 
 repositories {
-    mavenLocal()
     mavenCentral()
 
-    maven("https://marcpg.com/repo/")
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://repo.xenondevs.xyz/releases")
+    maven("https://marcpg.com/repo/")
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
-    implementation("org.postgresql:postgresql:42.7.4")
-    implementation("xyz.xenondevs.invui:invui:1.38")
-    implementation("com.marcpg:libpg:0.1.3")
+    paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
+    implementation("com.marcpg:libpg-paper:1.0.0")
+
+    implementation("org.postgresql:postgresql:42.7.5")
+    implementation("com.marcpg:libpg-storage-database-sql:1.0.0")
+
+    compileOnly("xyz.xenondevs.invui:invui:1.44")
 }
 
 tasks {
+    reobfJar {
+        dependsOn(jar)
+    }
     build {
-        dependsOn(shadowJar)
+        dependsOn(shadowJar, reobfJar)
     }
     runServer {
         dependsOn(shadowJar)
-        minecraftVersion("1.21.1")
+        minecraftVersion("1.21.4")
         downloadPlugins {
             url("https://github.com/playit-cloud/playit-minecraft-plugin/releases/latest/download/playit-minecraft-plugin.jar")
         }
     }
     shadowJar {
         archiveClassifier.set("")
-        manifest {
-            // Required for InvUI to properly work. Sadly, it will make paper remap the plugin, which takes a while.
-            attributes["paperweight-mappings-namespace"] = "spigot"
-        }
     }
     processResources {
         exclude("en_US.properties")

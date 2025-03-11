@@ -1,6 +1,8 @@
 package net.hectus.neobb.event;
 
 import com.destroystokyo.paper.event.server.ServerTickEndEvent;
+import com.marcpg.libpg.event.FluidFlowEvent;
+import com.marcpg.libpg.event.NaturalBlockBreakEvent;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.HectusGame;
 import net.hectus.neobb.game.util.GameManager;
@@ -13,8 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
@@ -76,7 +76,6 @@ public class GameEvents implements Listener {
         });
     }
 
-
     // ========== BLOCK EVENTS ==========
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -97,15 +96,13 @@ public class GameEvents implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onBlockBreak(@NotNull BlockBreakEvent event) {
-        if (event.getPlayer().getGameMode() != GameMode.CREATIVE)
-            event.setCancelled(true);
+    public void onNaturalBlockBreak(@NotNull NaturalBlockBreakEvent event) {
+        event.setCancelled(true);
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onBlockFromTo(@NotNull BlockFromToEvent event) { // Cancel fluid flow
-        if (event.getBlock().getType() != Material.DRAGON_EGG)
-            event.setCancelled(true);
+    public void onFluidFlow(@NotNull FluidFlowEvent event) {
+        event.setCancelled(true);
     }
 
     // ========== ENTITY EVENTS ==========

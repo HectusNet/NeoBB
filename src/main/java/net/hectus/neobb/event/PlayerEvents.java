@@ -1,7 +1,7 @@
 package net.hectus.neobb.event;
 
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
-import net.hectus.neobb.NeoBB;
+import com.marcpg.libpg.event.PlayerEvent;
 import net.hectus.neobb.game.mode.DefaultGame;
 import net.hectus.neobb.game.util.Difficulty;
 import net.hectus.neobb.game.util.GameManager;
@@ -16,8 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -33,15 +31,14 @@ public class PlayerEvents implements Listener {
     // ========== INVENTORY EVENTS ==========
 
     @EventHandler(ignoreCancelled = true)
-    public void onInventoryInteract(@NotNull InventoryInteractEvent event) {
-        if (event.getWhoClicked() instanceof Player eventPlayer)
-            Utilities.cancelEvent(event, eventPlayer, true, p -> event.getInventory().getType() == InventoryType.PLAYER);
+    public void onPlayerInventoryInteract(@NotNull PlayerEvent.PlayerInventoryInteractEvent event) {
+        Utilities.cancelEvent(event, event.player(), true, p -> event.getInventory().getType() == InventoryType.PLAYER);
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onInventoryClick(@NotNull InventoryClickEvent event) {
-        if (event.getSlotType() == InventoryType.SlotType.QUICKBAR && event.getClick() == ClickType.DROP && event.getWhoClicked() instanceof Player eventPlayer)
-            Utilities.playerEventAction(eventPlayer, false, p -> !p.game.started(), p -> {
+    public void onPlayerInventoryClick(@NotNull PlayerEvent.PlayerInventoryClickEvent event) {
+        if (event.getSlotType() == InventoryType.SlotType.QUICKBAR && event.getClick() == ClickType.DROP) {
+            Utilities.playerEventAction(event.player(), false, p -> !p.game.started(), p -> {
                 try { // Ignore this hell of code please lol.
                     Component line = Objects.requireNonNull(Objects.requireNonNull(event.getCurrentItem()).lore()).get(1);
                     if (line == null) return;
@@ -50,6 +47,7 @@ public class PlayerEvents implements Listener {
                 } catch (Exception ignored) {}
                 p.inventory.setDeckSlot(event.getSlot(), null, null);
             });
+        }
     }
 
     @EventHandler(ignoreCancelled = true)

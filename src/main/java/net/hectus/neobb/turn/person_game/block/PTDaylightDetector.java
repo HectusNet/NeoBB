@@ -1,9 +1,9 @@
 package net.hectus.neobb.turn.person_game.block;
 
+import com.marcpg.libpg.util.MinecraftTime;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.turn.default_game.block.BlockTurn;
 import net.hectus.neobb.turn.person_game.categorization.CounterCategory;
-import net.hectus.neobb.util.MinecraftTime;
 import org.bukkit.block.Block;
 
 public class PTDaylightDetector extends BlockTurn implements CounterCategory {

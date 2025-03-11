@@ -1,15 +1,16 @@
 package net.hectus.neobb.game;
 
 import com.marcpg.libpg.data.time.Time;
+import com.marcpg.libpg.event.CancellableImpl;
 import com.marcpg.libpg.lang.Translation;
 import com.marcpg.libpg.storing.CordMinecraftAdapter;
+import com.marcpg.libpg.util.MinecraftTime;
 import com.marcpg.libpg.util.Randomizer;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.Rating;
 import net.hectus.neobb.cosmetic.EffectManager;
-import net.hectus.neobb.event.custom.CancellableImpl;
-import net.hectus.neobb.game.util.Difficulty;
 import net.hectus.neobb.game.util.*;
+import net.hectus.neobb.game.util.Difficulty;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.player.TargetObj;
 import net.hectus.neobb.turn.DummyTurn;
@@ -234,7 +235,7 @@ public abstract class Game extends Modifiers.Modifiable {
 
     public void eliminatePlayer(@NotNull NeoPlayer player) {
         if (player.hasModifier(Modifiers.P_REVIVE)) {
-            player.player.playEffect(EntityEffect.TOTEM_RESURRECT);
+            player.player.playEffect(EntityEffect.PROTECTED_FROM_DEATH);
             player.sendMessage(Translation.component(player.locale(), "gameplay.info.revive.use").color(Colors.POSITIVE));
             NeoBB.LOG.info("{}: {} used a revive.", id, player.name());
             player.removeModifier(Modifiers.P_REVIVE);

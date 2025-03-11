@@ -9,7 +9,6 @@ import net.hectus.neobb.util.Colors;
 import net.hectus.neobb.util.Modifiers;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -32,7 +31,7 @@ public abstract class Buff {
     public abstract TextColor color();
 
     public Component line(Locale l) {
-        return Component.text("   | " + text(l) + target(l), color()).decoration(TextDecoration.ITALIC, false);
+        return Component.text("   | " + text(l) + target(l), color());
     }
 
     public String target(Locale l) {

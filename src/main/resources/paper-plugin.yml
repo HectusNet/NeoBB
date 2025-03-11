@@ -10,6 +10,9 @@ version: ${version}
 ### Main Class ###
 main: net.hectus.neobb.NeoBB
 
+### Loader Class ###
+loader: net.hectus.neobb.NeoLoader
+
 ### PaperAPI Version ###
 api-version: '1.21'
 

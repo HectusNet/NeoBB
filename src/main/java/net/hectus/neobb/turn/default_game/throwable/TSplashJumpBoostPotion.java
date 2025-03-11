@@ -1,9 +1,9 @@
 package net.hectus.neobb.turn.default_game.throwable;
 
+import com.marcpg.libpg.util.ItemBuilder;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.buff.Buff;
 import net.hectus.neobb.player.NeoPlayer;
-import net.hectus.neobb.shop.util.ItemBuilder;
 import net.hectus.neobb.turn.default_game.attributes.clazz.SupernaturalClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.BuffFunction;
 import net.hectus.neobb.util.Modifiers;

@@ -1,5 +1,6 @@
 package net.hectus.neobb.turn.legacy_game.structure;
 
+import com.marcpg.libpg.util.MinecraftTime;
 import net.hectus.neobb.buff.Buff;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.PlacedStructure;
@@ -8,7 +9,6 @@ import net.hectus.neobb.structure.StructureManager;
 import net.hectus.neobb.turn.default_game.attributes.clazz.NatureClazz;
 import net.hectus.neobb.turn.default_game.attributes.function.BuffFunction;
 import net.hectus.neobb.turn.default_game.structure.StructureTurn;
-import net.hectus.neobb.util.MinecraftTime;
 
 import java.util.List;
 

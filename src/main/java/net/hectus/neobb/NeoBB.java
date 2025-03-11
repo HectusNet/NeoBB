@@ -2,11 +2,13 @@ package net.hectus.neobb;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.marcpg.libpg.data.database.sql.AutoCatchingSQLConnection;
-import com.marcpg.libpg.data.database.sql.DummySQLConnection;
-import com.marcpg.libpg.data.database.sql.SQLConnection;
+import com.marcpg.libpg.MinecraftLibPG;
 import com.marcpg.libpg.lang.Translation;
-import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import com.marcpg.libpg.storage.connection.AutoCatchingSQLConnection;
+import com.marcpg.libpg.storage.connection.DummySQLConnection;
+import com.marcpg.libpg.storage.connection.SQLConnection;
+import com.marcpg.libpg.storing.tuple.triple.Triad;
+import com.marcpg.libpg.util.ServerUtils;
 import net.hectus.neobb.event.GameEvents;
 import net.hectus.neobb.event.PlayerEvents;
 import net.hectus.neobb.event.TurnEvents;
@@ -27,10 +29,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class NeoBB extends JavaPlugin {
@@ -63,6 +62,9 @@ public final class NeoBB extends JavaPlugin {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        MinecraftLibPG.init(this);
+        InvUI.getInstance().setPlugin(this);
+        StructureManager.load();
 
         PRODUCTION = CONFIG.getBoolean("production");
 
@@ -72,20 +74,14 @@ public final class NeoBB extends JavaPlugin {
             LOG.error("Could not load translations: {}", e.getMessage());
         }
         connectDatabase();
-        StructureManager.load();
 
-        InvUI.getInstance().setPlugin(this);
-
-        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
-            event.registrar().register(Commands.startCommand());
-            event.registrar().register(Commands.giveupCommand());
-            event.registrar().register(Commands.structureCommand());
-            event.registrar().register(Commands.debugCommand());
-        });
-
-        getServer().getPluginManager().registerEvents(new GameEvents(), this);
-        getServer().getPluginManager().registerEvents(new PlayerEvents(), this);
-        getServer().getPluginManager().registerEvents(new TurnEvents(), this);
+        ServerUtils.registerEvents(new GameEvents(), new PlayerEvents(), new TurnEvents());
+        ServerUtils.registerCommands(Triad.of(
+                "Starts a new game.", Commands.gamesCommand(), List.of("match", "round"),
+                "Gives up.", Commands.giveupCommand(), List.of("surrender"),
+                "Does structure-related stuff.", Commands.structureCommand(), List.of(),
+                "For various debugging purposes.", Commands.debugCommand(), List.of("testing")
+        ));
     }
 
     @Override
