@@ -21,7 +21,7 @@ import net.hectus.neobb.turn.default_game.warp.TDefaultWarp;
 import net.hectus.neobb.turn.default_game.warp.WarpTurn;
 import net.hectus.neobb.turn.person_game.categorization.WinConCategory;
 import net.hectus.neobb.util.Colors;
-import net.hectus.neobb.util.MinecraftTime;
+import net.hectus.neobb.util.Configuration;
 import net.hectus.neobb.util.Modifiers;
 import net.hectus.neobb.util.Utilities;
 import net.kyori.adventure.text.Component;
@@ -394,7 +394,7 @@ public abstract class Game extends Modifiers.Modifiable {
         }
         Bukkit.getScheduler().runTaskLater(NeoBB.PLUGIN, () -> {
             initialPlayers.forEach(p -> p.player.kick(Component.text("Game ended!")));
-            if (NeoBB.PRODUCTION) {
+            if (Configuration.PRODUCTION) {
                 Bukkit.getServer().shutdown();
             } else {
                 time(MinecraftTime.DAY);

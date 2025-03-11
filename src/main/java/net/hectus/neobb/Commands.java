@@ -40,8 +40,8 @@ import java.util.Objects;
 public final class Commands {
     private static final List<String> MODES = List.of("default", "card", "legacy", "person98");
 
-    public static LiteralCommandNode<CommandSourceStack> startCommand() {
-        return LiteralArgumentBuilder.<CommandSourceStack>literal("games")
+    public static LiteralCommandNode<CommandSourceStack> gamesCommand() {
+        return LiteralArgumentBuilder.<CommandSourceStack>literal("game")
                 .requires(source -> source.getSender().hasPermission("neobb.games"))
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("start")
                         .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("mode", StringArgumentType.word())

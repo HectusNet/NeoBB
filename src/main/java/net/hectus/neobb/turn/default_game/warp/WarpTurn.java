@@ -3,7 +3,6 @@ package net.hectus.neobb.turn.default_game.warp;
 import com.marcpg.libpg.storing.Cord;
 import com.marcpg.libpg.storing.CordMinecraftAdapter;
 import com.marcpg.libpg.util.Randomizer;
-import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.player.NeoPlayer;
 import net.hectus.neobb.structure.PlacedStructure;
 import net.hectus.neobb.structure.Structure;
@@ -11,6 +10,7 @@ import net.hectus.neobb.structure.StructureManager;
 import net.hectus.neobb.turn.default_game.attributes.clazz.Clazz;
 import net.hectus.neobb.turn.default_game.attributes.function.WarpFunction;
 import net.hectus.neobb.turn.default_game.structure.StructureTurn;
+import net.hectus.neobb.util.Configuration;
 import net.hectus.neobb.util.Modifiers;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -23,14 +23,14 @@ public abstract class WarpTurn extends StructureTurn implements WarpFunction {
 
     public WarpTurn(World world, String name) {
         super(null);
-        this.cord = Cord.ofList(NeoBB.CONFIG.getIntegerList("warps." + name));
+        this.cord = Cord.ofList(Configuration.CONFIG.getIntegerList("warps." + name));
         this.name = name;
         this.center = CordMinecraftAdapter.toLocation(cord, world).add(5, 0, 5);
     }
 
     public WarpTurn(PlacedStructure data, World world, NeoPlayer player, String name) {
         super(data, player);
-        this.cord = Cord.ofList(NeoBB.CONFIG.getIntegerList("warps." + name));
+        this.cord = Cord.ofList(Configuration.CONFIG.getIntegerList("warps." + name));
         this.name = name;
         this.center = CordMinecraftAdapter.toLocation(cord, world).add(5, 0, 5);
     }
@@ -52,7 +52,7 @@ public abstract class WarpTurn extends StructureTurn implements WarpFunction {
     }
 
     public Cord highCorner() {
-        return cord.add(new Cord(9, NeoBB.CONFIG.getInt("max-arena-height"), 9));
+        return cord.add(new Cord(9, Configuration.MAX_ARENA_HEIGHT, 9));
     }
 
     @Override

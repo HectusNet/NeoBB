@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.util.Arena;
+import net.hectus.neobb.util.Configuration;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,15 +53,14 @@ public final class StructureManager {
     }
 
     public static List<Structure> getStructures() {
-        String mode = Objects.requireNonNullElse(NeoBB.CONFIG.getString("structure-mode"), "local");
         try {
-            if (mode.equals("server")) {
+            if (Configuration.STRUCTURE_MODE == Configuration.StructureMode.SERVER) {
                 HttpRequest request = HttpRequest.newBuilder(new URI("https://marcpg.com/neobb/structure/all")).GET().build();
                 String response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString()).body();
                 return new Gson().fromJson(response, new TypeToken<List<Structure>>() {}.getType());
             } else {
                 List<Structure> structures = new ArrayList<>();
-                File[] structureFiles = NeoBB.STRUCTURE_DIR.toFile().listFiles();
+                File[] structureFiles = Configuration.STRUCTURE_MODE.path().toFile().listFiles();
                 if (structureFiles == null || structureFiles.length == 0) return List.of();
                 for (File structureFile : structureFiles) {
                     structures.add(new Gson().fromJson(new FileReader(structureFile), Structure.class));

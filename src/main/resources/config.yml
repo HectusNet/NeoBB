@@ -15,9 +15,9 @@
 
 ## The method of storing and loading structures. ##
 #   Available Methods:
-#     | -> server  : fetch from the global database
 #     | -> local   : in the plugin folder
 #     | -> global  : at '~/.config/neobb-structures' on your system
+#     | -> server  : fetch from the global database
 # Default: server
 structure-mode: server
 

@@ -6,6 +6,7 @@ import net.hectus.neobb.game.mode.DefaultGame;
 import net.hectus.neobb.game.util.Difficulty;
 import net.hectus.neobb.game.util.GameManager;
 import net.hectus.neobb.turn.default_game.warp.TDefaultWarp;
+import net.hectus.neobb.util.Configuration;
 import net.hectus.neobb.util.Modifiers;
 import net.hectus.neobb.util.Utilities;
 import net.kyori.adventure.text.Component;
@@ -73,7 +74,7 @@ public class PlayerEvents implements Listener {
                 .filter(p -> GameManager.player(p, false) == null)
                 .collect(Collectors.toList());
 
-        if (NeoBB.PRODUCTION && available.size() >= NeoBB.CONFIG.getInt("starting-players")) {
+        if (Configuration.PRODUCTION && available.size() >= Configuration.STARTING_PLAYERS) {
             new DefaultGame(Difficulty.NORMAL, player.getWorld(), available);
         } else {
             player.teleport(new TDefaultWarp(player.getWorld()).center.clone());

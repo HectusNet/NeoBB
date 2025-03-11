@@ -5,6 +5,7 @@ import com.marcpg.libpg.storing.Cord;
 import com.marcpg.libpg.storing.Pair;
 import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.util.Arena;
+import net.hectus.neobb.util.Configuration;
 import net.hectus.neobb.util.Utilities;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -49,11 +50,10 @@ public class Structure implements Serializable {
     }
 
     public void save() {
-        String mode = Objects.requireNonNullElse(NeoBB.CONFIG.getString("structure-mode"), "local");
-        if (mode.equals("server")) {
+        if (Configuration.STRUCTURE_MODE == Configuration.StructureMode.SERVER) {
             NeoBB.LOG.warn("Saving structures to the server is not supported yet!");
         } else {
-            File file = NeoBB.STRUCTURE_DIR.resolve(name + ".json").toFile();
+            File file = Configuration.STRUCTURE_MODE.path().resolve(name + ".json").toFile();
             try (FileWriter writer = new FileWriter(file)) {
                 new GsonBuilder().setPrettyPrinting().create().toJson(this, writer);
                 NeoBB.LOG.info("Saved structure {} to {}", name, file.getAbsolutePath());
@@ -64,11 +64,10 @@ public class Structure implements Serializable {
     }
 
     public void remove() throws IOException {
-        String mode = Objects.requireNonNullElse(NeoBB.CONFIG.getString("structure-mode"), "local");
-        if (mode.equals("server")) {
+        if (Configuration.STRUCTURE_MODE == Configuration.StructureMode.SERVER) {
             NeoBB.LOG.warn("Removing structures from the server is not supported yet!");
         } else {
-            Files.delete(NeoBB.STRUCTURE_DIR.resolve(name + ".json"));
+            Files.delete(Configuration.STRUCTURE_MODE.path().resolve(name + ".json"));
             NeoBB.LOG.info("Removed structure {}", name);
         }
     }

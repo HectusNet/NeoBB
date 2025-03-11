@@ -14,20 +14,16 @@ import net.hectus.neobb.event.PlayerEvents;
 import net.hectus.neobb.event.TurnEvents;
 import net.hectus.neobb.game.util.GameManager;
 import net.hectus.neobb.structure.StructureManager;
+import net.hectus.neobb.util.Configuration;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
 import xyz.xenondevs.invui.InvUI;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -38,41 +34,20 @@ public final class NeoBB extends JavaPlugin {
     public static NeoBB PLUGIN;
     public static Logger LOG;
     public static Path DATA_DIR;
-    public static FileConfiguration CONFIG;
     public static AutoCatchingSQLConnection<UUID> DATABASE;
-    public static Path STRUCTURE_DIR;
-    public static boolean PRODUCTION;
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
-
         PLUGIN = this;
         LOG = getSLF4JLogger();
         DATA_DIR = getDataPath();
-        CONFIG = getConfig();
 
-        try {
-            if (Objects.requireNonNullElse(CONFIG.getString("structure-mode"), "local").equals("global")) {
-                STRUCTURE_DIR = new File("~/.config/neobb-structures").toPath();
-            } else {
-                STRUCTURE_DIR = DATA_DIR.resolve("structures");
-            }
-            Files.createDirectories(STRUCTURE_DIR);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Configuration.init(this);
         MinecraftLibPG.init(this);
         InvUI.getInstance().setPlugin(this);
         StructureManager.load();
 
-        PRODUCTION = CONFIG.getBoolean("production");
-
-        try {
-            translations();
-        } catch (Exception e) {
-            LOG.error("Could not load translations: {}", e.getMessage());
-        }
+        translations();
         connectDatabase();
 
         ServerUtils.registerEvents(new GameEvents(), new PlayerEvents(), new TurnEvents());
@@ -91,32 +66,34 @@ public final class NeoBB extends JavaPlugin {
         DATABASE.closeConnection();
     }
 
-    void translations() throws URISyntaxException, IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder(new URI("https://marcpg.com/neobb/lang/all")).GET().build();
-        String response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString()).body();
-        Translation.loadMaps(new Gson().fromJson(response, new TypeToken<Map<Locale, Map<String, String>>>(){}.getType()));
+    void translations() {
+        try {
+            HttpRequest request = HttpRequest.newBuilder(new URI("https://marcpg.com/neobb/lang/all")).GET().build();
+            String response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString()).body();
+            Translation.loadMaps(new Gson().fromJson(response, new TypeToken<Map<Locale, Map<String, String>>>(){}.getType()));
+        } catch (Exception e) {
+            LOG.error("Could not retrieve translations from https://marcpg.com/neobb/lang/all.", e);
+        }
     }
 
     void connectDatabase() {
-        if (CONFIG.getBoolean("database.enabled")) {
+        if (Configuration.DATABASE_ENABLED) {
             try {
-                Class.forName("org.postgresql.Driver"); // Make sure the PostgreSQL driver is loaded.
                 DATABASE = new AutoCatchingSQLConnection<>(
                         SQLConnection.DatabaseType.POSTGRESQL,
-                        Objects.requireNonNull(CONFIG.getString("database.address")),
-                        CONFIG.getInt("database.port"),
-                        CONFIG.getString("database.database"),
-                        CONFIG.getString("database.user"),
-                        CONFIG.getString("database.passwd"),
-                        CONFIG.getString("database.table"),
+                        Objects.requireNonNull(Configuration.CONFIG.getString("database.address")),
+                        Configuration.CONFIG.getInt("database.port", 0),
+                        Configuration.CONFIG.getString("database.database", "hectus"),
+                        Configuration.CONFIG.getString("database.user"),
+                        Configuration.CONFIG.getString("database.passwd"),
+                        Configuration.CONFIG.getString("database.table", "neobb_playerdata"),
                         "uuid",
-                        e -> LOG.error("Database error: {}", e.getMessage())
+                        e -> LOG.error("Database error.", e)
                 );
-                return;
             } catch (Exception e) {
-                LOG.error("Couldn't establish connection to playerdata database! Using a dummy database now.", e);
+                LOG.error("Could not establish connection to database! Using a dummy database instead.", e);
+                DATABASE = new DummySQLConnection<>("table", "uuid");
             }
         }
-        DATABASE = new DummySQLConnection<>("table", "uuid");
     }
 }

@@ -2,9 +2,9 @@ package net.hectus.neobb.game.util;
 
 import com.marcpg.libpg.storing.Cord;
 import com.marcpg.libpg.storing.CordMinecraftAdapter;
-import net.hectus.neobb.NeoBB;
 import net.hectus.neobb.game.Game;
 import net.hectus.neobb.structure.BlockInfo;
+import net.hectus.neobb.util.Configuration;
 import net.hectus.neobb.util.Utilities;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -21,10 +21,10 @@ public class Arena {
     public final Game game;
     public final World world;
 
-    private final BlockInfo[][][] totalPlacedBlocks = new BlockInfo[9][NeoBB.CONFIG.getInt("max-arena-height")][9];
+    private final BlockInfo[][][] totalPlacedBlocks = new BlockInfo[9][Configuration.MAX_ARENA_HEIGHT][9];
 
     private final Set<Material> placedMaterials = new HashSet<>();
-    private BlockInfo[][][] placedBlocks = new BlockInfo[9][NeoBB.CONFIG.getInt("max-arena-height")][9];
+    private BlockInfo[][][] placedBlocks = new BlockInfo[9][Configuration.MAX_ARENA_HEIGHT][9];
     private int placedBlocksAmount = 0;
 
     public Arena(Game game, World world) {
