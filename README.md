@@ -76,13 +76,13 @@ For the colors, please try to use the ones provided in the utility class `Colors
 
 ### Adding new Turns
 
+> [!NOTE]
+> Please just ask MarcPG for help if you are working on it for the first time, because it is a lot easier to explain in person.
+
 Adding new turns is really simple. All you need to do is create a class which meets these requirements:
-1. Starts with the game mode's letter (like L for Legacy) and a T for Turn, like `TTurnName`, `TPurpleWool`, or `LTLegacyTurn`.
+1. Starts with the game mode's letter (like L for Legacy) and followed by T for Turn, like `TTurnName`, `TPurpleWool`, or with the game mode, `LTLegacyTurn` or `PTIronTrapdoor`.
 2. Extends the `Turn<?>` interface, where the type parameter should be the class of the turn's data. For some games, you can also use usage-specific turn classes, like `BlockTurn` and `ItemTurn`, which will also automate some stuff like the getting the required item for you.
 3. Implement the necessary interfaces based on the game it's for.
 4. Implement all required methods, like the `cost()`, `item()`, etc. and additionally also other methods like `apply()`.
 5. Add the turn into the game's `GameInfo` object. It is at the beginning of every game class and shouldn't be hard to find.
 6. Add it to the events in `TurnEvents` or create a new event method in it.
-
-> [!IMPORTANT]
-> Please just ask MarcPG for help if you are working on it for the first time, because it is a lot easier to explain in person.
