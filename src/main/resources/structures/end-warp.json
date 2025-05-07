@@ -1,0 +1,70 @@
+{
+  "name": "end-warp",
+  "materials": {
+    "END_STONE": 4,
+    "OBSIDIAN": 1
+  },
+  "blocks": {
+    "x": 3,
+    "y": 1,
+    "z": 3,
+    "blocks": [
+      [
+        [
+          null,
+          {
+            "cord": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 1.0
+            },
+            "material": "END_STONE"
+          },
+          null
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "END_STONE"
+          },
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 0.0,
+              "z": 1.0
+            },
+            "material": "OBSIDIAN"
+          },
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 0.0,
+              "z": 2.0
+            },
+            "material": "END_STONE"
+          }
+        ]
+      ],
+      [
+        [
+          null,
+          {
+            "cord": {
+              "x": 2.0,
+              "y": 0.0,
+              "z": 1.0
+            },
+            "material": "END_STONE"
+          },
+          null
+        ]
+      ]
+    ]
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "name": "desert-warp",
+  "materials": {
+    "SAND": 4,
+    "SUSPICIOUS_SAND": 1
+  },
+  "blocks": {
+    "x": 3,
+    "y": 1,
+    "z": 3,
+    "blocks": [
+      [
+        [
+          null,
+          {
+            "cord": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 1.0
+            },
+            "material": "SAND"
+          },
+          null
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "SAND"
+          },
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 0.0,
+              "z": 1.0
+            },
+            "material": "SUSPICIOUS_SAND"
+          },
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 0.0,
+              "z": 2.0
+            },
+            "material": "SAND"
+          }
+        ]
+      ],
+      [
+        [
+          null,
+          {
+            "cord": {
+              "x": 2.0,
+              "y": 0.0,
+              "z": 1.0
+            },
+            "material": "SAND"
+          },
+          null
+        ]
+      ]
+    ]
+  }
+}

@@ -31,7 +31,7 @@ max-arena-height: 9
 ## Production Mode ##
 # If this is set to true, the plugin will be loaded in production mode.
 # Production mode will start a game based on the "starting-players" and restart the
-# server once the current game ends. This is only useful for full scale servers.
+# server once the current game ends. This is only useful for full-scale servers.
 production: false
 
 
@@ -52,7 +52,7 @@ database:
   # The address/ip of the database. Can be localhost.
   address: localhost
 
-  # The port of the database. If set to 0, will use the database's default port.
+  # The port of the database. If set to 0, it will use the database's default port.
   port: 5432
 
   # The name of the database.

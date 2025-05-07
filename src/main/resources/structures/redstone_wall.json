@@ -1,0 +1,79 @@
+{
+  "name": "redstone_wall",
+  "materials": {
+    "REDSTONE_BLOCK": 6
+  },
+  "blocks": {
+    "x": 3,
+    "y": 2,
+    "z": 1,
+    "blocks": [
+      [
+        [
+          {
+            "cord": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "REDSTONE_BLOCK"
+          }
+        ],
+        [
+          {
+            "cord": {
+              "x": 0.0,
+              "y": 1.0,
+              "z": 0.0
+            },
+            "material": "REDSTONE_BLOCK"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "REDSTONE_BLOCK"
+          }
+        ],
+        [
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 1.0,
+              "z": 0.0
+            },
+            "material": "REDSTONE_BLOCK"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 2.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "REDSTONE_BLOCK"
+          }
+        ],
+        [
+          {
+            "cord": {
+              "x": 2.0,
+              "y": 1.0,
+              "z": 0.0
+            },
+            "material": "REDSTONE_BLOCK"
+          }
+        ]
+      ]
+    ]
+  }
+}

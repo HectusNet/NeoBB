@@ -1,0 +1,36 @@
+{
+  "name": "person-fire-warp",
+  "materials": {
+    "END_ROD": 1,
+    "LANTERN": 1
+  },
+  "blocks": {
+    "x": 1,
+    "y": 2,
+    "z": 1,
+    "blocks": [
+      [
+        [
+          {
+            "cord": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "END_ROD"
+          }
+        ],
+        [
+          {
+            "cord": {
+              "x": 0.0,
+              "y": 1.0,
+              "z": 0.0
+            },
+            "material": "LANTERN"
+          }
+        ]
+      ]
+    ]
+  }
+}
