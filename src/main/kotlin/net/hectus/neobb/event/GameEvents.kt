@@ -1,8 +1,6 @@
 package net.hectus.neobb.event
 
 import com.destroystokyo.paper.event.server.ServerTickEndEvent
-import com.marcpg.libpg.event.FluidFlowEvent
-import com.marcpg.libpg.event.NaturalBlockBreakEvent
 import net.hectus.neobb.NeoBB
 import net.hectus.neobb.game.GameManager
 import net.hectus.neobb.game.HectusGame
@@ -13,6 +11,8 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockFromToEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
@@ -86,7 +86,6 @@ class GameEvents : Listener {
         playerEventAction(event.player, true) { p ->
             try {
                 p.game.arena.addBlock(event.block)
-                NeoBB.LOG.info("Added block to arena!")
             } catch (e: IndexOutOfBoundsException) {
                 NeoBB.LOG.warn("Placed blocks out of bounds: {}", e.message)
                 event.isCancelled = true
@@ -98,14 +97,18 @@ class GameEvents : Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    fun onNaturalBlockBreak(event: NaturalBlockBreakEvent) {
-        event.isCancelled = true
+    fun onBlockBreak(event: BlockBreakEvent) {
+        if (!event.player.gameMode.isInvulnerable)
+            event.isCancelled = true
     }
 
+
     @EventHandler(ignoreCancelled = true)
-    fun onFluidFlow(event: FluidFlowEvent) {
-        event.isCancelled = true
+    fun onBlockFromTo(event: BlockFromToEvent) {
+        if (event.block.isLiquid)
+            event.isCancelled = true
     }
+
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     fun onEntityTargetLivingEntity(event: EntityTargetLivingEntityEvent) {

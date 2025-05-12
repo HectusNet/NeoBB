@@ -1,5 +1,6 @@
 package net.hectus.neobb.util
 
+import com.marcpg.libpg.storing.Cord
 import net.hectus.neobb.NeoBB
 import org.bukkit.configuration.file.FileConfiguration
 import java.io.File
@@ -16,6 +17,8 @@ object Configuration {
 
     var CONFIG: FileConfiguration private set
 
+    var SPAWN_CORD: Cord private set
+
     var STRUCTURE_MODE: StructureMode private set
     var PRODUCTION: Boolean private set
     var STARTING_PLAYERS: Int private set
@@ -25,6 +28,8 @@ object Configuration {
     init {
         NeoBB.PLUGIN.saveDefaultConfig()
         CONFIG = NeoBB.PLUGIN.config
+
+        SPAWN_CORD = Cord.ofList(CONFIG.getIntegerList("warps.default")).add(Cord(4.5, 0.0, 4.5))
 
         STRUCTURE_MODE = StructureMode.valueOf(CONFIG.getString("structure-mode", "local")!!.uppercase())
         PRODUCTION = CONFIG.getBoolean("production")

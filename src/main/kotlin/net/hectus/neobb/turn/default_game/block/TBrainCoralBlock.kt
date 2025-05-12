@@ -9,7 +9,7 @@ import net.hectus.neobb.turn.default_game.attribute.function.CounterattackFuncti
 import org.bukkit.block.Block
 
 class TBrainCoralBlock(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterattackFunction, WaterClazz {
-    override val cost: Int = 2
+    override val cost: Int = 4
 
     override fun counters(): List<CounterFilter> {
         return listOf(CounterFilter.clazz(RedstoneClazz::class))

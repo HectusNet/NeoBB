@@ -4,6 +4,7 @@ import com.marcpg.libpg.util.Randomizer
 import net.hectus.neobb.player.ForwardingTarget
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.player.Target
+import net.hectus.neobb.util.Constants
 import net.hectus.neobb.util.string
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
@@ -26,7 +27,7 @@ abstract class Buff<T>(protected val data: T, protected val target: BuffTarget) 
     abstract fun color(): TextColor
 
     fun line(locale: Locale): Component {
-        return Component.text("   | ${text(locale)}${target(locale)}", color())
+        return Component.text("${Constants.MINECRAFT_TAB_CHAR}| ${text(locale)}${target(locale)}", color())
     }
 
     fun target(locale: Locale): String {

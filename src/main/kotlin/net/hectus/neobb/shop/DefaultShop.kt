@@ -26,7 +26,6 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.bukkit.Sound
-import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.gui.Gui
@@ -74,7 +73,7 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
                         "item" to Pair(Material.STICK, ItemTurn::class),
                         "mob" to Pair(Material.CREEPER_SPAWN_EGG, MobTurn::class),
                         "throwable" to Pair(Material.EGG, ThrowableTurn::class),
-                        "structure" to Pair(Material.BAMBOO_BLOCK, StructureTurn::class)
+                        "structures" to Pair(Material.BAMBOO_BLOCK, StructureTurn::class)
                     ), "usage")
                 })
                 .addIngredient('2', Items.ClickItem(filter(Material.LAVA_BUCKET, "class")) { _, _ ->
@@ -129,7 +128,7 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
                         "item" to Pair(Material.STICK, ItemTurn::class),
                         "mob" to Pair(Material.CREEPER_SPAWN_EGG, MobTurn::class),
                         "throwable" to Pair(Material.EGG, ThrowableTurn::class),
-                        "structure" to Pair(Material.BAMBOO_BLOCK, StructureTurn::class),
+                        "structures" to Pair(Material.BAMBOO_BLOCK, StructureTurn::class),
                         "glass-wall" to Pair(Material.PURPLE_STAINED_GLASS, GlassWallTurn::class),
                         "other" to Pair(Material.STRUCTURE_BLOCK, OtherTurn::class)
                     ), "usage")
@@ -186,10 +185,10 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
 
     private fun syncContent() {
         gui.setContent(content(dummyTurns.stream()
-                    .filter { t -> filter.values.all { it.second.invoke(t) } }
-                    .flatMap { t -> t.items().stream().map { i -> Pair(ItemBuilder(i).lore(loreBuilder.turn(t).buildWithTooltips(player.locale())).build(), t) } }
-                    .sorted(Comparator.comparing { it.first.displayName().asString() })
-                    .collect(Collectors.toMap({ it.first }, { it.second }, { e, _ -> e }, { linkedMapOf() }))
+            .filter { t -> filter.values.all { it.second.invoke(t) } }
+            .flatMap { t -> t.items().stream().map { i -> Pair(ItemBuilder(i).lore(loreBuilder.turn(t).buildWithTooltips(player.locale())).build(), t) } }
+            .sorted(Comparator.comparing { it.first.displayName().asString() })
+            .collect(Collectors.toMap({ it.first }, { it.second }, { e, _ -> e }, { linkedMapOf() }))
         ))
     }
 
@@ -250,20 +249,7 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
         }
     }
 
-    private fun content(items: LinkedHashMap<ItemStack, Turn<*>>): List<Item> {
-        return items.sequencedKeySet().map { i -> Items.ClickItem(i) { _, e -> when (e.click) {
-            ClickType.LEFT -> buyConsumer.invoke(items, i)
-            ClickType.RIGHT -> repeat(3) {
-                if (!buyConsumer.invoke(items, i))
-                    return@ClickItem
-            }
-            ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> repeat(player.game.info.deckSize) {
-                if (!buyConsumer.invoke(items, i))
-                    return@ClickItem
-            }
-            else -> e.isCancelled = true
-        } } }
-    }
+    private fun content(items: LinkedHashMap<ItemStack, Turn<*>>): List<Item> = content(items, buyConsumer)
 
     private fun filter(item: Material, name: String): ItemStack {
         return ItemBuilder(item)

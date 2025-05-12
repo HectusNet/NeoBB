@@ -9,6 +9,7 @@ import net.hectus.neobb.game.Game
 import net.hectus.neobb.game.mode.PersonGame
 import net.hectus.neobb.shop.Shop
 import net.hectus.neobb.util.Ticking
+import net.hectus.neobb.util.component
 import net.hectus.neobb.util.following
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.audience.ForwardingAudience.Single
@@ -33,7 +34,7 @@ class NeoPlayer(val player: Player, val game: Game): ModifiableImpl(), Target, S
     var databaseInfo: DatabaseInfo = DatabaseInfo(player.uniqueId)
 
     var luck: Int = 20 ; private set
-    var health: Double = 0.0 ; private set
+    var health: Double = game.info.startingHealth ; private set
     var armor: Double = 0.0 ; private set
 
     init {
@@ -103,12 +104,12 @@ class NeoPlayer(val player: Player, val game: Game): ModifiableImpl(), Target, S
         }
 
         val actionbarText = game.actionbar(this)
-        if (actionbarText != null && actionbarText == Component.empty()) {
+        if (actionbarText != null && actionbarText != Component.empty()) {
             player.sendActionBar(actionbarText)
         }
     }
 
-    fun nextPlayer(): NeoPlayer = game.players.following(this)!!
+    fun nextPlayer(): NeoPlayer = game.players.following(this) ?: this
 
     fun opponents(onlyAlive: Boolean = true): MutableList<NeoPlayer> {
         return (if (onlyAlive) game.players else game.initialPlayers).filter { it != this }.toMutableList()

@@ -33,6 +33,8 @@ abstract class Turn<T>(val data: T?, val cord: Cord?, val player: NeoPlayer?) {
     open fun apply() {}
 
     open fun goodChoice(player: NeoPlayer): Boolean {
+        if (!player.game.started) return false
+
         if (!player.game.difficulty.completeRules && (unusable() || !player.game.allows(this))) return false
 
         if ((player.hasModifier(Modifiers.Player.Default.ATTACKED) || player.game.turnScheduler.exists(ScheduleID.FREEZE)) && !player.hasModifier(Modifiers.Player.Default.DEFENDED)) {

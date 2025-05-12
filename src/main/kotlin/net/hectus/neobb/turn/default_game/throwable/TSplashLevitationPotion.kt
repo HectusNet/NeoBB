@@ -26,7 +26,8 @@ class TSplashLevitationPotion(data: Projectile?, cord: Cord?, player: NeoPlayer?
         .build()
 
     override fun apply() {
-        if (player!!.player.hasPotionEffect(PotionEffectType.LEVITATION)) player.removeModifier(Modifiers.Player.EXTRA_TURN)
+        if (player!!.player.hasPotionEffect(PotionEffectType.LEVITATION))
+            player.removeModifier(Modifiers.Player.EXTRA_TURN)
 
         player.game.turnScheduler.runTaskLater(ScheduleID.LEVITATION, 3) {
             player.opponents(true).forEach { p ->

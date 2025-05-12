@@ -19,7 +19,7 @@
 #     | -> global  : at '~/.config/neobb-structures' on your system
 #     | -> server  : fetch from the global database
 # Default: server
-structure-mode: server
+structure-mode: local
 
 
 ## The maximum arena height. ##

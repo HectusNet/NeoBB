@@ -237,13 +237,8 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
 
     fun allShopDone(): Boolean = players.all { it.inventory.shopDone }
 
-    fun info(msg: String) {
-        NeoBB.LOG.info("[G-$id] $msg")
-    }
-
-    fun warn(msg: String) {
-        NeoBB.LOG.warn("[G-$id] $msg")
-    }
+    fun info(msg: String) = NeoBB.LOG.info("[${Constants.GAME_LOG_PREFIX}$id] $msg")
+    fun warn(msg: String) = NeoBB.LOG.warn("[${Constants.GAME_LOG_PREFIX}$id] $msg")
 
     // ==================================================
     // =============== CLOSED GAME LOGIC ================
@@ -305,7 +300,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
             return
         }
 
-        if (difficulty.completeRules && turn.unusable()) {
+        if (turn.unusable()) {
             info("${player.name()} used $turnNamespace incorrectly.")
             player.sendMessage(player.locale().component("gameplay.info.wrong_usage", color = Colors.NEGATIVE))
             player.playSound(Sound.ENTITY_VILLAGER_NO)

@@ -20,12 +20,12 @@ abstract class ItemLoreBuilder {
 
     fun buildWithTooltips(locale: Locale): List<Component> {
         val lore = build(locale).toMutableList()
-        lore.add(SEPARATOR)
-        lore.add(keybindPrefix("key.mouse.left").append(locale.component("item-lore.tooltip.buy")))
-        lore.add(keybindPrefix("key.mouse.right").append(locale.component("item-lore.tooltip.buy_3")))
-        lore.add(keybindPrefix("key.mouse.left").append(Component.text("+ ")).append(keybindPrefix("key.sneak")).append(locale.component("item-lore.tooltip.buy_max")))
-        lore.add(Component.space())
-        lore.add(keybindPrefix("key.drop").append(locale.component("item-lore.tooltip.sell")))
+        lore += SEPARATOR
+        lore += keybindPrefix("key.mouse.left").append(locale.component("item-lore.tooltip.buy"))
+        lore += keybindPrefix("key.mouse.right").append(locale.component("item-lore.tooltip.buy_3"))
+        lore += keybindPrefix("key.mouse.left").append(Component.text("+ ")).append(keybindPrefix("key.sneak")).append(locale.component("item-lore.tooltip.buy_max"))
+        lore += Component.space()
+        lore += keybindPrefix("key.drop").append(locale.component("item-lore.tooltip.sell"))
         return lore
     }
 
@@ -44,9 +44,7 @@ abstract class ItemLoreBuilder {
         return Formatter.lineWrap(text, 50).map { Component.text("   | $it", Colors.BLUE).decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE) }
     }
 
-    protected fun keybindPrefix(key: String): Component {
-        return Component.text("[")
-            .append(Component.keybind(key))
-            .append(Component.text("] "))
-    }
+    protected fun keybindPrefix(key: String): Component = Component.text("[")
+        .append(Component.keybind(key))
+        .append(Component.text("] "))
 }

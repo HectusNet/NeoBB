@@ -43,7 +43,7 @@ class NeoInventory(private var player: NeoPlayer) {
     }
 
     fun sellOne(item: ItemStack) {
-        val index = deck.lastIndexOf(item)
+        val index = deck.indexOfLast { item.isSimilar(it) }
         if (index == -1) return
 
         addCoins(dummyTurns[index]?.cost ?: 0)

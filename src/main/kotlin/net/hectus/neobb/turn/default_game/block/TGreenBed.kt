@@ -10,7 +10,7 @@ import net.hectus.neobb.turn.default_game.attribute.function.CounterattackFuncti
 import org.bukkit.block.Block
 
 class TGreenBed(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterattackFunction, SupernaturalClazz {
-    override val cost: Int = 3
+    override val cost: Int = 2
 
     override fun counters(): List<CounterFilter> {
         return listOf(CounterFilter.clazz(NeutralClazz::class), CounterFilter.clazz(NatureClazz::class))

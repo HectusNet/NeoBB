@@ -4,10 +4,8 @@ import com.marcpg.libpg.storing.Cord
 import net.hectus.neobb.game.util.ScheduleID
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.turn.Turn
-import net.hectus.neobb.util.Colors
-import net.hectus.neobb.util.Modifiers
-import net.hectus.neobb.util.asString
-import net.hectus.neobb.util.string
+import net.hectus.neobb.turn.default_game.attribute.function.BuffFunction
+import net.hectus.neobb.util.*
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
@@ -15,6 +13,11 @@ import java.util.*
 
 class ExtraTurn(data: Int = 1, target: BuffTarget = BuffTarget.YOU): Buff<Int>(data, target) {
     override fun apply(source: NeoPlayer) {
+        if (source.game.history.size >= Constants.MAX_EXTRA_TURNS && source.game.history.takeLast(Constants.MAX_EXTRA_TURNS).all { turn -> turn is BuffFunction && turn.buffs().any { it is ExtraTurn } }) {
+            source.sendMessage("gameplay.info.extra-turn.enough", color = Colors.NEUTRAL)
+            return
+        }
+
         val target = this.target.get(source)
         target.addModifier(Modifiers.Player.EXTRA_TURN)
 
@@ -23,6 +26,8 @@ class ExtraTurn(data: Int = 1, target: BuffTarget = BuffTarget.YOU): Buff<Int>(d
                 target.addModifier(Modifiers.Player.EXTRA_TURN)
             }
         }
+
+        source.game.target(false).sendMessage("gameplay.info.extra-turn", target.name(), color = Colors.NEUTRAL)
     }
 
     override fun text(locale: Locale): String =

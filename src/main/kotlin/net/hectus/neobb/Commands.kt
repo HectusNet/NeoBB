@@ -42,7 +42,7 @@ object Commands {
                 }
                 .then(Commands.argument("difficulty", StringArgumentType.word())
                     .suggests { _, builder ->
-                        GameDifficulty.entries.forEach { builder.suggest(it.name) }
+                        GameDifficulty.entries.forEach { builder.suggest(it.name.lowercase()) }
                         return@suggests builder.buildFuture()
                     }
                     .then(Commands.argument("players", ArgumentTypes.players())
@@ -130,12 +130,12 @@ object Commands {
 
             val player = GameManager.player(sender)
 
-            if (player != null) {
+            if (player != null && player.game.started) {
                 sender.sendMessage(sender.locale().component("command.giveup.confirm", color = Colors.NEUTRAL))
-                player.game.giveup(player)
-            } else {
-                sender.sendMessage(sender.locale().component("command.not_in_game", color = Colors.NEGATIVE))
+                player.game.eliminate(player)
+                return@executes 1
             }
+            sender.sendMessage(sender.locale().component("command.not_in_game", color = Colors.NEGATIVE))
             return@executes 1
         }
         .build()

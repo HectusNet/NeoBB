@@ -97,7 +97,7 @@ class PersonGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDiff
                 Component.text("💎", Colors.PERSON_4).append(locale.component("scoreboard.rank", color = Colors.PERSON_0))
                     .append(Component.text("???")),
                 Component.text("⚔", Colors.PERSON_4).append(locale.component("scoreboard.elo", color = Colors.PERSON_0))
-                    .append(Component.text(player.databaseInfo.elo, Colors.PERSON_3)),
+                    .append(Component.text(player.databaseInfo.elo.toInt(), Colors.PERSON_3)),
                 Component.empty(),
                 Component.empty(),
                 Component.text("mc", Colors.PERSON_1).append(Component.text(".hectus", Colors.PERSON_2)).append(Component.text(".net", Colors.PERSON_3))

@@ -11,30 +11,27 @@ import java.util.*
 
 class PersonItemLoreBuilder: ItemLoreBuilder() {
     override fun build(locale: Locale): List<Component> {
+        val turn = this.turn
         if (turn !is Category) return emptyList()
 
         val lore = mutableListOf<Component>()
 
-        if ((turn?.damage ?: 0.0) > 0.0) {
-            lore.add(
-                Component.text("Damage: ", (turn as Category).categoryColor, TextDecoration.BOLD)
-                    .append(Component.text("${turn!!.damage} hearts."))
-            )
+        if (turn.damage > 0.0) {
+            lore += Component.text("Damage: ", turn.categoryColor, TextDecoration.BOLD)
+                .append(Component.text("${turn.damage} hearts."))
         }
 
         if (turn is CounterFunction) {
-            lore.add(locale.component("item-lore.counters", color = (turn as Category).categoryColor, decoration = TextDecoration.BOLD)
-                .append(Component.text((turn as CounterFunction).counters().joinToString(", ") { it.text(locale) })))
+            lore += locale.component("item-lore.counters", color = turn.categoryColor, decoration = TextDecoration.BOLD)
+                .append(Component.text(turn.counters().joinToString(", ") { it.text(locale) }))
         }
         if (turn is PWarpTurn) {
-            lore.add(
-                Component.text("Probability: ", (turn as Category).categoryColor, TextDecoration.BOLD)
-                    .append(Component.text((turn as PWarpTurn).chance.toString() + "%"))
-            )
+            lore += Component.text("Probability: ", turn.categoryColor, TextDecoration.BOLD)
+                .append(Component.text(turn.chance.toString() + "%"))
         }
         if (turn is BuffFunction) {
-            lore.addAll((turn as BuffFunction).buffs().map { b -> Component.text("Probability: ", (turn as Category).categoryColor, TextDecoration.BOLD)
-                .append(Component.text(b.text(locale) + b.target(locale), b.color())) }.toList())
+            lore += turn.buffs().map { b -> Component.text("Probability: ", turn.categoryColor, TextDecoration.BOLD)
+                .append(Component.text(b.text(locale) + b.target(locale), b.color())) }.toList()
         }
 
         return lore

@@ -25,7 +25,8 @@ class TSplashJumpBoostPotion(data: Projectile?, cord: Cord?, player: NeoPlayer?)
         .build()
 
     override fun apply() {
-        if (player!!.player.hasPotionEffect(PotionEffectType.LEVITATION)) player.removeModifier(Modifiers.Player.EXTRA_TURN)
+        if (player!!.player.hasPotionEffect(PotionEffectType.JUMP_BOOST))
+            player.removeModifier(Modifiers.Player.EXTRA_TURN)
 
         player.opponents(true).forEach { p ->
             if (p.player.hasPotionEffect(PotionEffectType.JUMP_BOOST)) {

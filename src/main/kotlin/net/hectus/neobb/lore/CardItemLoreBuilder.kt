@@ -7,12 +7,12 @@ class CardItemLoreBuilder: ItemLoreBuilder() {
     override fun build(locale: Locale): List<Component> {
         val lore = mutableListOf<Component>()
 
-        lore.add(SEPARATOR)
-        lore.add(key(locale, "item-lore.damage", "❖").append(Component.text(turn?.damage ?: 0.0)))
+        lore += SEPARATOR
+        lore += key(locale, "item-lore.damage", "❖").append(Component.text(turn?.damage ?: 0.0))
         if (turn?.requiresUsageGuide == true) {
-            lore.add(SEPARATOR)
-            lore.add(key(locale, "item-lore.usage", "➽"))
-            lore.addAll(longText(locale, "usage.card-game"))
+            lore += SEPARATOR
+            lore += key(locale, "item-lore.usage", "➽")
+            lore += longText(locale, "usage.card-game")
         }
 
         return lore

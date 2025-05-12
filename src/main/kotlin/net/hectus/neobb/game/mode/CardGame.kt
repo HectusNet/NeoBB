@@ -26,7 +26,7 @@ class CardGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDiffic
     override val info: GameInfo = GameInfo(
         namespace = "card",
         hasStructures = false,
-        startingHealth = 50.0,
+        startingHealth = 40.0,
         coins = 0,
         deckSize = 5,
         turnTimer = 15,

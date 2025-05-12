@@ -1,12 +1,11 @@
 package net.hectus.neobb.game.util
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import net.hectus.neobb.NeoBB
 import net.hectus.neobb.game.Game
+import net.hectus.neobb.util.Constants
 import kotlin.io.path.createDirectories
 import kotlin.io.path.writeText
-import kotlin.time.Clock
 
 @Serializable
 private data class GameReplay(
@@ -47,7 +46,7 @@ fun Game.saveReplay() {
         winner = players.firstOrNull()?.name()
     )
 
-    val filename = "replay-${Clock.System.now()}-$id.json"
-    NeoBB.DATA_DIR.resolve("replays").createDirectories().resolve(filename).writeText(Json.encodeToString(replay))
+    val filename = "replay-${System.currentTimeMillis()}-$id.json"
+    NeoBB.DATA_DIR.resolve("replays").createDirectories().resolve(filename).writeText(Constants.JSON.encodeToString(replay))
     info("Saved replay data to replays/$filename")
 }

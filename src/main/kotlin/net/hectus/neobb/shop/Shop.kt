@@ -37,4 +37,19 @@ abstract class Shop(val player: NeoPlayer) {
             player.sendMessage(player.locale().component("shop.wait", color = Colors.EXTRA))
         }
     }
+
+    protected fun content(items: LinkedHashMap<ItemStack, Turn<*>>, consumer: (Map<ItemStack, Turn<*>>, ItemStack) -> Boolean): List<Item> {
+        return items.sequencedKeySet().map { i -> Items.ClickItem(i) { _, e -> when (e.click) {
+            ClickType.LEFT -> consumer(items, i)
+            ClickType.RIGHT -> repeat(3) {
+                if (!consumer(items, i))
+                    return@ClickItem
+            }
+            ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> repeat(player.game.info.deckSize) {
+                if (!consumer(items, i))
+                    return@ClickItem
+            }
+            else -> e.isCancelled = true
+        } } }
+    }
 }

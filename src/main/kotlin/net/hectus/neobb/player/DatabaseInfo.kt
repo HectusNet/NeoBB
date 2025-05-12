@@ -43,7 +43,7 @@ class DatabaseInfo(val uuid: UUID) {
 
         placeParticle = enumValueNoCase(getString("cosmetic_particle", PlaceParticle.ENCHANTMENT.name))
 
-        placeSound = Registry.SOUNDS.get(Key.key(getString("cosmetic_place_sound"))) ?: Sound.BLOCK_NOTE_BLOCK_BELL
+        placeSound = Registry.SOUNDS.get(Key.key(getString("cosmetic_place_sound", "block.note_block.bell"))) ?: Sound.BLOCK_NOTE_BLOCK_BELL
         outline = NamedTextColor.namedColor(getInt("cosmetic_outline", NamedTextColor.WHITE.value())) ?: NamedTextColor.WHITE
         winAnimation = enumValueNoCase(getString("cosmetic_win_animation", PlayerAnimation.NONE.name))
         deathAnimation = enumValueNoCase(getString("cosmetic_death_animation", PlayerAnimation.NONE.name))

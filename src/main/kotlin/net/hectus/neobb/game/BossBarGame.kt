@@ -2,6 +2,7 @@ package net.hectus.neobb.game
 
 import net.hectus.neobb.game.util.GameDifficulty
 import net.hectus.neobb.util.Ticking
+import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.text.Component
 import org.bukkit.World
@@ -16,6 +17,7 @@ abstract class BossBarGame(world: World, bukkitPlayers: List<Player>, difficulty
 
     override fun extraEnd(force: Boolean) {
         bossBar.removeViewer(target(false))
+        bossBar.viewers().forEach { bossBar.removeViewer(it as Audience) }
     }
 
     override fun extraTick(tick: Ticking.Tick) {

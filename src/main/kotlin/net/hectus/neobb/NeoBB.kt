@@ -61,7 +61,7 @@ class NeoBB : JavaPlugin() {
 
     override fun onDisable() {
         GameManager.GAMES.values.forEach { it.draw(true) }
-        Bukkit.unloadWorld("world", false) // Prevent saving of the worlds.
+        Bukkit.unloadWorld("world", false) // Prevent the saving of the worlds.
         DATABASE.closeConnection()
     }
 
@@ -82,7 +82,7 @@ class NeoBB : JavaPlugin() {
 
     private fun connectDatabase() {
         if (Configuration.DATABASE_ENABLED) {
-            runCatching {
+            try {
                 DATABASE = AutoCatchingSQLConnection(
                     SQLConnection.DatabaseType.POSTGRESQL,
                     Configuration.CONFIG.getString("database.address")!!,
@@ -93,10 +93,13 @@ class NeoBB : JavaPlugin() {
                     Configuration.CONFIG.getString("database.table", "neobb_playerdata"),
                     "uuid"
                 ) { LOG.error("Database error.", it) }
-            }.onFailure { e ->
+                LOG.info("Connected to real database.")
+                return
+            } catch (e: Exception) {
                 LOG.error("Could not establish connection to database! Using a dummy database instead.", e)
-                DATABASE = DummySQLConnection("table", "uuid")
             }
         }
+        LOG.info("Connected to dummy database.")
+        DATABASE = DummySQLConnection("table", "uuid")
     }
 }
