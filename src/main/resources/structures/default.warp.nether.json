@@ -1,0 +1,70 @@
+{
+  "name": "default.warp.nether",
+  "materials": {
+    "MAGMA_BLOCK": 1,
+    "NETHERRACK": 4
+  },
+  "blocks": {
+    "x": 3,
+    "y": 1,
+    "z": 3,
+    "blocks": [
+      [
+        [
+          null,
+          {
+            "cord": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 1.0
+            },
+            "material": "NETHERRACK"
+          },
+          null
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "NETHERRACK"
+          },
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 0.0,
+              "z": 1.0
+            },
+            "material": "MAGMA_BLOCK"
+          },
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 0.0,
+              "z": 2.0
+            },
+            "material": "NETHERRACK"
+          }
+        ]
+      ],
+      [
+        [
+          null,
+          {
+            "cord": {
+              "x": 2.0,
+              "y": 0.0,
+              "z": 1.0
+            },
+            "material": "NETHERRACK"
+          },
+          null
+        ]
+      ]
+    ]
+  }
+}

@@ -1,15 +1,20 @@
 package net.hectus.neobb.turn.legacy_game.warp
 
+import com.marcpg.libpg.storing.Cord
 import net.hectus.neobb.buff.Luck
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.structure.PlacedStructure
+import net.hectus.neobb.structure.StaticStructure
+import net.hectus.neobb.structure.StaticStructures
 import net.hectus.neobb.turn.default_game.attribute.clazz.Clazz
 import net.hectus.neobb.turn.default_game.attribute.clazz.NeutralClazz
 import net.hectus.neobb.turn.default_game.attribute.clazz.SupernaturalClazz
 import net.hectus.neobb.util.Utilities
 import kotlin.reflect.KClass
 
-class LTBookWarp(data: PlacedStructure?, player: NeoPlayer?) : LWarpTurn(data, "book", player) {
+class LTBookWarp(data: PlacedStructure?, cord: Cord, player: NeoPlayer?) : LWarpTurn(data, cord, "book", player) {
+    override val staticStructure: StaticStructure = StaticStructures.Legacy.Warp.BOOK
+
     override val cost: Int = 4
     override val chance: Double = 20.0
     override val allows: List<KClass<out Clazz>> = listOf(NeutralClazz::class, SupernaturalClazz::class)

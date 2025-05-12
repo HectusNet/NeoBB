@@ -5,8 +5,8 @@ import com.marcpg.libpg.util.MinecraftTime
 import net.hectus.neobb.buff.Buff
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.structure.PlacedStructure
-import net.hectus.neobb.structure.Structure
-import net.hectus.neobb.structure.StructureManager
+import net.hectus.neobb.structure.StaticStructure
+import net.hectus.neobb.structure.StaticStructures
 import net.hectus.neobb.turn.default_game.CounterFilter
 import net.hectus.neobb.turn.default_game.attribute.clazz.HotClazz
 import net.hectus.neobb.turn.default_game.attribute.clazz.NatureClazz
@@ -18,7 +18,7 @@ import net.hectus.neobb.turn.default_game.structure.StructureTurn
 
 class LTDaylightSensorStrip(data: PlacedStructure?, cord: Cord?, player: NeoPlayer?) : StructureTurn(data, cord, player), BuffFunction, CounterFunction, RedstoneClazz {
     override val cost: Int = 6
-    override val referenceStructure: Structure = StructureManager["legacy-daylight_sensor_strip"]!!
+    override val staticStructure: StaticStructure = StaticStructures.Legacy.DAYLIGHT_SENSOR_STRIP
 
     override fun apply() {
         player!!.game.time = MinecraftTime.DAY

@@ -1,13 +1,18 @@
 package net.hectus.neobb.turn.person_game.warp
 
+import com.marcpg.libpg.storing.Cord
 import net.hectus.neobb.buff.Buff
 import net.hectus.neobb.buff.Effect
 import net.hectus.neobb.game.util.ScheduleID
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.structure.PlacedStructure
+import net.hectus.neobb.structure.StaticStructure
+import net.hectus.neobb.structure.StaticStructures
 import org.bukkit.potion.PotionEffectType
 
-class PTVoidWarp(data: PlacedStructure?, player: NeoPlayer?) : PWarpTurn(data, "void", player) {
+class PTVoidWarp(data: PlacedStructure?, cord: Cord, player: NeoPlayer?) : PWarpTurn(data, cord, "void", player) {
+    override val staticStructure: StaticStructure = StaticStructures.Person.Warp.VOID
+
     override val chance: Double = 20.0
 
     override fun apply() {

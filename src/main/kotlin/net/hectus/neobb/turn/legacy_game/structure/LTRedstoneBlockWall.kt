@@ -6,8 +6,8 @@ import net.hectus.neobb.buff.ExtraTurn
 import net.hectus.neobb.game.util.ScheduleID
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.structure.PlacedStructure
-import net.hectus.neobb.structure.Structure
-import net.hectus.neobb.structure.StructureManager
+import net.hectus.neobb.structure.StaticStructure
+import net.hectus.neobb.structure.StaticStructures
 import net.hectus.neobb.turn.default_game.attribute.clazz.NatureClazz
 import net.hectus.neobb.turn.default_game.attribute.function.BuffFunction
 import net.hectus.neobb.turn.default_game.structure.StructureTurn
@@ -16,7 +16,7 @@ import org.bukkit.util.Vector
 
 class LTRedstoneBlockWall(data: PlacedStructure?, cord: Cord?, player: NeoPlayer?) : StructureTurn(data, cord, player), BuffFunction, NatureClazz {
     override val cost: Int = 6
-    override val referenceStructure: Structure = StructureManager["legacy-redstone_block_wall"]!!
+    override val staticStructure: StaticStructure = StaticStructures.Legacy.REDSTONE_BLOCK_WALL
 
     override fun apply() {
         val nextPlayer = player!!.nextPlayer().player

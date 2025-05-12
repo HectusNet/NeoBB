@@ -4,8 +4,8 @@ import com.marcpg.libpg.storing.Cord
 import net.hectus.neobb.game.util.ScheduleID
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.structure.PlacedStructure
-import net.hectus.neobb.structure.Structure
-import net.hectus.neobb.structure.StructureManager
+import net.hectus.neobb.structure.StaticStructure
+import net.hectus.neobb.structure.StaticStructures
 import net.hectus.neobb.turn.default_game.CounterFilter
 import net.hectus.neobb.turn.default_game.attribute.clazz.HotClazz
 import net.hectus.neobb.turn.default_game.attribute.clazz.NeutralClazz
@@ -18,7 +18,7 @@ import org.bukkit.inventory.ItemStack
 
 class TOakDoorTurtling(data: PlacedStructure?, cord: Cord?, player: NeoPlayer?) : StructureTurn(data, cord, player), DefenseFunction, NeutralClazz {
     override val cost: Int = 4
-    override val referenceStructure: Structure = StructureManager["oak_door_turtling"]!!
+    override val staticStructure: StaticStructure = StaticStructures.Default.OAK_DOOR_TURTLING
 
     override fun items(): List<ItemStack> {
         // Not sure if it would be OAK_DOOR or some lower part thing with the automatic item detection based on the saved structure.

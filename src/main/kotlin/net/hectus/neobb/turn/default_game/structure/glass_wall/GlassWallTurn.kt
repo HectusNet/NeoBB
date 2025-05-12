@@ -8,8 +8,6 @@ import net.hectus.neobb.game.mode.DefaultGame
 import net.hectus.neobb.game.util.ScheduleID
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.structure.PlacedStructure
-import net.hectus.neobb.structure.Structure
-import net.hectus.neobb.structure.StructureManager
 import net.hectus.neobb.turn.default_game.attribute.function.BuffFunction
 import net.hectus.neobb.turn.default_game.attribute.function.DefenseFunction
 import net.hectus.neobb.turn.default_game.structure.StructureTurn
@@ -17,12 +15,8 @@ import net.hectus.neobb.util.Modifiers
 
 abstract class GlassWallTurn(data: PlacedStructure?, cord: Cord?, player: NeoPlayer?) : StructureTurn(data, cord, player), DefenseFunction, BuffFunction {
     override val cost: Int = 5
-    override val referenceStructure: Structure
-        get() = StructureManager[color().lowercase() + "_glass_wall"]!!
 
     private var stay: Boolean = false
-
-    open fun color(): String = this::class.simpleName!!.removePrefix("T").removeSuffix("GlassWall").lowercase()
 
     override fun applyDefense() {
         player!!.addModifier(Modifiers.Player.Default.DEFENDED)

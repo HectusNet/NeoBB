@@ -5,8 +5,8 @@ import net.hectus.neobb.buff.Buff
 import net.hectus.neobb.game.util.ScheduleID
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.structure.PlacedStructure
-import net.hectus.neobb.structure.Structure
-import net.hectus.neobb.structure.StructureManager
+import net.hectus.neobb.structure.StaticStructure
+import net.hectus.neobb.structure.StaticStructures
 import net.hectus.neobb.turn.default_game.CounterFilter
 import net.hectus.neobb.turn.default_game.attribute.clazz.NeutralClazz
 import net.hectus.neobb.turn.default_game.attribute.clazz.RedstoneClazz
@@ -17,7 +17,7 @@ import net.hectus.neobb.util.Modifiers
 
 class TIronBarJail(data: PlacedStructure?, cord: Cord?, player: NeoPlayer?) : StructureTurn(data, cord, player), BuffFunction, NeutralClazz {
     override val cost: Int = 7
-    override val referenceStructure: Structure = StructureManager["iron_bar_jail"]!!
+    override val staticStructure: StaticStructure = StaticStructures.Default.IRON_BAR_JAIL
 
     private val trapped: NeoPlayer?
         get() = player?.nextPlayer()

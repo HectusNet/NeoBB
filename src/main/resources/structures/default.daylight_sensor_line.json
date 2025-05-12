@@ -1,0 +1,97 @@
+{
+  "name": "default.daylight_sensor_line",
+  "materials": {
+    "DAYLIGHT_DETECTOR": 7
+  },
+  "blocks": {
+    "x": 7,
+    "y": 1,
+    "z": 1,
+    "blocks": [
+      [
+        [
+          {
+            "cord": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "DAYLIGHT_DETECTOR"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "DAYLIGHT_DETECTOR"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 2.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "DAYLIGHT_DETECTOR"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 3.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "DAYLIGHT_DETECTOR"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 4.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "DAYLIGHT_DETECTOR"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 5.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "DAYLIGHT_DETECTOR"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 6.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "DAYLIGHT_DETECTOR"
+          }
+        ]
+      ]
+    ]
+  }
+}

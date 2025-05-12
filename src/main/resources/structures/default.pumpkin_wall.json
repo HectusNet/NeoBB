@@ -1,0 +1,167 @@
+{
+  "name": "default.pumpkin_wall",
+  "materials": {
+    "JACK_O_LANTERN": 14
+  },
+  "blocks": {
+    "x": 7,
+    "y": 2,
+    "z": 1,
+    "blocks": [
+      [
+        [
+          {
+            "cord": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "JACK_O_LANTERN"
+          }
+        ],
+        [
+          {
+            "cord": {
+              "x": 0.0,
+              "y": 1.0,
+              "z": 0.0
+            },
+            "material": "JACK_O_LANTERN"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "JACK_O_LANTERN"
+          }
+        ],
+        [
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 1.0,
+              "z": 0.0
+            },
+            "material": "JACK_O_LANTERN"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 2.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "JACK_O_LANTERN"
+          }
+        ],
+        [
+          {
+            "cord": {
+              "x": 2.0,
+              "y": 1.0,
+              "z": 0.0
+            },
+            "material": "JACK_O_LANTERN"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 3.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "JACK_O_LANTERN"
+          }
+        ],
+        [
+          {
+            "cord": {
+              "x": 3.0,
+              "y": 1.0,
+              "z": 0.0
+            },
+            "material": "JACK_O_LANTERN"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 4.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "JACK_O_LANTERN"
+          }
+        ],
+        [
+          {
+            "cord": {
+              "x": 4.0,
+              "y": 1.0,
+              "z": 0.0
+            },
+            "material": "JACK_O_LANTERN"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 5.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "JACK_O_LANTERN"
+          }
+        ],
+        [
+          {
+            "cord": {
+              "x": 5.0,
+              "y": 1.0,
+              "z": 0.0
+            },
+            "material": "JACK_O_LANTERN"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 6.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "JACK_O_LANTERN"
+          }
+        ],
+        [
+          {
+            "cord": {
+              "x": 6.0,
+              "y": 1.0,
+              "z": 0.0
+            },
+            "material": "JACK_O_LANTERN"
+          }
+        ]
+      ]
+    ]
+  }
+}

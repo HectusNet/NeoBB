@@ -2,6 +2,8 @@ package net.hectus.neobb.player
 
 import com.marcpg.libpg.data.modifiable.ModifiableImpl
 import com.marcpg.libpg.storing.Cord
+import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -73,5 +75,9 @@ open class ForwardingTarget(private val players: MutableList<NeoPlayer>): Modifi
 
     override fun eachNeoPlayer(action: (NeoPlayer) -> Unit) {
         players.forEach { it.eachNeoPlayer(action) }
+    }
+
+    override fun sendMessage(key: String, vararg variables: String?, color: TextColor?, decoration: TextDecoration?) {
+        players.forEach { it.sendMessage(key, *variables, color = color, decoration = decoration) }
     }
 }

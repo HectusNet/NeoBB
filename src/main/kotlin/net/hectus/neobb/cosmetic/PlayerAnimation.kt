@@ -36,7 +36,7 @@ enum class PlayerAnimation(private val action: (Player, Cord) -> Unit) {
     });
 
     fun play(player: NeoPlayer) {
-        play(player.player, player.game.warp.cord!!)
+        play(player.player, player.game.warp.lowCorner)
     }
 
     fun play(player: Player, cord: Cord) {

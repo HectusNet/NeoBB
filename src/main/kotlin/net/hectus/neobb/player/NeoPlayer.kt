@@ -14,6 +14,8 @@ import net.hectus.neobb.util.following
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.audience.ForwardingAudience.Single
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Location
@@ -78,6 +80,10 @@ class NeoPlayer(val player: Player, val game: Game): ModifiableImpl(), Target, S
 
     override fun eachNeoPlayer(action: (NeoPlayer) -> Unit) {
         action.invoke(this)
+    }
+
+    override fun sendMessage(key: String, vararg variables: String?, color: TextColor?, decoration: TextDecoration?) {
+        player.sendMessage(player.locale().component(key, *variables, color = color, decoration = decoration))
     }
 
     override fun tick(tick: Ticking.Tick) {

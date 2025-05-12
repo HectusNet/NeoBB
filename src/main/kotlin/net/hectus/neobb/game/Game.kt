@@ -14,6 +14,7 @@ import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.player.Target
 import net.hectus.neobb.turn.Turn
 import net.hectus.neobb.turn.default_game.TTimeLimit
+import net.hectus.neobb.turn.default_game.structure.StructureTurn
 import net.hectus.neobb.turn.default_game.warp.TDefaultWarp
 import net.hectus.neobb.turn.default_game.warp.WarpTurn
 import net.hectus.neobb.turn.person_game.categorization.WinConCategory
@@ -46,8 +47,8 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
     // ============ PUBLIC GETTER VARIABLES =============
     // ==================================================
 
-    var warp: WarpTurn = TDefaultWarp(null, null)
-        set(warp) = warp(warp)
+    var warp: WarpTurn = TDefaultWarp(null, Configuration.SPAWN_CORD, null)
+    var playedWarps: List<WarpTurn> = mutableListOf(warp)
 
     var time: MinecraftTime = MinecraftTime.MIDNIGHT
         set(value) {
@@ -159,7 +160,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
      * @return `false` if the turn method should abort, `true` if it can continue.
      */
     fun outOfBounds(location: Location, event: Cancellable? = null): Boolean {
-        if (!location.asCord().inBounds(warp.cord!!, warp.highCorner)) {
+        if (!location.asCord().inBounds(warp.lowCorner, warp.highCorner)) {
             if (event != null)
                 event.isCancelled = true
             return true
@@ -312,7 +313,11 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
 
         if (turn !is TTimeLimit) {
             runCatching {
-                player.inventory.clearSlot(player.player.inventory.heldItemSlot)
+                if (turn is StructureTurn) {
+                    turn.referenceStructure.materials.forEach { m, a -> player.inventory.clearFirst { i, _ -> i.type == m && i.amount == a } }
+                } else {
+                    player.inventory.clearSlot(player.player.inventory.heldItemSlot)
+                }
             }
         }
 
@@ -323,7 +328,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
                 player.damage(turn.damage, turn is WinConCategory)
 
             effectManager.applyEffects(turn)
-            initialPlayers.forEach { it.sendMessage(it.locale().component("gameplay.info.turn-used", player.name(), turnNamespace, color = Colors.EXTRA)) }
+            target(false).sendMessage("gameplay.info.turn-used", player.name(), turnNamespace, color = Colors.EXTRA)
         }
 
         nextTurn(turn)
@@ -334,6 +339,9 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         info("${warp.player?.name()} has warped from ${this.warp.name} to ${warp.name}.")
 
         this.warp = warp
+        if (playedWarps.all { it.name != warp.name })
+            this.playedWarps += warp
+
         allowed.clear()
         allowed.addAll(warp.allows)
         modifiers.removeIf { it is String && it.startsWith(Modifiers.Game.NO_WARP.name) }
@@ -363,6 +371,15 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         }
 
         extraStart()
+
+        bukkitRunTimer(20, 20) {
+            if (id !in GameManager.GAMES) {
+                it.cancel()
+            } else {
+                if (!players.contains(currentPlayer()))
+                    moveToNextPlayer()
+            }
+        }
     }
 
     fun end(force: Boolean = false) {
@@ -378,7 +395,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
 
         bukkitRunLater(Time(5)) {
             if (Configuration.PRODUCTION) {
-                initialPlayers.forEach { it.player.kick(it.locale().component("gameplay.info.kick", color = Colors.NEUTRAL)) }
+                target(false).sendMessage("gameplay.info.kick", color = Colors.NEUTRAL)
                 Bukkit.getServer().shutdown()
             } else {
                 time = MinecraftTime.DAY

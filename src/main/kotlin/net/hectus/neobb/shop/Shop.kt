@@ -2,20 +2,20 @@ package net.hectus.neobb.shop
 
 import net.hectus.neobb.lore.ItemLoreBuilder
 import net.hectus.neobb.player.NeoPlayer
-import net.hectus.neobb.structure.PlacedStructure
+import net.hectus.neobb.shop.util.Items
 import net.hectus.neobb.turn.Turn
 import net.hectus.neobb.util.Colors
+import net.hectus.neobb.util.Configuration
 import net.hectus.neobb.util.component
+import org.bukkit.event.inventory.ClickType
+import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.invui.item.Item
 import kotlin.reflect.KClass
 
 abstract class Shop(val player: NeoPlayer) {
     companion object {
         fun turn(clazz: KClass<out Turn<*>>, player: NeoPlayer): Turn<*> {
-            return if (clazz.simpleName?.contains("warp", true) == true) {
-                clazz.java.getConstructor(PlacedStructure::class.java, NeoPlayer::class.java).newInstance(null, player)
-            } else {
-                clazz.constructors.first().call(null, null, player)
-            }
+            return clazz.constructors.first().call(null, Configuration.SPAWN_CORD, player)
         }
     }
 

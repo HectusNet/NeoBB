@@ -1,0 +1,53 @@
+{
+  "name": "default.iron_bar_jail",
+  "materials": {
+    "IRON_BARS": 4
+  },
+  "blocks": {
+    "x": 2,
+    "y": 1,
+    "z": 2,
+    "blocks": [
+      [
+        [
+          {
+            "cord": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "IRON_BARS"
+          },
+          {
+            "cord": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 1.0
+            },
+            "material": "IRON_BARS"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "IRON_BARS"
+          },
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 0.0,
+              "z": 1.0
+            },
+            "material": "IRON_BARS"
+          }
+        ]
+      ]
+    ]
+  }
+}

@@ -1,15 +1,20 @@
 package net.hectus.neobb.turn.legacy_game.warp
 
+import com.marcpg.libpg.storing.Cord
 import net.hectus.neobb.buff.Luck
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.structure.PlacedStructure
+import net.hectus.neobb.structure.StaticStructure
+import net.hectus.neobb.structure.StaticStructures
 import net.hectus.neobb.turn.default_game.attribute.clazz.Clazz
 import net.hectus.neobb.turn.default_game.attribute.clazz.ColdClazz
 import net.hectus.neobb.turn.default_game.attribute.clazz.NeutralClazz
 import net.hectus.neobb.turn.default_game.attribute.clazz.WaterClazz
 import kotlin.reflect.KClass
 
-class LTCliffWarp(data: PlacedStructure?, player: NeoPlayer?) : LWarpTurn(data, "cliff", player) {
+class LTCliffWarp(data: PlacedStructure?, cord: Cord, player: NeoPlayer?) : LWarpTurn(data, cord, "cliff", player) {
+    override val staticStructure: StaticStructure = StaticStructures.Legacy.Warp.CLIFF
+
     override val cost: Int = 4
     override val chance: Double = 66.66
     override val allows: List<KClass<out Clazz>> = listOf(NeutralClazz::class, ColdClazz::class, WaterClazz::class)

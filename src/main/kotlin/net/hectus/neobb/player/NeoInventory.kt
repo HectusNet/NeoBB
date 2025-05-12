@@ -54,6 +54,15 @@ class NeoInventory(private var player: NeoPlayer) {
         setSlot(slot, null, null)
     }
 
+    fun clearFirst(predicate: (ItemStack, Turn<*>) -> Boolean) {
+        for (i in deck.indices) {
+            if (deck[i] != null && predicate(deck[i]!!, dummyTurns[i]!!)) {
+                clearSlot(i)
+                return
+            }
+        }
+    }
+
     fun add(turn: Turn<*>) {
         turn.items().forEach { i -> add(ItemBuilder(i)
             .lore(player.shop.loreBuilder.turn(turn).buildWithTooltips(player.locale()))

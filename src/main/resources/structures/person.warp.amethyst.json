@@ -1,0 +1,36 @@
+{
+  "name": "person.warp.amethyst",
+  "materials": {
+    "AMETHYST_CLUSTER": 1,
+    "OBSIDIAN": 1
+  },
+  "blocks": {
+    "x": 1,
+    "y": 2,
+    "z": 1,
+    "blocks": [
+      [
+        [
+          {
+            "cord": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "OBSIDIAN"
+          }
+        ],
+        [
+          {
+            "cord": {
+              "x": 0.0,
+              "y": 1.0,
+              "z": 0.0
+            },
+            "material": "AMETHYST_CLUSTER"
+          }
+        ]
+      ]
+    ]
+  }
+}

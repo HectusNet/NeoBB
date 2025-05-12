@@ -1,0 +1,114 @@
+{
+  "name": "legacy.warp.wood",
+  "materials": {
+    "OAK_LEAVES": 5,
+    "OAK_LOG": 2
+  },
+  "blocks": {
+    "x": 3,
+    "y": 3,
+    "z": 3,
+    "blocks": [
+      [
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          {
+            "cord": {
+              "x": 0.0,
+              "y": 1.0,
+              "z": 1.0
+            },
+            "material": "OAK_LEAVES"
+          },
+          null
+        ],
+        [
+          null,
+          null,
+          null
+        ]
+      ],
+      [
+        [
+          null,
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 0.0,
+              "z": 1.0
+            },
+            "material": "OAK_LOG"
+          },
+          null
+        ],
+        [
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 1.0,
+              "z": 0.0
+            },
+            "material": "OAK_LEAVES"
+          },
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 1.0,
+              "z": 1.0
+            },
+            "material": "OAK_LOG"
+          },
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 1.0,
+              "z": 2.0
+            },
+            "material": "OAK_LEAVES"
+          }
+        ],
+        [
+          null,
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 2.0,
+              "z": 1.0
+            },
+            "material": "OAK_LEAVES"
+          },
+          null
+        ]
+      ],
+      [
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          {
+            "cord": {
+              "x": 2.0,
+              "y": 1.0,
+              "z": 1.0
+            },
+            "material": "OAK_LEAVES"
+          },
+          null
+        ],
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    ]
+  }
+}

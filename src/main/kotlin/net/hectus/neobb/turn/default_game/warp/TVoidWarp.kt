@@ -1,11 +1,16 @@
 package net.hectus.neobb.turn.default_game.warp
 
+import com.marcpg.libpg.storing.Cord
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.structure.PlacedStructure
+import net.hectus.neobb.structure.StaticStructure
+import net.hectus.neobb.structure.StaticStructures
 import net.hectus.neobb.turn.default_game.attribute.clazz.*
 import kotlin.reflect.KClass
 
-class TVoidWarp(data: PlacedStructure?, player: NeoPlayer?) : WarpTurn(data, "void", player) {
+class TVoidWarp(data: PlacedStructure?, cord: Cord, player: NeoPlayer?) : WarpTurn(data, cord, "void", player) {
+    override val staticStructure: StaticStructure = StaticStructures.Default.Warp.VOID
+
     override val cost: Int = 4
     override val chance: Double = 10.0
     override val allows: List<KClass<out Clazz>> = listOf(ColdClazz::class, NeutralClazz::class, WaterClazz::class, RedstoneClazz::class, SupernaturalClazz::class)

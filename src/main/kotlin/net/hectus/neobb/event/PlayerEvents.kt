@@ -3,7 +3,6 @@ package net.hectus.neobb.event
 import com.destroystokyo.paper.event.player.PlayerJumpEvent
 import com.marcpg.libpg.event.PlayerEvent.PlayerInventoryClickEvent
 import com.marcpg.libpg.event.PlayerEvent.PlayerInventoryInteractEvent
-import com.marcpg.libpg.storing.Cord
 import net.hectus.neobb.game.GameManager
 import net.hectus.neobb.game.mode.DefaultGame
 import net.hectus.neobb.util.*
@@ -62,7 +61,7 @@ class PlayerEvents : Listener {
         if (Configuration.PRODUCTION && available.size >= Configuration.STARTING_PLAYERS) {
             DefaultGame(player.world, available)
         } else {
-            player.teleport(Cord.ofList(Configuration.CONFIG.getIntegerList("warps.default")).asLocation(player.world))
+            player.teleport(Configuration.SPAWN_CORD.asLocation(player.world))
         }
     }
 

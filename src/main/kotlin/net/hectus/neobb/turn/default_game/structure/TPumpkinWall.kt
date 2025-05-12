@@ -6,14 +6,14 @@ import net.hectus.neobb.buff.Buff
 import net.hectus.neobb.buff.Luck
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.structure.PlacedStructure
-import net.hectus.neobb.structure.Structure
-import net.hectus.neobb.structure.StructureManager
+import net.hectus.neobb.structure.StaticStructure
+import net.hectus.neobb.structure.StaticStructures
 import net.hectus.neobb.turn.default_game.attribute.clazz.NatureClazz
 import net.hectus.neobb.turn.default_game.attribute.function.BuffFunction
 
 class TPumpkinWall(data: PlacedStructure?, cord: Cord?, player: NeoPlayer?) : StructureTurn(data, cord, player), BuffFunction, NatureClazz {
     override val cost: Int = 5
-    override val referenceStructure: Structure = StructureManager["pumpkin_wall"]!!
+    override val staticStructure: StaticStructure = StaticStructures.Default.PUMPKIN_WALL
 
     override fun apply() {
         player!!.game.time = MinecraftTime.MIDNIGHT

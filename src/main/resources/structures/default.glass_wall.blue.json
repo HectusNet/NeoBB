@@ -1,0 +1,79 @@
+{
+  "name": "default.glass_wall.blue",
+  "materials": {
+    "BLUE_STAINED_GLASS": 6
+  },
+  "blocks": {
+    "x": 3,
+    "y": 2,
+    "z": 1,
+    "blocks": [
+      [
+        [
+          {
+            "cord": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "BLUE_STAINED_GLASS"
+          }
+        ],
+        [
+          {
+            "cord": {
+              "x": 0.0,
+              "y": 1.0,
+              "z": 0.0
+            },
+            "material": "BLUE_STAINED_GLASS"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "BLUE_STAINED_GLASS"
+          }
+        ],
+        [
+          {
+            "cord": {
+              "x": 1.0,
+              "y": 1.0,
+              "z": 0.0
+            },
+            "material": "BLUE_STAINED_GLASS"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "cord": {
+              "x": 2.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "material": "BLUE_STAINED_GLASS"
+          }
+        ],
+        [
+          {
+            "cord": {
+              "x": 2.0,
+              "y": 1.0,
+              "z": 0.0
+            },
+            "material": "BLUE_STAINED_GLASS"
+          }
+        ]
+      ]
+    ]
+  }
+}

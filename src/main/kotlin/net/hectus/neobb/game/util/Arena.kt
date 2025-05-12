@@ -22,13 +22,17 @@ class Arena(val game: Game) {
     }
 
     fun addBlock(block: Block) {
-        val cord = block.location.asCord().subtract(game.warp.cord!!)
+        val cord = block.location.asCord().subtract(game.warp.lowCorner)
         this[cord.x.toInt(), cord.y.toInt(), cord.z.toInt()] = BlockInfo(cord, block.type)
         placedBlocks++
     }
 
     fun clear() {
-        completeSpace.forEach { game.warp.cord!!.add(it!!.cord).asLocation(game.world).block.type = Material.AIR }
+        completeSpace.forEach {
+            game.playedWarps.forEach { w ->
+                w.lowCorner.add(it!!.cord).asLocation(game.world).block.type = Material.AIR
+            }
+        }
         game.history.forEach { t ->
             if (t.data is Entity)
                 t.data.remove()
