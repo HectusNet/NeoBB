@@ -6,6 +6,8 @@ import net.hectus.neobb.game.util.GameDifficulty
 import net.hectus.neobb.game.util.GameInfo
 import net.hectus.neobb.lore.PersonItemLoreBuilder
 import net.hectus.neobb.player.NeoPlayer
+import net.hectus.neobb.rating.Rank
+import net.hectus.neobb.rating.Rank.Companion.toRankTranslations
 import net.hectus.neobb.shop.PersonShop
 import net.hectus.neobb.turn.Turn
 import net.hectus.neobb.turn.person_game.block.*
@@ -95,7 +97,7 @@ class PersonGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDiff
                 Component.empty(),
                 locale.component("scoreboard.stats", color = Colors.PERSON_2, decoration = TextDecoration.BOLD),
                 Component.text("💎", Colors.PERSON_4).append(locale.component("scoreboard.rank", color = Colors.PERSON_0))
-                    .append(Component.text("???")),
+                    .append(Rank.ofElo(player.databaseInfo.elo).toRankTranslations(locale)),
                 Component.text("⚔", Colors.PERSON_4).append(locale.component("scoreboard.elo", color = Colors.PERSON_0))
                     .append(Component.text(player.databaseInfo.elo.toInt(), Colors.PERSON_3)),
                 Component.empty(),

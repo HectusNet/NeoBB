@@ -7,6 +7,8 @@ import net.hectus.neobb.game.util.GameDifficulty
 import net.hectus.neobb.game.util.GameInfo
 import net.hectus.neobb.lore.DefaultItemLoreBuilder
 import net.hectus.neobb.player.NeoPlayer
+import net.hectus.neobb.rating.Rank
+import net.hectus.neobb.rating.Rank.Companion.toRankTranslations
 import net.hectus.neobb.shop.DefaultShop
 import net.hectus.neobb.turn.default_game.block.*
 import net.hectus.neobb.turn.default_game.flower.*
@@ -81,6 +83,11 @@ class DefaultGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDif
                     .append(Component.text(player.game.timeLeft.preciselyFormatted, Colors.RESET)),
                 locale.component("scoreboard.luck", color = Colors.ACCENT)
                     .append(Component.text(player.luck, Colors.RESET)),
+                Component.empty(),
+                locale.component("scoreboard.rank", color = Colors.ACCENT)
+                    .append(Rank.ofElo(player.databaseInfo.elo).toRankTranslations(locale)),
+                locale.component("scoreboard.elo", color = Colors.ACCENT)
+                    .append(Component.text(player.databaseInfo.elo, Colors.RESET)),
                 Component.empty(),
                 Component.text("NeoBB-" + NeoBB.VERSION + " (d" + Integer.toHexString(LocalDateTime.now().dayOfYear) + "h" + LocalDateTime.now().hour + ")", Colors.EXTRA),
                 Component.text("mc.hectus.net", Colors.LINK)
