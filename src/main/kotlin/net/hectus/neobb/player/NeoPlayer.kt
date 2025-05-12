@@ -24,6 +24,7 @@ import org.bukkit.entity.Player
 import org.bukkit.scoreboard.Criteria
 import org.bukkit.scoreboard.DisplaySlot
 import org.bukkit.scoreboard.Objective
+import org.bukkit.scoreboard.Team
 import java.util.*
 
 class NeoPlayer(val player: Player, val game: Game): ModifiableImpl(), Target, Single, Ticking {
@@ -39,8 +40,14 @@ class NeoPlayer(val player: Player, val game: Game): ModifiableImpl(), Target, S
     var health: Double = game.info.startingHealth ; private set
     var armor: Double = 0.0 ; private set
 
+    val team: Team = Bukkit.getScoreboardManager().mainScoreboard.registerNewTeam("highlight-${player.uniqueId}")
+
     init {
         clean()
+
+        team.color(databaseInfo.outline)
+        team.addEntity(player)
+
         try {
             val constructor = game.info.shop.constructors.firstOrNull { it.parameters.size == 1 } ?: throw ReflectiveOperationException("No primary constructor")
             shop = constructor.call(this)
@@ -127,6 +134,7 @@ class NeoPlayer(val player: Player, val game: Game): ModifiableImpl(), Target, S
         player.inventory.clear()
         player.clearActivePotionEffects()
         player.gameMode = GameMode.SURVIVAL
+        player.isGlowing = false
     }
 
     fun addLuck(luck: Int) {

@@ -5,17 +5,22 @@ import net.hectus.neobb.turn.Turn
 import net.hectus.neobb.turn.default_game.block.BlockTurn
 import net.hectus.neobb.turn.default_game.mob.MobTurn
 import net.hectus.neobb.turn.default_game.structure.StructureTurn
+import net.hectus.neobb.util.Constants
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Bukkit
+import org.bukkit.Color
 import org.bukkit.Location
 import org.bukkit.block.Block
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Shulker
-import org.bukkit.potion.PotionEffect
-import org.bukkit.potion.PotionEffectType
+import org.bukkit.entity.BlockDisplay
+import org.bukkit.entity.Display
+import org.bukkit.entity.Entity
+import org.bukkit.scoreboard.Team
+import org.bukkit.util.Transformation
+import org.joml.AxisAngle4f
+import org.joml.Vector3f
 
 class EffectManager {
-    private var highlight: LivingEntity? = null
+    private var highlight: Pair<Entity, Team?>? = null
 
     fun applyEffects(turn: Turn<*>) {
         if (turn.player == null) return
@@ -34,33 +39,40 @@ class EffectManager {
         player.databaseInfo.placeParticle.spawn(location)
     }
 
-    @Suppress("removal")
     fun highlightBlock(block: Block, outlineColor: NamedTextColor) {
-        if (block.type.name.contains("GLASS") || block.type.isTransparent) return // TODO: Improve this check!
+        clearHighlight()
 
-        block.world.spawn(block.location, Shulker::class.java) { shulker ->
-            shulker.setAI(false)
-            shulker.isInvisible = true
-            shulker.isInvulnerable = true
-            applyHighlight(shulker, outlineColor)
-        }
+        val display = block.world.spawn(block.location, BlockDisplay::class.java)
+        display.block = block.blockData.clone()
+        display.transformation = Transformation(
+            Vector3f(0.0f),
+            AxisAngle4f(0.0f, 0.0f, 0.0f, 0.0f),
+            Vector3f(Constants.HIGHLIGHT_SCALE),
+            AxisAngle4f(0.0f, 0.0f, 0.0f, 0.0f)
+        )
+        display.brightness = Display.Brightness(block.lightFromBlocks.toInt(), block.lightFromSky.toInt())
+
+        display.glowColorOverride = Color.fromRGB(outlineColor.value())
+        display.isGlowing = true
+
+        highlight = display to null
     }
 
-    fun applyHighlight(entity: LivingEntity, outlineColor: NamedTextColor) {
+    fun applyHighlight(entity: Entity, outlineColor: NamedTextColor) {
         clearHighlight()
-        highlight = entity
-
-        entity.addPotionEffect(PotionEffect(PotionEffectType.GLOWING, -1, 0, false, false))
 
         val team = Bukkit.getScoreboardManager().mainScoreboard.registerNewTeam("highlight-${entity.uniqueId.mostSignificantBits}")
         team.color(outlineColor)
         team.addEntity(entity)
+        highlight = entity to team
     }
 
     fun clearHighlight() {
-        highlight?.let { when (it) {
-            is Shulker -> it.remove()
-            else -> it.removePotionEffect(PotionEffectType.GLOWING)
-        } }
+        val highlight = highlight ?: return
+        when (highlight.first) {
+            is BlockDisplay -> highlight.first.remove()
+            else -> highlight.first.isGlowing = false
+        }
+        highlight.second?.unregister()
     }
 }

@@ -21,7 +21,7 @@ object Constants {
     val DEFAULT_DIFFICULTY = GameDifficulty.NORMAL
     const val MAX_EXTRA_TURNS = 3
 
-    const val HIGHLIGHT_SCALE = 1.0f
+    const val HIGHLIGHT_SCALE = 0.99f
     const val SPAWN_POINT_RADIUS = 3.0
 
     val JSON: Json = @OptIn(ExperimentalSerializationApi::class) (Json {

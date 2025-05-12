@@ -6,12 +6,12 @@ import com.marcpg.libpg.storing.Cord
 import com.marcpg.libpg.util.MinecraftTime
 import com.marcpg.libpg.util.Randomizer
 import net.hectus.neobb.NeoBB
-import net.hectus.neobb.rating.Rating
 import net.hectus.neobb.cosmetic.EffectManager
 import net.hectus.neobb.game.util.*
 import net.hectus.neobb.player.ForwardingTarget
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.player.Target
+import net.hectus.neobb.rating.Rating
 import net.hectus.neobb.turn.Turn
 import net.hectus.neobb.turn.default_game.TTimeLimit
 import net.hectus.neobb.turn.default_game.structure.StructureTurn
@@ -22,6 +22,7 @@ import net.hectus.neobb.util.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
 import org.bukkit.*
+import org.bukkit.entity.BlockDisplay
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 import kotlin.math.cos
@@ -90,6 +91,9 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
                 Math.toDegrees(angle + Math.PI / 2).toFloat(), 0f // No, I am not a math guy...
             )
         }
+
+        // Clear any previous block highlights.
+        world.getEntitiesByClass(BlockDisplay::class.java).forEach { it.remove() }
 
         GameManager.add(this)
         info("Initialized the game.")
@@ -167,7 +171,9 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
     }
 
     fun moveToNextPlayer() {
+        currentPlayer().player.isGlowing = false
         turningIndex = (turningIndex + 1) % players.size
+        currentPlayer().player.isGlowing = true
     }
 
     fun turnCountdownTick() {
@@ -368,6 +374,8 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
                 it.locale().component("gameplay.info.start.first-sub", color = Colors.POSITIVE))) }
         }
 
+        currentPlayer().player.isGlowing = true
+
         extraStart()
 
         bukkitRunTimer(20, 20) {
@@ -381,7 +389,10 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
     }
 
     fun end(force: Boolean = false) {
-        initialPlayers.forEach { it.clean() }
+        initialPlayers.forEach {
+            it.clean()
+            it.team.unregister()
+        }
         GameManager.remove(this)
         effectManager.clearHighlight()
 
