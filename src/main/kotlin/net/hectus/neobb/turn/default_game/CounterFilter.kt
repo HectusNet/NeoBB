@@ -3,6 +3,7 @@ package net.hectus.neobb.turn.default_game
 import com.marcpg.libpg.lang.Translation
 import net.hectus.neobb.turn.Turn
 import net.hectus.neobb.turn.default_game.attribute.clazz.Clazz
+import net.hectus.neobb.util.Constants
 import net.hectus.neobb.util.counterFilterName
 import net.kyori.adventure.text.Component
 import java.util.*
@@ -39,6 +40,6 @@ interface CounterFilter {
     fun text(locale: Locale): String
 
     fun line(locale: Locale): Component {
-        return Component.text("   | " + text(locale))
+        return Component.text("${Constants.MINECRAFT_TAB_CHAR}| " + text(locale))
     }
 }

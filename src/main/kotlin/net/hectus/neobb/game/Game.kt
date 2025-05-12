@@ -6,7 +6,7 @@ import com.marcpg.libpg.storing.Cord
 import com.marcpg.libpg.util.MinecraftTime
 import com.marcpg.libpg.util.Randomizer
 import net.hectus.neobb.NeoBB
-import net.hectus.neobb.Rating
+import net.hectus.neobb.rating.Rating
 import net.hectus.neobb.cosmetic.EffectManager
 import net.hectus.neobb.game.util.*
 import net.hectus.neobb.player.ForwardingTarget
@@ -28,8 +28,8 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.reflect.KClass
 
-abstract class Game(val world: World, private val bukkitPlayers: List<Player>, val difficulty: GameDifficulty = GameDifficulty.NORMAL): ModifiableImpl(), Ticking {
-    val id: String = Randomizer.generateRandomString(10, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
+abstract class Game(val world: World, private val bukkitPlayers: List<Player>, val difficulty: GameDifficulty = Constants.DEFAULT_DIFFICULTY): ModifiableImpl(), Ticking {
+    val id: String = Randomizer.generateRandomString(Constants.GAME_ID_LENGTH, Constants.GAME_ID_CHARSET)
     lateinit var arena: Arena
     val effectManager = EffectManager()
     val turnScheduler = TurnScheduler()
@@ -82,13 +82,11 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         allowed.addAll(warp.allows)
         resetTurnCountdown()
 
-        val radius = 2.5
         val playerCount = players.size
-
         for (i in 0..<playerCount) {
             val angle = 2 * Math.PI * i / playerCount
             players[i].teleport(
-                Cord(warp.center.x() + radius * cos(angle), warp.center.y(), warp.center.z() + radius * sin(angle)),
+                Cord(warp.center.x() + Constants.SPAWN_POINT_RADIUS * cos(angle), warp.center.y(), warp.center.z() + Constants.SPAWN_POINT_RADIUS * sin(angle)),
                 Math.toDegrees(angle + Math.PI / 2).toFloat(), 0f // No, I am not a math guy...
             )
         }
@@ -393,7 +391,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
             return
         }
 
-        bukkitRunLater(Time(5)) {
+        bukkitRunLater(Time(Constants.GAME_CLEANUP_DELAY)) {
             if (Configuration.PRODUCTION) {
                 target(false).sendMessage("gameplay.info.kick", color = Colors.NEUTRAL)
                 Bukkit.getServer().shutdown()
@@ -420,8 +418,8 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         player.databaseInfo.winAnimation.play(player)
 
         end(false)
-        if (difficulty.ranked) // TODO: Support multiple winners/losers!
-            Rating.updateRankingsWin(player.databaseInfo, player.opponents(false).first().databaseInfo, difficulty.eloFactor)
+        if (difficulty.ranked)
+            Rating.updateFFARankings(initialPlayers.map { it.databaseInfo }, player.databaseInfo)
     }
 
     fun draw(force: Boolean = false) {
@@ -430,24 +428,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         info("The game resulted in a draw.")
 
         end(force)
-        if (difficulty.ranked) // TODO: Support multiple players for draw!
-            Rating.updateRankingsDraw(initialPlayers.first().databaseInfo, initialPlayers.last().databaseInfo, difficulty.eloFactor)
-    }
-
-    fun giveup(player: NeoPlayer) {
-        players.forEach { it.showTitle(Title.title(it.locale().component("gameplay.info.ending.giveup", player.name(), color = Colors.NEUTRAL),
-            it.locale().component("gameplay.info.ending.giveup-sub", player.name(), color = Colors.EXTRA))) }
-        info("${player.name()} has given up.")
-
-        player.opponents(true).forEach { it.databaseInfo.winAnimation.play(it) }
-
-        end(false)
-        if (difficulty.ranked) { // TODO: Support multiple players for draw!
-            runCatching {
-                Rating.updateRankingsWin(player.opponents(true).first().databaseInfo, player.databaseInfo, difficulty.eloFactor)
-            }.onFailure {
-                Rating.updateRankingsWin(player.opponents(false).first().databaseInfo, player.databaseInfo, difficulty.eloFactor)
-            }
-        }
+        if (difficulty.ranked)
+            Rating.updateFFARankings(initialPlayers.map { it.databaseInfo }, null)
     }
 }
