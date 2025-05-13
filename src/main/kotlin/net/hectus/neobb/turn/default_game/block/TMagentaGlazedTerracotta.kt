@@ -10,7 +10,6 @@ import org.bukkit.block.data.Directional
 
 class TMagentaGlazedTerracotta(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterattackFunction, NeutralClazz {
     override val cost: Int = 4
-    override val requiresUsageGuide: Boolean = true
 
     override fun unusable(): Boolean {
         if (isDummy()) return true

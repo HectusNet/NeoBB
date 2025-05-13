@@ -18,14 +18,18 @@ class DefaultItemLoreBuilder: ItemLoreBuilder() {
         lore += key(locale, "info.usage.usage", "❖").append(locale.component("info.usage.${usage()}"))
         lore += key(locale, "info.function.function", "❖").append(locale.component("info.function.${function()}"))
         lore += key(locale, "info.class.class", "❖").append(locale.component("info.class.${clazz()}"))
-        lore += SEPARATOR
-        lore += key(locale, "item-lore.description", "❖")
-        lore += longText(locale, "description")
-        if (turn?.requiresUsageGuide == true) {
+
+        if (locale.translationExists("description")) {
+            lore += SEPARATOR
+            lore += key(locale, "item-lore.description", "❖")
+            lore += longText(locale, "description")
+        }
+        if (locale.translationExists("usage")) {
             lore += SEPARATOR
             lore += key(locale, "item-lore.usage", "➽")
             lore += longText(locale, "usage")
         }
+
         if (turn is CounterFunction) {
             lore += SEPARATOR
             lore += key(locale, "item-lore.counters", "🛡")

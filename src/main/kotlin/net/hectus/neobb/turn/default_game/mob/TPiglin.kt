@@ -11,7 +11,6 @@ import org.bukkit.entity.Piglin
 import org.bukkit.potion.PotionEffectType
 
 class TPiglin(data: Piglin?, cord: Cord?, player: NeoPlayer?) : MobTurn<Piglin>(data, cord, player), EventFunction, HotClazz {
-    override val requiresUsageGuide: Boolean = true
     override val cost: Int = 3
 
     override fun triggerEvent() {

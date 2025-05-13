@@ -150,7 +150,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
     open fun onOutOfBounds(player: NeoPlayer) = eliminate(player)
 
     open fun allows(turn: Turn<*>): Boolean {
-        return allowed.all { it.isInstance(turn) && (turn !is WarpTurn || !hasModifier(Modifiers.Game.NO_WARP.name + "_" + turn.name)) }
+        return !difficulty.completeRules || allowed.all { it.isInstance(turn) && (turn !is WarpTurn || !hasModifier(Modifiers.Game.NO_WARP.name + "_" + turn.name)) }
     }
 
     // ==================================================
@@ -293,10 +293,20 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
 
     fun turn(turn: Turn<*>, event: Cancellable? = null) {
         val player = turn.player!!
+        val nextPlayer = player.nextPlayer()
         val turnNamespace = turn.namespace()
+
+        if (!allows(turn)) {
+            info("${player.name()} can't use $turnNamespace in the current warp.")
+            player.sendMessage("gameplay.info.wrong_warp", color = Colors.NEGATIVE)
+            player.playSound(Sound.ENTITY_VILLAGER_NO)
+            return
+        }
 
         if (outOfBounds(turn.location(), event)) {
             info("${player.name()} used $turnNamespace out of bounds.")
+            player.sendMessage("gameplay.info.out_of_bounds", color = Colors.NEGATIVE)
+            player.playSound(Sound.ENTITY_VILLAGER_NO)
             return
         }
 
@@ -328,11 +338,13 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         if (!skipped && executeTurn(turn)) {
             turn.apply()
 
-            if (turn.damage != 0.0)
-                player.damage(turn.damage, turn is WinConCategory)
+            if (turn !is TTimeLimit) {
+                if (turn.damage != 0.0)
+                    nextPlayer.damage(turn.damage, turn is WinConCategory)
 
-            effectManager.applyEffects(turn)
-            target(false).sendMessage("gameplay.info.turn-used", player.name(), turnNamespace, color = Colors.EXTRA)
+                effectManager.applyEffects(turn)
+                initialPlayers.forEach { it.sendMessage("gameplay.info.turn-used", player.name(), turn.name(it.locale()), color = Colors.EXTRA) }
+            }
         }
 
         nextTurn(turn)
@@ -351,6 +363,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         modifiers.removeIf { it is String && it.startsWith(Modifiers.Game.NO_WARP.name) }
 
         players.forEach { p ->
+            p.removeModifier(Modifiers.Player.Default.DEFENDED)
             if (warp.temperature == WarpTurn.Temperature.COLD) {
                 p.player.fireTicks = 0
                 turnScheduler.remove(ScheduleID.BURN)

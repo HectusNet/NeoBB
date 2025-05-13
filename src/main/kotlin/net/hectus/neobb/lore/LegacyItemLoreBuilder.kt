@@ -26,7 +26,7 @@ class LegacyItemLoreBuilder: ItemLoreBuilder() {
             lore += (turn as CounterFunction).counters().map { it.line(locale) }
         }
 
-        if (turn?.requiresUsageGuide == true) {
+        if (locale.translationExists("usage")) {
             lore += SEPARATOR
             lore += key(locale, "item-lore.usage", "➽")
             lore += longText(locale, "usage")

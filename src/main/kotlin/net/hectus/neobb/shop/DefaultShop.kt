@@ -85,7 +85,7 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
                         "nature" to Pair(Material.AZALEA_LEAVES, NatureClazz::class),
                         "redstone" to Pair(Material.REDSTONE_BLOCK, RedstoneClazz::class),
                         "dream" to Pair(Material.WHITE_WOOL, SupernaturalClazz::class)
-                    ), "clazz")
+                    ), "class")
                 })
                 .addIngredient('3', Items.ClickItem(filter(Material.IRON_AXE, "type")) { _, _ ->
                     filterUsageMenu(mapOf(
@@ -96,7 +96,7 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
                         "buff" to Pair(Material.SPLASH_POTION, BuffFunction::class),
                         "defense" to Pair(Material.SHIELD, DefenseFunction::class),
                         "await" to Pair(Material.CLOCK, ComboTurn::class)
-                    ), "class")
+                    ), "function")
                 })
 
                 .addIngredient('D', Items.ClickItem(ItemBuilder(Material.LIME_DYE)

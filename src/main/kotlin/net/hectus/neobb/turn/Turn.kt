@@ -20,7 +20,6 @@ abstract class Turn<T>(val data: T?, val cord: Cord?, val player: NeoPlayer?) {
         }
     }
 
-    open val requiresUsageGuide: Boolean = false
     open val maxAmount: Int = 2
     open val damage: Double = 0.0
     open val cost: Int = 0
@@ -35,7 +34,7 @@ abstract class Turn<T>(val data: T?, val cord: Cord?, val player: NeoPlayer?) {
     open fun goodChoice(player: NeoPlayer): Boolean {
         if (!player.game.started) return false
 
-        if (!player.game.difficulty.completeRules && (unusable() || !player.game.allows(this))) return false
+        if (unusable() || !player.game.allows(this)) return false
 
         if ((player.hasModifier(Modifiers.Player.Default.ATTACKED) || player.game.turnScheduler.exists(ScheduleID.FREEZE)) && !player.hasModifier(Modifiers.Player.Default.DEFENDED)) {
             if (player.game.history.isEmpty()) return true
@@ -58,7 +57,7 @@ abstract class Turn<T>(val data: T?, val cord: Cord?, val player: NeoPlayer?) {
 
     fun isDummy(): Boolean = this == DUMMY || data == null
 
-    fun namespace(): String = (this::class.simpleName ?: "unknown").counterFilterName().camelToSnake()
+    fun namespace(): String = this::class.java.simpleName.counterFilterName().camelToSnake()
 
     open fun name(locale: Locale): String {
         val key = "turns.${namespace()}"

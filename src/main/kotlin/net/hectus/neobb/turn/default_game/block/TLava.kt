@@ -12,7 +12,6 @@ import org.bukkit.inventory.ItemStack
 
 class TLava(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), BuffFunction, HotClazz {
     override val cost: Int = 6
-    override val requiresUsageGuide: Boolean = true
     override val maxAmount: Int = 1
 
     override fun item(): ItemStack = ItemStack(Material.LAVA_BUCKET)

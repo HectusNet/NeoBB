@@ -8,9 +8,9 @@ import org.bukkit.Material
 import java.util.*
 
 enum class Rank(val minElo: Double, val levels: Int, val league: Int, val material: Material, val color: TextColor) {
-    DIRT(100.0, 1, 1, Material.DIRT, TextColor.color(0x907050)),
-    WOOD(250.0, 1, 1, Material.OAK_PLANKS, TextColor.color(0xBCA988)),
-    STONE(500.0, 1, 1, Material.STONE, TextColor.color(0x88888A)),
+    DIRT(250.0, 1, 1, Material.DIRT, TextColor.color(0x907050)),
+    WOOD(500.0, 1, 1, Material.OAK_PLANKS, TextColor.color(0xBCA988)),
+    STONE(750.0, 1, 1, Material.STONE, TextColor.color(0x88888A)),
     DEEPSLATE(1000.0, 1, 1, Material.DEEPSLATE, TextColor.color(0x565655)),
     NETHERRACK(1250.0, 1, 1, Material.NETHERRACK, TextColor.color(0x743435)),
     COAL(1500.0, 2, 2, Material.COAL, TextColor.color(0x3f3f3f)),
@@ -40,10 +40,10 @@ enum class Rank(val minElo: Double, val levels: Int, val league: Int, val materi
                     var level = rank.levels
                     while (current > rank.minElo) {
                         current -= levelStep
-                        level--
                         if (elo >= current) {
                             return rank to level
                         }
+                        level--
                     }
                     return rank to 1
                 }
@@ -55,6 +55,7 @@ enum class Rank(val minElo: Double, val levels: Int, val league: Int, val materi
 
         fun Pair<Rank, Int>.toRankTranslations(locale: Locale) = locale
             .component("rating.rank.${first.name.lowercase()}")
+            .appendSpace()
             .append(Component.text(second.toRomanNumeral()))
             .color(first.color)
 

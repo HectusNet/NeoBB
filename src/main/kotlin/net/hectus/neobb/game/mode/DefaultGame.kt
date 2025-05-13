@@ -87,7 +87,7 @@ class DefaultGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDif
                 locale.component("scoreboard.rank", color = Colors.ACCENT)
                     .append(Rank.ofElo(player.databaseInfo.elo).toRankTranslations(locale)),
                 locale.component("scoreboard.elo", color = Colors.ACCENT)
-                    .append(Component.text(player.databaseInfo.elo, Colors.RESET)),
+                    .append(Component.text(player.databaseInfo.elo.toInt(), Colors.RESET)),
                 Component.empty(),
                 Component.text("NeoBB-" + NeoBB.VERSION + " (d" + Integer.toHexString(LocalDateTime.now().dayOfYear) + "h" + LocalDateTime.now().hour + ")", Colors.EXTRA),
                 Component.text("mc.hectus.net", Colors.LINK)

@@ -13,7 +13,6 @@ import org.bukkit.block.Block
 
 class TRespawnAnchor(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), BuffFunction, HotClazz {
     override val cost: Int = 4
-    override val requiresUsageGuide: Boolean = true
 
     override fun buffs(): List<Buff<*>> {
         return listOf(Teleport(player!!.game.history.lastOrNull()?.location()?.asCord() ?: Cord(0.0, 0.0, 0.0)), ChancedBuff(50.0, ExtraTurn()))

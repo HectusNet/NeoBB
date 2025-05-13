@@ -48,4 +48,9 @@ abstract class ItemLoreBuilder {
     protected fun keybindPrefix(key: String): Component = Component.text("[")
         .append(Component.keybind(key))
         .append(Component.text("] "))
+
+    protected fun Locale.translationExists(prefix: String): Boolean {
+        val key = prefix + "." + turn?.namespace()
+        return string(key) != key
+    }
 }

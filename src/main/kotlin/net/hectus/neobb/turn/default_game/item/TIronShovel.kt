@@ -13,7 +13,6 @@ import net.hectus.neobb.turn.default_game.flower.TDirt
 import org.bukkit.inventory.ItemStack
 
 class TIronShovel(data: ItemStack?, cord: Cord?, player: NeoPlayer?) : ItemTurn(data, cord, player), CounterbuffFunction, NeutralClazz {
-    override val requiresUsageGuide: Boolean = true
     override val cost: Int = 5
 
     override fun counters(): List<CounterFilter> {

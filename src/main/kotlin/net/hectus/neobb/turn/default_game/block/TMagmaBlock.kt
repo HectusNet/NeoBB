@@ -8,5 +8,4 @@ import org.bukkit.block.Block
 
 class TMagmaBlock(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), AttackFunction, HotClazz {
     override val cost: Int = 4
-    override val requiresUsageGuide: Boolean = true
 }

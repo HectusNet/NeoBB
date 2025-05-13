@@ -17,6 +17,7 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
 class TOakDoorTurtling(data: PlacedStructure?, cord: Cord?, player: NeoPlayer?) : StructureTurn(data, cord, player), DefenseFunction, NeutralClazz {
+    override val maxAmount: Int = 1
     override val cost: Int = 4
     override val staticStructure: StaticStructure = StaticStructures.Default.OAK_DOOR_TURTLING
 

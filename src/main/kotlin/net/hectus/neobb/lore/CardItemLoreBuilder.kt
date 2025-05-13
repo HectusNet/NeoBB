@@ -9,7 +9,7 @@ class CardItemLoreBuilder: ItemLoreBuilder() {
 
         lore += SEPARATOR
         lore += key(locale, "item-lore.damage", "❖").append(Component.text(turn?.damage ?: 0.0))
-        if (turn?.requiresUsageGuide == true) {
+        if (locale.translationExists("usage")) {
             lore += SEPARATOR
             lore += key(locale, "item-lore.usage", "➽")
             lore += longText(locale, "usage.card-game")

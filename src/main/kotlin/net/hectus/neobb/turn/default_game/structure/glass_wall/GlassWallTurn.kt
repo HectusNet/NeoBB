@@ -14,6 +14,7 @@ import net.hectus.neobb.turn.default_game.structure.StructureTurn
 import net.hectus.neobb.util.Modifiers
 
 abstract class GlassWallTurn(data: PlacedStructure?, cord: Cord?, player: NeoPlayer?) : StructureTurn(data, cord, player), DefenseFunction, BuffFunction {
+    override val maxAmount: Int = 1
     override val cost: Int = 5
 
     private var stay: Boolean = false

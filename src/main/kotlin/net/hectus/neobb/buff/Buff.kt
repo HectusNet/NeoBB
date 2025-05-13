@@ -4,6 +4,7 @@ import com.marcpg.libpg.util.Randomizer
 import net.hectus.neobb.player.ForwardingTarget
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.player.Target
+import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Constants
 import net.hectus.neobb.util.string
 import net.kyori.adventure.text.Component
@@ -39,6 +40,8 @@ class ChancedBuff(data: Double, val buff: Buff<*>, target: BuffTarget = BuffTarg
     override fun apply(source: NeoPlayer) {
         if (Randomizer.boolByChance(data))
             buff.apply(source)
+
+        source.sendMessage("gameplay.info.chance.fail", buff.text(source.locale()), color = Colors.NEUTRAL)
     }
 
     override fun text(locale: Locale): String = "$data | ${buff.text(locale)}"

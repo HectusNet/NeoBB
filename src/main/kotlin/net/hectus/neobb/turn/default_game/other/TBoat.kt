@@ -11,7 +11,6 @@ import org.bukkit.entity.Boat
 import org.bukkit.inventory.ItemStack
 
 class TBoat(data: Boat?, cord: Cord?, player: NeoPlayer?) : OtherTurn<Boat>(data, cord, player), EventFunction, WaterClazz {
-    override val requiresUsageGuide: Boolean = true
     override val cost: Int = 3
 
     override fun item(): ItemStack = ItemStack(Material.OAK_BOAT)

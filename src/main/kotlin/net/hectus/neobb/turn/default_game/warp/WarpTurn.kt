@@ -14,7 +14,6 @@ import kotlin.reflect.KClass
 abstract class WarpTurn(data: PlacedStructure?, cord: Cord, val name: String, player: NeoPlayer?) : StructureTurn(data, cord, player), WarpFunction {
     enum class Temperature { COLD, NORMAL, HOT }
 
-    override val requiresUsageGuide: Boolean = true
     override val maxAmount: Int = 1
 
     abstract val chance: Double

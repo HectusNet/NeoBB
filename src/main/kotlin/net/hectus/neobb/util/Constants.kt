@@ -7,7 +7,7 @@ import net.hectus.neobb.game.util.GameDifficulty
 
 object Constants {
     const val INITIAL_PLAYER_RATING = 1500.0
-    const val MIN_PLAYER_RATING = 100.0
+    const val MIN_PLAYER_RATING = 250.0
     const val MAX_PLAYER_RD = 350.0
 
     const val MINECRAFT_TAB_CHAR = "   "

@@ -13,7 +13,6 @@ import org.bukkit.block.Block
 
 class TCampfire(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterattackFunction, HotClazz {
     override val cost: Int = 5
-    override val requiresUsageGuide: Boolean = true
 
     override fun apply() {
         if (player!!.game.history.isEmpty()) return

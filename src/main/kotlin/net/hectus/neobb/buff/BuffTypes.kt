@@ -30,8 +30,7 @@ class ExtraTurn(data: Int = 1, target: BuffTarget = BuffTarget.YOU): Buff<Int>(d
         source.game.target(false).sendMessage("gameplay.info.extra-turn", target.name(), color = Colors.NEUTRAL)
     }
 
-    override fun text(locale: Locale): String =
-        locale.string("item-builder.buff.extra-turn" + (if (data > 1) "s" else ""), data.toString())
+    override fun text(locale: Locale): String = locale.string("item-lore.buff.extra-turn" + (if (data > 1) "s" else ""), data.toString())
 
     override fun color(): TextColor {
         return when (target) {
@@ -45,6 +44,8 @@ class ExtraTurn(data: Int = 1, target: BuffTarget = BuffTarget.YOU): Buff<Int>(d
 class Luck(data: Int, target: BuffTarget = BuffTarget.YOU): Buff<Int>(data, target) {
     override fun apply(source: NeoPlayer) {
         source.addLuck(data)
+
+        source.game.target(false).sendMessage("gameplay.info.luck", target.name, data.toString(), color = Colors.NEUTRAL)
     }
 
     override fun text(locale: Locale): String = locale.string("item-lore.buff.luck", data.toString())
@@ -97,10 +98,11 @@ class Teleport(data: Cord, target: BuffTarget = BuffTarget.YOU): Buff<Cord>(data
 class Give(data: Turn<*>, target: BuffTarget = BuffTarget.YOU): Buff<Turn<*>>(data, target) {
     override fun apply(source: NeoPlayer) {
         source.eachNeoPlayer { it.inventory.add(data) }
+
+        source.game.initialPlayers.forEach { it.sendMessage("gameplay.info.give", target.name, data.name(it.locale()), color = Colors.NEUTRAL) }
     }
 
-    override fun text(locale: Locale): String =
-        locale.string("item-lore.buff.give", data.items().stream().mapToInt { it.amount }.sum().toString(), data.items().first().displayName().asString())
+    override fun text(locale: Locale): String = locale.string("item-lore.buff.give", data.items().stream().mapToInt { it.amount }.sum().toString(), data.items().first().displayName().asString())
 
     override fun color(): TextColor {
         return when (target) {

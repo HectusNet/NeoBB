@@ -16,7 +16,6 @@ import org.bukkit.potion.PotionEffectType
 
 class TSponge(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterbuffFunction, WaterClazz {
     override val cost: Int = 5
-    override val requiresUsageGuide: Boolean = true
 
     override fun apply() {
         if (player!!.game.history.isEmpty()) return
