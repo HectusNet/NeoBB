@@ -29,7 +29,7 @@ class TOakDoorTurtling(data: PlacedStructure?, cord: Cord?, player: NeoPlayer?) 
     override fun applyDefense() {
         player!!.addModifier(Modifiers.Player.Default.DEFENDED)
         player.game.turnScheduler.runTaskTimer(ScheduleID.OAK_DOOR_TURTLING, 1, {
-            !player.hasModifier(Modifiers.Player.Default.DEFENDED)
+            player.hasModifier(Modifiers.Player.Default.DEFENDED)
         }) {
             if (player.game.history.last() is CounterFunction &&
                 CounterFilter.clazz(HotClazz::class).doCounter(player.game.history.last()) ||
