@@ -2,9 +2,9 @@ package net.hectus.neobb.player
 
 import com.marcpg.libpg.util.ItemBuilder
 import com.marcpg.libpg.util.Randomizer
-import net.hectus.neobb.shop.util.Items
-import net.hectus.neobb.turn.Turn
-import net.hectus.neobb.turn.person_game.categorization.Category
+import net.hectus.neobb.modes.shop.util.Items
+import net.hectus.neobb.modes.turn.Turn
+import net.hectus.neobb.modes.turn.person_game.categorization.Category
 import net.hectus.neobb.util.component
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack

@@ -1,11 +1,11 @@
 package net.hectus.neobb.game.util
 
 import com.marcpg.libpg.data.time.Time
-import net.hectus.neobb.lore.DummyItemLoreBuilder
-import net.hectus.neobb.lore.ItemLoreBuilder
-import net.hectus.neobb.shop.DummyShop
-import net.hectus.neobb.shop.Shop
-import net.hectus.neobb.turn.Turn
+import net.hectus.neobb.modes.lore.DummyItemLoreBuilder
+import net.hectus.neobb.modes.lore.ItemLoreBuilder
+import net.hectus.neobb.modes.shop.DummyShop
+import net.hectus.neobb.modes.shop.Shop
+import net.hectus.neobb.modes.turn.Turn
 import kotlin.reflect.KClass
 
 data class GameInfo(

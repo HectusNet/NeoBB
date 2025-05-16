@@ -3,7 +3,7 @@ package net.hectus.neobb.event
 import com.destroystokyo.paper.event.server.ServerTickEndEvent
 import net.hectus.neobb.NeoBB
 import net.hectus.neobb.game.GameManager
-import net.hectus.neobb.game.HectusGame
+import net.hectus.neobb.game.mode.HectusGame
 import net.hectus.neobb.util.*
 import org.bukkit.GameMode
 import org.bukkit.Material

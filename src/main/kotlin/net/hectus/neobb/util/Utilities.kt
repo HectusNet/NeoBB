@@ -6,8 +6,8 @@ import com.marcpg.libpg.storing.Cord
 import com.marcpg.libpg.storing.CordMinecraftAdapter
 import net.hectus.neobb.NeoBB
 import net.hectus.neobb.game.GameManager
+import net.hectus.neobb.modes.turn.Turn
 import net.hectus.neobb.player.NeoPlayer
-import net.hectus.neobb.turn.Turn
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration

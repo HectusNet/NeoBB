@@ -4,11 +4,11 @@ import net.hectus.neobb.NeoBB
 import net.hectus.neobb.game.Game
 import net.hectus.neobb.game.util.GameDifficulty
 import net.hectus.neobb.game.util.GameInfo
-import net.hectus.neobb.lore.CardItemLoreBuilder
+import net.hectus.neobb.modes.lore.CardItemLoreBuilder
+import net.hectus.neobb.modes.shop.RandomizedShop
+import net.hectus.neobb.modes.turn.Turn
+import net.hectus.neobb.modes.turn.card_game.*
 import net.hectus.neobb.player.NeoPlayer
-import net.hectus.neobb.shop.RandomizedShop
-import net.hectus.neobb.turn.Turn
-import net.hectus.neobb.turn.card_game.*
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.component
 import net.kyori.adventure.text.Component

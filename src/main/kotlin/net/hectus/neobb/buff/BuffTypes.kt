@@ -2,9 +2,9 @@ package net.hectus.neobb.buff
 
 import com.marcpg.libpg.storing.Cord
 import net.hectus.neobb.game.util.ScheduleID
+import net.hectus.neobb.modes.turn.Turn
+import net.hectus.neobb.modes.turn.default_game.attribute.function.BuffFunction
 import net.hectus.neobb.player.NeoPlayer
-import net.hectus.neobb.turn.Turn
-import net.hectus.neobb.turn.default_game.attribute.function.BuffFunction
 import net.hectus.neobb.util.*
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.potion.PotionEffect

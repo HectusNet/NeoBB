@@ -7,7 +7,7 @@ import io.papermc.paper.entity.TeleportFlag
 import io.papermc.paper.scoreboard.numbers.NumberFormat
 import net.hectus.neobb.game.Game
 import net.hectus.neobb.game.mode.PersonGame
-import net.hectus.neobb.shop.Shop
+import net.hectus.neobb.modes.shop.Shop
 import net.hectus.neobb.util.Ticking
 import net.hectus.neobb.util.component
 import net.hectus.neobb.util.following
