@@ -86,11 +86,18 @@ open class Structure(
     fun rotated(): Structure {
         if (rotated != null) return rotated!!
 
-        val newBlocks = BlockSpace(y = Configuration.MAX_ARENA_HEIGHT)
-        blocks.forEach { block, x, y, z ->
-            newBlocks[z, y, x] = BlockInfo(Cord(z.toDouble(), y.toDouble(), x.toDouble()), block!!.material)
-        }
-        return Structure(name, newBlocks)
+        val xLength = blocks.x
+        val zLength = blocks.z
+        val newBlocks = BlockSpace(zLength, blocks.y, xLength)
+
+        for (y in 0 until blocks.y)
+            for (x in 0 until xLength)
+                for (z in 0 until zLength)
+                    newBlocks[z, y, xLength - 1 - x] = blocks[x, y, z]
+
+        val structure = Structure(name, materials, newBlocks, this)
+        rotated = structure
+        return structure
     }
 
     fun place(location: Location, replace: Boolean) {
