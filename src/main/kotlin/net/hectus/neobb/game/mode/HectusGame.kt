@@ -44,8 +44,12 @@ abstract class HectusGame(world: World, bukkitPlayers: List<Player>, difficulty:
 
         if (turn is DefenseFunction) {
             info("Applying defense from turn.")
-            player.sendMessage("gameplay.info.function.defense", color = Colors.POSITIVE)
-            turn.applyDefense()
+            if (player.hasModifier(Modifiers.Player.Default.ATTACKED)) {
+                player.sendMessage("gameplay.info.function.defense.attacked", color = Colors.NEGATIVE)
+            } else {
+                player.sendMessage("gameplay.info.function.defense", color = Colors.POSITIVE)
+                turn.applyDefense()
+            }
         }
 
         if (turn is EventFunction) {

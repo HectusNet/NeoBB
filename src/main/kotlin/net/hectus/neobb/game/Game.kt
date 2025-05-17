@@ -209,7 +209,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
                 moveToNextPlayer()
             }
 
-            if (turn.player.hasModifier(Modifiers.Player.Default.ATTACKED) && !turn.player.hasModifier(Modifiers.Player.Default.DEFENDED)) {
+            if (turn.player.hasModifier(Modifiers.Player.Default.ATTACKED)) {
                 eliminate(turn.player)
             }
         }
