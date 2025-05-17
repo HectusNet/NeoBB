@@ -75,7 +75,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
     // ==================================================
 
     fun init() {
-        initialPlayers = bukkitPlayers.map { NeoPlayer(it, this) }.toList()
+        initialPlayers = bukkitPlayers.map { NeoPlayer(it, this) }.shuffled()
         initialTarget = ForwardingTarget(initialPlayers.toMutableList())
         players = initialPlayers.toMutableList()
 
