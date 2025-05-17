@@ -70,7 +70,7 @@ fun bukkitRunTimer(delay: Long, interval: Long, task: (BukkitTask) -> Unit) = Bu
 
 fun <T> List<T>.following(element: T): T? {
     val index = indexOf(element)
-    return if (index != -1 && index + 1 < size) this[index + 1] else null
+    return if (index != -1) this[(index + 1) % size] else null
 }
 
 fun Component.asString(): String = PlainTextComponentSerializer.plainText().serialize(this)

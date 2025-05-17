@@ -36,7 +36,6 @@ class NeoBB : JavaPlugin() {
         const val VERSION = "0.1.0"
     }
 
-    @Suppress("UnstableApiUsage")
     override fun onEnable() {
         PLUGIN = this
         LOG = slF4JLogger

@@ -20,7 +20,7 @@ abstract class HectusGame(world: World, bukkitPlayers: List<Player>, difficulty:
                 info("Not applying counter from turn.")
                 return false
             } else {
-                info("Applying counter from turn.")
+                info("Applied counter from turn.")
                 player.sendMessage("gameplay.info.function.counter", color = Colors.POSITIVE)
             }
         }
