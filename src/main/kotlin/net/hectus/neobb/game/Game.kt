@@ -297,7 +297,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         val nextPlayer = player.nextPlayer()
         val turnNamespace = turn.namespace()
 
-        if (!allows(turn)) {
+        if (Constants.CHECK_WARP_CLASSES && !allows(turn)) {
             info("${player.name()} can't use $turnNamespace in the current warp.")
             player.sendMessage("gameplay.info.wrong_warp", color = Colors.NEGATIVE)
             player.playSound(Sound.ENTITY_VILLAGER_NO)

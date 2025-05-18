@@ -13,8 +13,8 @@ object Constants {
     const val MINECRAFT_TAB_CHAR = "   "
     const val MAX_LORE_WIDTH = 50
 
-    const val GAME_ID_LENGTH = 10
-    const val GAME_ID_CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    const val GAME_ID_LENGTH = 16
+    const val GAME_ID_CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789"
     const val GAME_LOG_PREFIX = "G-"
     const val GAME_CLEANUP_DELAY = 5L
 
@@ -23,6 +23,8 @@ object Constants {
 
     const val HIGHLIGHT_SCALE = 0.99f
     const val SPAWN_POINT_RADIUS = 3.0
+
+    const val CHECK_WARP_CLASSES = false
 
     val JSON: Json = @OptIn(ExperimentalSerializationApi::class) (Json {
         prettyPrint = true

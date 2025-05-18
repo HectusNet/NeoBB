@@ -15,7 +15,7 @@ class TMagentaGlazedTerracotta(data: Block?, cord: Cord?, player: NeoPlayer?) : 
         if (isDummy()) return true
 
         return if (player!!.game.history.isNotEmpty() && player.game.history.last() is BlockTurn) {
-            data!!.getRelative((data.blockData as Directional).facing) != player.game.history.last().data
+            data!!.getRelative((data.blockData as Directional).facing.oppositeFace) != player.game.history.last().data
         } else true
     }
 

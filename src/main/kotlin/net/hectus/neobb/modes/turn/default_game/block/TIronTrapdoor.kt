@@ -2,7 +2,6 @@ package net.hectus.neobb.modes.turn.default_game.block
 
 import com.marcpg.libpg.storing.Cord
 import net.hectus.neobb.modes.turn.default_game.CounterFilter
-import net.hectus.neobb.modes.turn.default_game.attribute.clazz.NatureClazz
 import net.hectus.neobb.modes.turn.default_game.attribute.clazz.NeutralClazz
 import net.hectus.neobb.modes.turn.default_game.attribute.clazz.RedstoneClazz
 import net.hectus.neobb.modes.turn.default_game.attribute.clazz.WaterClazz
@@ -14,6 +13,6 @@ class TIronTrapdoor(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(d
     override val cost: Int = 4
 
     override fun counters(): List<CounterFilter> {
-        return listOf(CounterFilter.clazz(NatureClazz::class), CounterFilter.clazz(WaterClazz::class), CounterFilter.clazz(RedstoneClazz::class))
+        return listOf(CounterFilter.clazz(NeutralClazz::class), CounterFilter.clazz(WaterClazz::class), CounterFilter.clazz(RedstoneClazz::class))
     }
 }
