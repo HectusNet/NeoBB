@@ -21,11 +21,6 @@ enum class Modifiers {;
         REDSTONE_POWER,
         NO_WARP;
 
-        enum class Legacy {
-            PORTAL_AWAIT,
-            NO_ATTACK
-        }
-
         enum class Person {
             FIRE_ENTITIES,
             BLUE_ENTITIES,

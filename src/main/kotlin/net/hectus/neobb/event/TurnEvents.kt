@@ -1,12 +1,11 @@
 package net.hectus.neobb.event
 
 import com.marcpg.libpg.event.CancellableImpl
-import com.marcpg.libpg.event.PlayerEvent.PlayerPortalCreateEvent
-import com.marcpg.libpg.event.PlayerEvent.PlayerTNTPrimeEvent
-import com.marcpg.libpg.util.Randomizer
-import io.papermc.paper.event.player.PlayerNameEntityEvent
 import net.hectus.neobb.game.GameManager
-import net.hectus.neobb.game.mode.*
+import net.hectus.neobb.game.mode.CardGame
+import net.hectus.neobb.game.mode.DefaultGame
+import net.hectus.neobb.game.mode.HectusGame
+import net.hectus.neobb.game.mode.PersonGame
 import net.hectus.neobb.matrix.structure.PlacedStructure
 import net.hectus.neobb.matrix.structure.StructureManager
 import net.hectus.neobb.modes.turn.card_game.*
@@ -20,19 +19,6 @@ import net.hectus.neobb.modes.turn.default_game.structure.*
 import net.hectus.neobb.modes.turn.default_game.structure.glass_wall.*
 import net.hectus.neobb.modes.turn.default_game.throwable.*
 import net.hectus.neobb.modes.turn.default_game.warp.*
-import net.hectus.neobb.modes.turn.legacy_game.block.LTPurpleWool
-import net.hectus.neobb.modes.turn.legacy_game.block.LTSeaPickle
-import net.hectus.neobb.modes.turn.legacy_game.block.LTTnt
-import net.hectus.neobb.modes.turn.legacy_game.item.LTDinnerboneTag
-import net.hectus.neobb.modes.turn.legacy_game.item.LTEnchantedGoldenApple
-import net.hectus.neobb.modes.turn.legacy_game.item.LTLightningTrident
-import net.hectus.neobb.modes.turn.legacy_game.other.LTNoteBlock
-import net.hectus.neobb.modes.turn.legacy_game.structure.LTDaylightSensorStrip
-import net.hectus.neobb.modes.turn.legacy_game.structure.LTNetherPortal
-import net.hectus.neobb.modes.turn.legacy_game.structure.LTPumpkinWall
-import net.hectus.neobb.modes.turn.legacy_game.structure.LTRedstoneBlockWall
-import net.hectus.neobb.modes.turn.legacy_game.structure.glass_wall.LTLightBlueGlassWall
-import net.hectus.neobb.modes.turn.legacy_game.warp.*
 import net.hectus.neobb.modes.turn.person_game.block.*
 import net.hectus.neobb.modes.turn.person_game.item.PTSuspiciousStew
 import net.hectus.neobb.modes.turn.person_game.other.PTArmorStand
@@ -43,7 +29,6 @@ import net.hectus.neobb.modes.turn.person_game.throwable.PTSplashPotion
 import net.hectus.neobb.modes.turn.person_game.warp.*
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
-import net.hectus.neobb.util.Modifiers
 import net.hectus.neobb.util.asCord
 import net.hectus.neobb.util.bukkitRunLater
 import net.kyori.adventure.text.Component
@@ -51,7 +36,6 @@ import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.data.type.NoteBlock
-import org.bukkit.block.data.type.SeaPickle
 import org.bukkit.entity.*
 import org.bukkit.event.Cancellable
 import org.bukkit.event.EventHandler
@@ -67,7 +51,6 @@ import org.bukkit.event.hanging.HangingPlaceEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
-import org.bukkit.event.world.PortalCreateEvent
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.potion.PotionType
 
@@ -158,7 +141,7 @@ class TurnEvents: Listener {
                     Material.PACKED_ICE -> player.game.turn(TPackedIce(block, cord, player), event)
                     Material.PINK_BED -> player.game.turn(TPinkBed(block, cord, player), event)
                     Material.POWDER_SNOW -> player.game.turn(TPowderSnow(block, cord, player), event)
-                    Material.PURPLE_WOOL -> player.game.turn(if (player.game is LegacyGame) LTPurpleWool(block, cord, player) else TPurpleWool(block, cord, player), event)
+                    Material.PURPLE_WOOL -> player.game.turn(TPurpleWool(block, cord, player), event)
                     Material.RED_BED -> player.game.turn(TRedBed(block, cord, player), event)
                     Material.RED_CARPET -> player.game.turn(TRedCarpet(block, cord, player), event)
                     Material.REPEATER -> player.game.turn(TRepeater(block, cord, player), event)
@@ -263,32 +246,6 @@ class TurnEvents: Listener {
                 "default.warp.wood" -> player.game.turn(TWoodWarp(placed, cord, player), event)
             }
         }
-        if (player.game is LegacyGame) {
-            when (structure.name) {
-                "legacy.pumpkin_wall" -> player.game.turn(LTPumpkinWall(placed, cord, player), event)
-                "legacy.daylight_sensor_strip" -> player.game.turn(LTDaylightSensorStrip(placed, cord, player), event)
-                "legacy.redstone_block_wall" -> player.game.turn(LTRedstoneBlockWall(placed, cord, player), event)
-                "legacy.nether_portal" -> LTNetherPortal.await(player.game)
-                "legacy.glass_wall.white" -> player.game.turn(TWhiteGlassWall(placed, cord, player), event)
-                "legacy.glass_wall.light_blue" -> player.game.turn(LTLightBlueGlassWall(placed, cord, player), event)
-                "legacy.warp.aether" -> player.game.turn(LTAetherWarp(placed, cord, player), event)
-                "legacy.warp.amethyst" -> player.game.turn(LTAmethystWarp(placed, cord, player), event)
-                "legacy.warp.book" -> player.game.turn(LTBookWarp(placed, cord, player), event)
-                "legacy.warp.cliff" -> player.game.turn(LTCliffWarp(placed, cord, player), event)
-                "legacy.warp.end" -> player.game.turn(LTEndWarp(placed, cord, player), event)
-                "legacy.warp.ice" -> player.game.turn(LTIceWarp(placed, cord, player), event)
-                "legacy.warp.mushroom" -> player.game.turn(LTMushroomWarp(placed, cord, player), event)
-                "legacy.warp.nether" -> player.game.turn(LTNetherWarp(placed, cord, player), event)
-                "legacy.warp.redstone" -> player.game.turn(LTRedstoneWarp(placed, cord, player), event)
-                "legacy.warp.snow" -> player.game.turn(LTSnowWarp(placed, cord, player), event)
-                "legacy.warp.sun" -> player.game.turn(LTSunWarp(placed, cord, player), event)
-                "legacy.warp.underwater" -> player.game.turn(LTUnderwaterWarp(placed, cord, player), event)
-                "legacy.warp.void" -> player.game.turn(LTVoidWarp(placed, cord, player), event)
-                "legacy.warp.wood" -> player.game.turn(LTWoodWarp(placed, cord, player), event)
-                "legacy.warp.heaven" -> player.game.turn(if (Randomizer.boolByChance(55.0)) LTHeavenWarp(placed, cord, player) else LTHellWarp(placed, cord, player), event)
-                "legacy.warp.hell" -> player.game.turn(if (Randomizer.boolByChance(55.0)) LTHellWarp(placed, cord, player) else LTHeavenWarp(placed, cord, player), event)
-            }
-        }
         if (player.game is PersonGame) {
             when (structure.name) {
                 "person.candle_circle" -> player.game.turn(PTCandleCircle(placed, cord, player), event)
@@ -343,15 +300,6 @@ class TurnEvents: Listener {
                 if (turn is InteractableCardTurn && player == turn.player && turn.data!!.location == event.clickedBlock!!.location)
                     turn.interact()
             }
-            is LegacyGame -> {
-                val blockData = event.clickedBlock!!.blockData
-                if (event.clickedBlock != null && blockData is NoteBlock) {
-                    player.game.turn(LTNoteBlock(blockData, event.clickedBlock!!.location.asCord(), player), event)
-                } else if (event.clickedBlock != null && blockData is SeaPickle) {
-                    if (blockData.pickles == blockData.maximumPickles)
-                        player.game.turn(LTSeaPickle(event.clickedBlock, event.clickedBlock!!.location.asCord(), player), event)
-                }
-            }
             else -> {}
         }
     }
@@ -396,12 +344,6 @@ class TurnEvents: Listener {
 
             if (player!!.game is DefaultGame)
                 player.game.turn(TChorusFruit(event.item, event.player.location.asCord(), player), event)
-        } else if (event.item.type == Material.ENCHANTED_GOLDEN_APPLE) {
-            val player = GameManager.player(event.player, true)
-            if (unusable(event.player, player, true, event, "You cannot eat enchanted golden apples right now!")) return
-
-            if (player!!.game is LegacyGame)
-                player.game.turn(LTEnchantedGoldenApple(event.item, event.player.location.asCord(), player), event)
         } else if (event.item.type == Material.SUSPICIOUS_STEW) {
             val player = GameManager.player(event.player, true)
             if (unusable(event.player, player, true, event, "You cannot eat enchanted suspicious stew right now!")) return
@@ -462,10 +404,6 @@ class TurnEvents: Listener {
                         player.game.turn(TEnderPearl(entity, entity.location.asCord(), player), event)
                     }
                 }
-                is LegacyGame -> {
-                    if (entity is Trident)
-                        player.game.turn(LTLightningTrident(entity.itemStack, entity.location.asCord(), player), event)
-                }
                 is PersonGame -> {
                     if (entity is Snowball)
                         player.game.turn(PTSnowball(entity, entity.location.asCord(), player), event)
@@ -484,34 +422,6 @@ class TurnEvents: Listener {
 
         if (player.game is DefaultGame && event.itemDrop.itemStack.type == Material.IRON_SHOVEL)
             player.game.turn(TIronShovel(event.itemDrop.itemStack, event.itemDrop.location.asCord(), player), event)
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    fun onPlayerNameEntity(event: PlayerNameEntityEvent) {
-        val player = GameManager.player(event.player, true)
-        if (unusable(event.player, player, true, event, "You cannot name mobs right now!")) return
-
-        if (event.entity is Sheep && event.name == Component.text("Dinnerbone"))
-            player!!.game.turn(LTDinnerboneTag(event.player.activeItem, event.entity.location.asCord(), player), event)
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    fun onPlayerTNTPrime(event: PlayerTNTPrimeEvent) {
-        val player = GameManager.player(event.player(), true)
-        if (unusable(event.player(), player, true, event, "You cannot prime tnt right now!")) return
-
-        player!!.game.turn(LTTnt(event.block, event.block.location.asCord(), player), event)
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    fun onPlayerPortalCreate(event: PlayerPortalCreateEvent) {
-        if (event.reason == PortalCreateEvent.CreateReason.FIRE) {
-            val player = GameManager.player(event.player(), true)
-            if (unusable(event.player(), player, false, event, "You cannot ignite portals right now!")) return
-
-            if (player!!.game.hasModifier(Modifiers.Game.Legacy.PORTAL_AWAIT))
-                player.game.turn(LTNetherPortal(event.blocks, event.entity!!.location.asCord(), player), event)
-        }
     }
 
     private fun unusable(fallbackPlayer: Player, player: NeoPlayer?, requireTurning: Boolean, event: Cancellable, message: String): Boolean {

@@ -1,7 +1,6 @@
 package net.hectus.neobb.modes.turn.default_game.attribute.function
 
 import com.marcpg.libpg.storing.Cord
-import net.hectus.neobb.game.mode.LegacyGame
 import net.hectus.neobb.modes.turn.Turn
 import net.hectus.neobb.modes.turn.default_game.CounterFilter
 import net.hectus.neobb.player.NeoPlayer
@@ -16,7 +15,7 @@ interface CounterFunction : Function {
         if (turn.player!!.game.history.isEmpty()) return true
         val last: Turn<*> = turn.player.game.history.last()
 
-        if (turn.player.game !is LegacyGame || last.cord?.add(Cord(0.0, 1.0, 0.0)) == turn.cord) { // Only check if it's a legacy game.
+        if (!turn.player.game.difficulty.blockPositionRules || last.cord?.add(Cord(0.0, 1.0, 0.0)) == turn.cord) { // Only check if it's a hard or champ difficulty.
             if (!turn.player.game.difficulty.completeRules || counters().any { it.doCounter(last) }) {
                 counter(turn.player, last)
             } else {

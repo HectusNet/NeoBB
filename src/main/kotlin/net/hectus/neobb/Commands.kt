@@ -13,7 +13,6 @@ import net.hectus.neobb.external.cosmetic.PlayerAnimation
 import net.hectus.neobb.game.GameManager
 import net.hectus.neobb.game.mode.CardGame
 import net.hectus.neobb.game.mode.DefaultGame
-import net.hectus.neobb.game.mode.LegacyGame
 import net.hectus.neobb.game.mode.PersonGame
 import net.hectus.neobb.game.util.GameDifficulty
 import net.hectus.neobb.matrix.structure.Structure
@@ -30,7 +29,7 @@ import java.util.*
 
 @Suppress("UnstableApiUsage")
 object Commands {
-    val MODES = listOf("default", "card", "legacy", "person98")
+    val MODES = listOf("default", "card", "person98")
 
     fun games() : LiteralCommandNode<CommandSourceStack> = Commands.literal("game")
         .requires { source -> source.sender.hasPermission("neobb.games") }
@@ -63,7 +62,6 @@ object Commands {
                                 when (context.getArgument("mode", String::class.java)) {
                                     "default" -> DefaultGame(players.last().world, players, difficulty).init()
                                     "card" -> CardGame(players.last().world, players, difficulty).init()
-                                    "legacy" -> LegacyGame(players.last().world, players, difficulty).init()
                                     "person98" -> PersonGame(players.last().world, players, difficulty).init()
                                     else -> source.sendMessage(locale.component("command.games.start.unknown_mode", color = Colors.NEGATIVE))
                                 }

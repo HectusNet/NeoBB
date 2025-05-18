@@ -2,10 +2,8 @@ package net.hectus.neobb.modes.shop
 
 import com.marcpg.libpg.util.ItemBuilder
 import net.hectus.neobb.NeoBB
-import net.hectus.neobb.game.mode.LegacyGame
 import net.hectus.neobb.modes.shop.util.FilterState
 import net.hectus.neobb.modes.shop.util.Items
-import net.hectus.neobb.modes.turn.ComboTurn
 import net.hectus.neobb.modes.turn.Turn
 import net.hectus.neobb.modes.turn.default_game.attribute.clazz.*
 import net.hectus.neobb.modes.turn.default_game.attribute.function.*
@@ -56,121 +54,65 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
     init {
         val locale = player.locale()
 
-        gui = if (player.game is LegacyGame) {
-            ScrollGui.items().setStructure(
-                "1 # # # # # # # ^", // # = Border
-                "2 # * * * * * * #", // F = Filters
-                "3 # * * * * * * #", // * = Items
-                "4 # * * * * * * #", // D = Done Button
-                "5 # * * * * * * #", // ^ = Scroll Up
-                "6 # # # D # # # v") // v = Scroll Down
-                .setBackground(Items.BLACK_BACKGROUND)
-                .addIngredient('#', Items.GRAY_BACKGROUND)
+        gui = ScrollGui.items().setStructure(
+            "1 # # # # # # # ^", // # = Border
+            "2 # * * * * * * #", // F = Filters
+            "3 # * * * * * * #", // * = Items
+            "4 # * * * * * * #", // D = Done Button
+            "5 # * * * * * * #", // ^ = Scroll Up
+            "6 # # # D # # # v") // v = Scroll Down
+            .setBackground(Items.BLACK_BACKGROUND)
+            .addIngredient('#', Items.GRAY_BACKGROUND)
 
-                .addIngredient('1', Items.ClickItem(filter(Material.EGG, "usage")) { _, _ ->
-                    filterUsageMenu(mapOf(
-                        "block" to Pair(Material.GRASS_BLOCK, BlockTurn::class),
-                        "item" to Pair(Material.STICK, ItemTurn::class),
-                        "mob" to Pair(Material.CREEPER_SPAWN_EGG, MobTurn::class),
-                        "throwable" to Pair(Material.EGG, ThrowableTurn::class),
-                        "structures" to Pair(Material.BAMBOO_BLOCK, StructureTurn::class)
-                    ), "usage")
-                })
-                .addIngredient('2', Items.ClickItem(filter(Material.LAVA_BUCKET, "class")) { _, _ ->
-                    filterUsageMenu(mapOf(
-                        "neutral" to Pair(Material.DIRT, NeutralClazz::class),
-                        "hot" to Pair(Material.MAGMA_BLOCK, HotClazz::class),
-                        "cold" to Pair(Material.BLUE_ICE, ColdClazz::class),
-                        "water" to Pair(Material.WATER_BUCKET, WaterClazz::class),
-                        "nature" to Pair(Material.AZALEA_LEAVES, NatureClazz::class),
-                        "redstone" to Pair(Material.REDSTONE_BLOCK, RedstoneClazz::class),
-                        "dream" to Pair(Material.WHITE_WOOL, SupernaturalClazz::class)
-                    ), "class")
-                })
-                .addIngredient('3', Items.ClickItem(filter(Material.IRON_AXE, "type")) { _, _ ->
-                    filterUsageMenu(mapOf(
-                        "attack" to Pair(Material.DIAMOND_SWORD, AttackFunction::class),
-                        "counter" to Pair(Material.TOTEM_OF_UNDYING, CounterFunction::class),
-                        "counterattack" to Pair(Material.DIAMOND_CHESTPLATE, CounterattackFunction::class),
-                        "warp" to Pair(Material.END_PORTAL_FRAME, WarpFunction::class),
-                        "buff" to Pair(Material.SPLASH_POTION, BuffFunction::class),
-                        "defense" to Pair(Material.SHIELD, DefenseFunction::class),
-                        "await" to Pair(Material.CLOCK, ComboTurn::class)
-                    ), "function")
-                })
+            .addIngredient('1', Items.ClickItem(filter(Material.EGG, "usage")) { _, _ ->
+                filterUsageMenu(mapOf(
+                    "block" to Pair(Material.GRASS_BLOCK, BlockTurn::class),
+                    "flower" to Pair(Material.POPPY, FlowerTurn::class),
+                    "item" to Pair(Material.STICK, ItemTurn::class),
+                    "mob" to Pair(Material.CREEPER_SPAWN_EGG, MobTurn::class),
+                    "throwable" to Pair(Material.EGG, ThrowableTurn::class),
+                    "structures" to Pair(Material.BAMBOO_BLOCK, StructureTurn::class),
+                    "glass-wall" to Pair(Material.PURPLE_STAINED_GLASS, GlassWallTurn::class),
+                    "other" to Pair(Material.STRUCTURE_BLOCK, OtherTurn::class)
+                ), "usage")
+            })
+            .addIngredient('2', Items.ClickItem(filter(Material.LAVA_BUCKET, "class")) { _, _ ->
+                filterUsageMenu(mapOf(
+                    "neutral" to Pair(Material.DIRT, NeutralClazz::class),
+                    "hot" to Pair(Material.MAGMA_BLOCK, HotClazz::class),
+                    "cold" to Pair(Material.BLUE_ICE, ColdClazz::class),
+                    "water" to Pair(Material.WATER_BUCKET, WaterClazz::class),
+                    "nature" to Pair(Material.AZALEA_LEAVES, NatureClazz::class),
+                    "redstone" to Pair(Material.REDSTONE_BLOCK, RedstoneClazz::class),
+                    "supernatural" to Pair(Material.REPEATING_COMMAND_BLOCK, SupernaturalClazz::class)
+                ), "clazz")
+            })
+            .addIngredient('3', Items.ClickItem(filter(Material.IRON_AXE, "function")) { _, _ ->
+                filterUsageMenu(mapOf(
+                    "attack" to Pair(Material.DIAMOND_SWORD, AttackFunction::class),
+                    "buff" to Pair(Material.SPLASH_POTION, BuffFunction::class),
+                    "counterattack" to Pair(Material.DIAMOND_CHESTPLATE, CounterattackFunction::class),
+                    "counterbuff" to Pair(Material.WITHER_ROSE, CounterbuffFunction::class),
+                    "counter" to Pair(Material.TOTEM_OF_UNDYING, CounterFunction::class),
+                    "defense" to Pair(Material.SHIELD, DefenseFunction::class),
+                    "event" to Pair(Material.FIREWORK_ROCKET, EventFunction::class),
+                    "warp" to Pair(Material.END_PORTAL_FRAME, WarpFunction::class)
+                ), "class")
+            })
 
-                .addIngredient('D', Items.ClickItem(ItemBuilder(Material.LIME_DYE)
+            .addIngredient('D', Items.ClickItem(
+                ItemBuilder(Material.LIME_DYE)
                     .name(locale.component("shop.done.name", color = Colors.ACCENT, decoration = TextDecoration.BOLD))
                     .addLore(locale.component("shop.done.lore.1", color = Colors.NEUTRAL))
                     .addLore(locale.component("shop.done.lore.2", color = Colors.NEUTRAL))
-                    .build()) { _, _ -> player.closeInv() })
+                    .build()
+            ) { _, _ -> player.closeInv() })
 
-                .addIngredient('^', Items.ScrollItem(true))
-                .addIngredient('v', Items.ScrollItem(false))
+            .addIngredient('^', Items.ScrollItem(true))
+            .addIngredient('v', Items.ScrollItem(false))
 
-                .addIngredient('*', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-                .build()
-        } else {
-            ScrollGui.items().setStructure(
-                "1 # # # # # # # ^", // # = Border
-                "2 # * * * * * * #", // F = Filters
-                "3 # * * * * * * #", // * = Items
-                "4 # * * * * * * #", // D = Done Button
-                "5 # * * * * * * #", // ^ = Scroll Up
-                "6 # # # D # # # v") // v = Scroll Down
-                .setBackground(Items.BLACK_BACKGROUND)
-                .addIngredient('#', Items.GRAY_BACKGROUND)
-
-                .addIngredient('1', Items.ClickItem(filter(Material.EGG, "usage")) { _, _ ->
-                    filterUsageMenu(mapOf(
-                        "block" to Pair(Material.GRASS_BLOCK, BlockTurn::class),
-                        "flower" to Pair(Material.POPPY, FlowerTurn::class),
-                        "item" to Pair(Material.STICK, ItemTurn::class),
-                        "mob" to Pair(Material.CREEPER_SPAWN_EGG, MobTurn::class),
-                        "throwable" to Pair(Material.EGG, ThrowableTurn::class),
-                        "structures" to Pair(Material.BAMBOO_BLOCK, StructureTurn::class),
-                        "glass-wall" to Pair(Material.PURPLE_STAINED_GLASS, GlassWallTurn::class),
-                        "other" to Pair(Material.STRUCTURE_BLOCK, OtherTurn::class)
-                    ), "usage")
-                })
-                .addIngredient('2', Items.ClickItem(filter(Material.LAVA_BUCKET, "class")) { _, _ ->
-                    filterUsageMenu(mapOf(
-                        "neutral" to Pair(Material.DIRT, NeutralClazz::class),
-                        "hot" to Pair(Material.MAGMA_BLOCK, HotClazz::class),
-                        "cold" to Pair(Material.BLUE_ICE, ColdClazz::class),
-                        "water" to Pair(Material.WATER_BUCKET, WaterClazz::class),
-                        "nature" to Pair(Material.AZALEA_LEAVES, NatureClazz::class),
-                        "redstone" to Pair(Material.REDSTONE_BLOCK, RedstoneClazz::class),
-                        "supernatural" to Pair(Material.REPEATING_COMMAND_BLOCK, SupernaturalClazz::class)
-                    ), "clazz")
-                })
-                .addIngredient('3', Items.ClickItem(filter(Material.IRON_AXE, "function")) { _, _ ->
-                    filterUsageMenu(mapOf(
-                        "attack" to Pair(Material.DIAMOND_SWORD, AttackFunction::class),
-                        "buff" to Pair(Material.SPLASH_POTION, BuffFunction::class),
-                        "counterattack" to Pair(Material.DIAMOND_CHESTPLATE, CounterattackFunction::class),
-                        "counterbuff" to Pair(Material.WITHER_ROSE, CounterbuffFunction::class),
-                        "counter" to Pair(Material.TOTEM_OF_UNDYING, CounterFunction::class),
-                        "defense" to Pair(Material.SHIELD, DefenseFunction::class),
-                        "event" to Pair(Material.FIREWORK_ROCKET, EventFunction::class),
-                        "warp" to Pair(Material.END_PORTAL_FRAME, WarpFunction::class)
-                    ), "class")
-                })
-
-                .addIngredient('D', Items.ClickItem(
-                    ItemBuilder(Material.LIME_DYE)
-                        .name(locale.component("shop.done.name", color = Colors.ACCENT, decoration = TextDecoration.BOLD))
-                        .addLore(locale.component("shop.done.lore.1", color = Colors.NEUTRAL))
-                        .addLore(locale.component("shop.done.lore.2", color = Colors.NEUTRAL))
-                        .build()
-                ) { _, _ -> player.closeInv() })
-
-                .addIngredient('^', Items.ScrollItem(true))
-                .addIngredient('v', Items.ScrollItem(false))
-
-                .addIngredient('*', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-                .build()
-        }
+            .addIngredient('*', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+            .build()
     }
 
     override fun open() {

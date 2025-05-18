@@ -46,45 +46,6 @@ enum class StaticStructures : StaticStructure {
         }
     }
 
-    enum class Legacy : StaticStructure {
-        DAYLIGHT_SENSOR_STRIP,
-        NETHER_PORTAL,
-        PUMPKIN_WALL,
-        REDSTONE_BLOCK_WALL;
-
-        override val key: String = "legacy.${name.lowercase()}"
-
-        enum class GlassWall : StaticStructure {
-            DEFAULT,
-            LIGHT_BLUE,
-            LIME;
-
-            override val key: String = "default.glass_wall.${name.lowercase()}"
-        }
-
-        enum class Warp : StaticStructure {
-            NETHER,
-            SNOW,
-            SUN,
-            VOID,
-            AETHER, //
-            AMETHYST,
-            BOOK, //
-            CLIFF, //
-            DESERT, //
-            END, //
-            HEAVEN, //
-            HELL, //
-            ICE, //
-            MUSHROOM,
-            REDSTONE, //
-            UNDERWATER, //
-            WOOD;
-
-            override val key: String = "legacy.warp.${name.lowercase()}"
-        }
-    }
-
     enum class Person : StaticStructure {
         CANDLE_CIRCLE,
         PUMPKIN_WALL,
