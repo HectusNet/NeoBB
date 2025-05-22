@@ -8,7 +8,7 @@ import net.hectus.neobb.NeoBB
 import net.hectus.neobb.matrix.BlockInfo
 import net.hectus.neobb.matrix.BlockSpace
 import net.hectus.neobb.util.Configuration
-import net.hectus.neobb.util.asCord
+import net.hectus.util.asCord
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World

@@ -6,7 +6,7 @@ import net.hectus.neobb.modes.turn.default_game.CounterFilter
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Modifiers
-import net.hectus.neobb.util.component
+import net.hectus.util.component
 
 interface CounterFunction : Function {
     fun counters(): List<CounterFilter>

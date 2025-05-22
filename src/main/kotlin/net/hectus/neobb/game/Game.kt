@@ -20,7 +20,12 @@ import net.hectus.neobb.player.ForwardingTarget
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.player.Target
 import net.hectus.neobb.util.*
-import net.kyori.adventure.text.Component
+import net.hectus.util.asCord
+import net.hectus.util.bukkitRunLater
+import net.hectus.util.bukkitRunTimer
+import net.hectus.util.component
+import net.hectus.util.display.SimpleActionBar
+import net.hectus.util.display.SimpleScoreboard
 import net.kyori.adventure.title.Title
 import org.bukkit.*
 import org.bukkit.entity.BlockDisplay
@@ -44,6 +49,9 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
     val allowed: MutableSet<KClass<*>> = mutableSetOf()
 
     abstract val info: GameInfo
+
+    open val scoreboard: ((NeoPlayer) -> SimpleScoreboard)? = null
+    open val actionBar: ((NeoPlayer) -> SimpleActionBar)? = null
 
     // ==================================================
     // ============ PUBLIC GETTER VARIABLES =============
@@ -144,9 +152,6 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
      * @param tick The tick which this method was called for.
      */
     open fun extraTick(tick: Ticking.Tick) {}
-
-    open fun scoreboard(player: NeoPlayer): List<Component>? = null
-    open fun actionbar(player: NeoPlayer): Component? = null
 
     open fun onOutOfBounds(player: NeoPlayer) = eliminate(player)
 
@@ -253,7 +258,6 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
     override fun tick(tick: Ticking.Tick) {
         if (!started) return
 
-        players.forEach { it.tick(tick) }
         if (tick.isSecond()) {
             timeLeft.decrement()
             if (timeLeft.get() == 0L)

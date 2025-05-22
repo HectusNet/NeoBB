@@ -17,9 +17,9 @@ import net.hectus.neobb.modes.turn.default_game.structure.glass_wall.GlassWallTu
 import net.hectus.neobb.modes.turn.default_game.throwable.ThrowableTurn
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
-import net.hectus.neobb.util.asString
-import net.hectus.neobb.util.bukkitRun
-import net.hectus.neobb.util.component
+import net.hectus.util.asString
+import net.hectus.util.bukkitRun
+import net.hectus.util.component
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material

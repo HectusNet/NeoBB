@@ -5,7 +5,7 @@ import net.hectus.neobb.modes.turn.default_game.attribute.clazz.WaterClazz
 import net.hectus.neobb.modes.turn.default_game.attribute.function.EventFunction
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Modifiers
-import net.hectus.neobb.util.bukkitRunTimer
+import net.hectus.util.bukkitRunTimer
 import org.bukkit.Material
 import org.bukkit.entity.Boat
 import org.bukkit.inventory.ItemStack

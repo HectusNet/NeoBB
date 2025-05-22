@@ -8,7 +8,7 @@ import net.hectus.neobb.modes.turn.default_game.attribute.function.BuffFunction
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Modifiers
-import net.hectus.neobb.util.component
+import net.hectus.util.component
 import org.bukkit.block.Block
 
 class TSeaLantern(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), BuffFunction, WaterClazz {

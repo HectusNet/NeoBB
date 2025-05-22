@@ -22,8 +22,9 @@ import net.hectus.neobb.modes.turn.default_game.warp.*
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Modifiers
-import net.hectus.neobb.util.component
-import net.hectus.neobb.util.string
+import net.hectus.util.component
+import net.hectus.util.display.*
+import net.hectus.util.string
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.World
@@ -67,49 +68,33 @@ class DefaultGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDif
         ),
     )
 
-    override fun onOutOfBounds(player: NeoPlayer) {
-        player.damage(2.0)
-    }
+    override val scoreboard: ((NeoPlayer) -> SimpleScoreboard)? = { p -> SimpleScoreboard(p.player, 5, MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"),
+        ValueScoreboardEntry(p.locale().component("scoreboard.turning", color = Colors.ACCENT)) { Component.text(if (currentPlayer() === p) p.locale().string("scoreboard.turning.you") else currentPlayer().name()) },
+        ValueScoreboardEntry(p.locale().component("scoreboard.time", color = Colors.ACCENT)) { Component.text(p.game.timeLeft.preciselyFormatted) },
+        ValueScoreboardEntry(p.locale().component("scoreboard.luck", color = Colors.ACCENT)) { Component.text(p.luck) },
+        BlankScoreboardEntry(),
+        ValueScoreboardEntry(p.locale().component("scoreboard.rank", color = Colors.ACCENT)) { Rank.ofElo(p.databaseInfo.elo).toRankTranslations(p.locale()) },
+        ValueScoreboardEntry(p.locale().component("scoreboard.elo", color = Colors.ACCENT)) { Component.text(p.databaseInfo.elo.toInt()) },
+        BlankScoreboardEntry(),
+        SimpleScoreboardEntry() { Component.text("NeoBB-" + NeoBB.VERSION + " (d" + Integer.toHexString(LocalDateTime.now().dayOfYear) + "h" + LocalDateTime.now().hour + ")", Colors.EXTRA) },
+        StaticScoreboardEntry(Component.text("mc.hectus.net", Colors.LINK)),
+    ) }
 
-    override fun scoreboard(player: NeoPlayer): List<Component> {
-        val locale = player.locale()
-        return try {
-            listOf(
-                MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"),
-                locale.component("scoreboard.turning", color = Colors.ACCENT)
-                    .append(Component.text(if (currentPlayer() === player) locale.string("scoreboard.turning.you") else currentPlayer().name(), Colors.RESET)),
-                locale.component("scoreboard.time", color = Colors.ACCENT)
-                    .append(Component.text(player.game.timeLeft.preciselyFormatted, Colors.RESET)),
-                locale.component("scoreboard.luck", color = Colors.ACCENT)
-                    .append(Component.text(player.luck, Colors.RESET)),
-                Component.empty(),
-                locale.component("scoreboard.rank", color = Colors.ACCENT)
-                    .append(Rank.ofElo(player.databaseInfo.elo).toRankTranslations(locale)),
-                locale.component("scoreboard.elo", color = Colors.ACCENT)
-                    .append(Component.text(player.databaseInfo.elo.toInt(), Colors.RESET)),
-                Component.empty(),
-                Component.text("NeoBB-" + NeoBB.VERSION + " (d" + Integer.toHexString(LocalDateTime.now().dayOfYear) + "h" + LocalDateTime.now().hour + ")", Colors.EXTRA),
-                Component.text("mc.hectus.net", Colors.LINK)
-            )
-        } catch (e: Exception) {
-            listOf(MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"))
-        }
-    }
-
-    override fun actionbar(player: NeoPlayer): Component {
-        val locale = player.locale()
-        return if (currentPlayer() === player) {
-            if (player.hasModifier(Modifiers.Player.Default.ATTACKED)) {
-                if (player.hasModifier(Modifiers.Player.Default.DEFENDED)) {
-                    locale.component("actionbar.defended_attack", color = Colors.NEUTRAL)
-                } else {
-                    locale.component("actionbar.attacked", color = Colors.NEGATIVE)
-                }
+    override val actionBar: ((NeoPlayer) -> SimpleActionBar)? = { p -> SimpleActionBar(p.player, 1) { if (currentPlayer() === p) {
+        if (p.hasModifier(Modifiers.Player.Default.ATTACKED)) {
+            if (p.hasModifier(Modifiers.Player.Default.DEFENDED)) {
+                p.locale().component("actionbar.defended_attack", color = Colors.NEUTRAL)
             } else {
-                locale.component("actionbar.you_turning", color = Colors.POSITIVE)
+                p.locale().component("actionbar.attacked", color = Colors.NEGATIVE)
             }
         } else {
-            locale.component("actionbar.other_turning", currentPlayer().name(), color = Colors.NEUTRAL)
+            p.locale().component("actionbar.you_turning", color = Colors.POSITIVE)
         }
+    } else {
+        p.locale().component("actionbar.other_turning", currentPlayer().name(), color = Colors.NEUTRAL)
+    } } }
+
+    override fun onOutOfBounds(player: NeoPlayer) {
+        player.damage(2.0)
     }
 }

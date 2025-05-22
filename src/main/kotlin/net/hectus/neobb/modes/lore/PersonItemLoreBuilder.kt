@@ -4,7 +4,7 @@ import net.hectus.neobb.modes.turn.default_game.attribute.function.BuffFunction
 import net.hectus.neobb.modes.turn.default_game.attribute.function.CounterFunction
 import net.hectus.neobb.modes.turn.person_game.categorization.Category
 import net.hectus.neobb.modes.turn.person_game.warp.PWarpTurn
-import net.hectus.neobb.util.component
+import net.hectus.util.component
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import java.util.*

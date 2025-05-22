@@ -18,9 +18,9 @@ import net.hectus.neobb.game.util.GameDifficulty
 import net.hectus.neobb.matrix.structure.Structure
 import net.hectus.neobb.matrix.structure.StructureManager
 import net.hectus.neobb.util.Colors
-import net.hectus.neobb.util.asCord
-import net.hectus.neobb.util.component
-import net.hectus.neobb.util.enumValueNoCase
+import net.hectus.util.asCord
+import net.hectus.util.component
+import net.hectus.util.enumValueNoCase
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.World

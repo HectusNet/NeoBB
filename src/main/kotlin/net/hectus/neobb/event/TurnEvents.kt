@@ -29,8 +29,8 @@ import net.hectus.neobb.modes.turn.person_game.throwable.PTSplashPotion
 import net.hectus.neobb.modes.turn.person_game.warp.*
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
-import net.hectus.neobb.util.asCord
-import net.hectus.neobb.util.bukkitRunLater
+import net.hectus.util.asCord
+import net.hectus.util.bukkitRunLater
 import net.kyori.adventure.text.Component
 import org.bukkit.GameMode
 import org.bukkit.Material

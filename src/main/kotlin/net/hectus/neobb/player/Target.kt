@@ -2,7 +2,7 @@ package net.hectus.neobb.player
 
 import com.marcpg.libpg.data.modifiable.Modifiable
 import com.marcpg.libpg.storing.Cord
-import net.hectus.neobb.util.asCord
+import net.hectus.util.asCord
 import net.kyori.adventure.audience.ForwardingAudience
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration

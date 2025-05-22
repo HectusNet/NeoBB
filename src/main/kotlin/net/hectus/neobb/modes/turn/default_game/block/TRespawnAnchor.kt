@@ -8,7 +8,7 @@ import net.hectus.neobb.buff.Teleport
 import net.hectus.neobb.modes.turn.default_game.attribute.clazz.HotClazz
 import net.hectus.neobb.modes.turn.default_game.attribute.function.BuffFunction
 import net.hectus.neobb.player.NeoPlayer
-import net.hectus.neobb.util.asCord
+import net.hectus.util.asCord
 import org.bukkit.block.Block
 
 class TRespawnAnchor(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), BuffFunction, HotClazz {

@@ -11,9 +11,9 @@ import net.hectus.neobb.modes.turn.person_game.structure.PTTorchCircle
 import net.hectus.neobb.modes.turn.person_game.warp.PTAmethystWarp
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
-import net.hectus.neobb.util.asString
-import net.hectus.neobb.util.bukkitRun
-import net.hectus.neobb.util.component
+import net.hectus.util.asString
+import net.hectus.util.bukkitRun
+import net.hectus.util.component
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.bukkit.Sound

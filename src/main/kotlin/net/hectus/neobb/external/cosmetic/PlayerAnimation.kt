@@ -4,8 +4,8 @@ import com.marcpg.libpg.storing.Cord
 import com.marcpg.libpg.util.Randomizer
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Utilities
-import net.hectus.neobb.util.asLocation
-import net.hectus.neobb.util.bukkitRunTimer
+import net.hectus.util.asLocation
+import net.hectus.util.bukkitRunTimer
 import org.bukkit.Color
 import org.bukkit.FireworkEffect
 import org.bukkit.Material

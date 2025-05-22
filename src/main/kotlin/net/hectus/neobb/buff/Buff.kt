@@ -6,7 +6,7 @@ import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.player.Target
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Constants
-import net.hectus.neobb.util.string
+import net.hectus.util.string
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import java.util.*

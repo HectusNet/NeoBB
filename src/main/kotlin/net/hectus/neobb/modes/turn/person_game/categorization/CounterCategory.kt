@@ -4,7 +4,7 @@ import com.marcpg.libpg.storing.Cord
 import net.hectus.neobb.modes.turn.Turn
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
-import net.hectus.neobb.util.component
+import net.hectus.util.component
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor

@@ -2,8 +2,8 @@ package net.hectus.neobb.matrix
 
 import net.hectus.neobb.game.Game
 import net.hectus.neobb.util.Configuration
-import net.hectus.neobb.util.asCord
-import net.hectus.neobb.util.asLocation
+import net.hectus.util.asCord
+import net.hectus.util.asLocation
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity

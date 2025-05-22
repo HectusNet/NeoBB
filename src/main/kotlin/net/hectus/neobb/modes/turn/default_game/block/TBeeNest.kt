@@ -6,7 +6,7 @@ import net.hectus.neobb.modes.turn.default_game.attribute.clazz.NatureClazz
 import net.hectus.neobb.modes.turn.default_game.attribute.function.AttackFunction
 import net.hectus.neobb.modes.turn.default_game.mob.TBee
 import net.hectus.neobb.player.NeoPlayer
-import net.hectus.neobb.util.asCord
+import net.hectus.util.asCord
 import org.bukkit.block.Block
 import org.bukkit.entity.Bee
 

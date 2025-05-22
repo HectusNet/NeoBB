@@ -4,8 +4,8 @@ import com.marcpg.libpg.text.Formatter
 import net.hectus.neobb.modes.turn.Turn
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Constants
-import net.hectus.neobb.util.component
-import net.hectus.neobb.util.string
+import net.hectus.util.component
+import net.hectus.util.string
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import java.util.*

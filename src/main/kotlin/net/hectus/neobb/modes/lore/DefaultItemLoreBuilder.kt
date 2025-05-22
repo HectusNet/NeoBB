@@ -2,7 +2,7 @@ package net.hectus.neobb.modes.lore
 
 import net.hectus.neobb.modes.turn.default_game.attribute.function.BuffFunction
 import net.hectus.neobb.modes.turn.default_game.attribute.function.CounterFunction
-import net.hectus.neobb.util.component
+import net.hectus.util.component
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import java.util.*

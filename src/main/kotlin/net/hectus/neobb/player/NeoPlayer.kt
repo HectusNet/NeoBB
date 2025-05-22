@@ -4,16 +4,15 @@ import com.marcpg.libpg.data.modifiable.ModifiableImpl
 import com.marcpg.libpg.storing.Cord
 import com.marcpg.libpg.util.MinecraftTime
 import io.papermc.paper.entity.TeleportFlag
-import io.papermc.paper.scoreboard.numbers.NumberFormat
 import net.hectus.neobb.game.Game
 import net.hectus.neobb.game.mode.PersonGame
 import net.hectus.neobb.modes.shop.Shop
-import net.hectus.neobb.util.Ticking
-import net.hectus.neobb.util.component
-import net.hectus.neobb.util.following
+import net.hectus.util.component
+import net.hectus.util.display.SimpleActionBar
+import net.hectus.util.display.SimpleScoreboard
+import net.hectus.util.following
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.audience.ForwardingAudience.Single
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Bukkit
@@ -21,13 +20,10 @@ import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.entity.Player
-import org.bukkit.scoreboard.Criteria
-import org.bukkit.scoreboard.DisplaySlot
-import org.bukkit.scoreboard.Objective
 import org.bukkit.scoreboard.Team
 import java.util.*
 
-class NeoPlayer(val player: Player, val game: Game): ModifiableImpl(), Target, Single, Ticking {
+class NeoPlayer(val player: Player, val game: Game): ModifiableImpl(), Target, Single {
     companion object {
         val SCOREBOARD_MANAGER = Bukkit.getScoreboardManager()
     }
@@ -42,6 +38,9 @@ class NeoPlayer(val player: Player, val game: Game): ModifiableImpl(), Target, S
 
     val team: Team = Bukkit.getScoreboardManager().mainScoreboard.registerNewTeam("highlight-${player.uniqueId}")
 
+    val scoreboard: SimpleScoreboard? = game.scoreboard?.invoke(this)
+    val actionBar: SimpleActionBar? = game.actionBar?.invoke(this)
+
     init {
         clean()
 
@@ -55,6 +54,9 @@ class NeoPlayer(val player: Player, val game: Game): ModifiableImpl(), Target, S
         } catch (e: ReflectiveOperationException) {
             throw RuntimeException(e)
         }
+
+        scoreboard?.start()
+        actionBar?.start()
     }
 
     override fun audience(): Audience = player
@@ -91,35 +93,6 @@ class NeoPlayer(val player: Player, val game: Game): ModifiableImpl(), Target, S
 
     override fun sendMessage(key: String, vararg variables: String?, color: TextColor?, decoration: TextDecoration?) {
         player.sendMessage(player.locale().component(key, *variables, color = color, decoration = decoration))
-    }
-
-    override fun tick(tick: Ticking.Tick) {
-        val scoreboardText = game.scoreboard(this)
-        if (!scoreboardText.isNullOrEmpty()) {
-            val objective: Objective
-            if (player.scoreboard == SCOREBOARD_MANAGER.mainScoreboard) {
-                val scoreboard = SCOREBOARD_MANAGER.newScoreboard
-                objective = scoreboard.registerNewObjective("neobb", Criteria.DUMMY, scoreboardText.first())
-                objective.displaySlot = DisplaySlot.SIDEBAR
-                player.scoreboard = scoreboard
-            } else {
-                objective = player.scoreboard.getObjective("neobb") ?: player.scoreboard.registerNewObjective("neobb", Criteria.DUMMY, scoreboardText.first())
-            }
-
-            scoreboardText.forEachIndexed { i, _ ->
-                if (i == 0) return@forEachIndexed
-
-                val score = objective.getScore("score-$i")
-                score.numberFormat(NumberFormat.blank())
-                score.score = scoreboardText.size - i
-                score.customName(scoreboardText[i])
-            }
-        }
-
-        val actionbarText = game.actionbar(this)
-        if (actionbarText != null && actionbarText != Component.empty()) {
-            player.sendActionBar(actionbarText)
-        }
     }
 
     fun nextPlayer(): NeoPlayer = game.players.following(this) ?: this

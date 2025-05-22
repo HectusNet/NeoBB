@@ -1,7 +1,7 @@
 package net.hectus.neobb.external.rating
 
-import net.hectus.neobb.util.component
-import net.hectus.neobb.util.makeCapitalized
+import net.hectus.util.component
+import net.hectus.util.makeCapitalized
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Material

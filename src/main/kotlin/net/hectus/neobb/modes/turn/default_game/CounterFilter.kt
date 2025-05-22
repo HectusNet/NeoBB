@@ -4,7 +4,7 @@ import com.marcpg.libpg.lang.Translation
 import net.hectus.neobb.modes.turn.Turn
 import net.hectus.neobb.modes.turn.default_game.attribute.clazz.Clazz
 import net.hectus.neobb.util.Constants
-import net.hectus.neobb.util.counterFilterName
+import net.hectus.util.counterFilterName
 import net.kyori.adventure.text.Component
 import java.util.*
 import kotlin.reflect.KClass

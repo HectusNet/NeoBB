@@ -21,7 +21,11 @@ import net.hectus.neobb.modes.turn.person_game.warp.*
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Modifiers
-import net.hectus.neobb.util.component
+import net.hectus.util.component
+import net.hectus.util.display.BlankScoreboardEntry
+import net.hectus.util.display.SimpleScoreboard
+import net.hectus.util.display.StaticScoreboardEntry
+import net.hectus.util.display.ValueScoreboardEntry
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -53,6 +57,16 @@ class PersonGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDiff
             PTWhiteWool::class, PTWoodWall::class
         ),
     )
+
+    override val scoreboard: ((NeoPlayer) -> SimpleScoreboard)? = { p -> SimpleScoreboard(p.player, 5, MiniMessage.miniMessage().deserialize("<bold><#328825>Block <#37BF1F>Battles <reset><#9D9D9D>Alpha " + NeoBB.VERSION),
+        BlankScoreboardEntry(),
+        StaticScoreboardEntry(p.locale().component("scoreboard.stats", color = Colors.PERSON_2, decoration = TextDecoration.BOLD)),
+        ValueScoreboardEntry(Component.text("💎", Colors.PERSON_4).append(p.locale().component("scoreboard.rank", color = Colors.PERSON_0))) { Rank.ofElo(p.databaseInfo.elo).toRankTranslations(p.locale()) },
+        ValueScoreboardEntry(Component.text("⚔", Colors.PERSON_4).append(p.locale().component("scoreboard.elo", color = Colors.PERSON_0))) { Component.text(p.databaseInfo.elo.toInt()) },
+        BlankScoreboardEntry(),
+        BlankScoreboardEntry(),
+        StaticScoreboardEntry(Component.text("mc", Colors.PERSON_1).append(Component.text(".hectus", Colors.PERSON_2)).append(Component.text(".net", Colors.PERSON_3))),
+    ) }
 
     override fun preTurn(turn: Turn<*>): Boolean {
         if (turn is WinConCategory && turn.player!!.game.hasModifier(Modifiers.Game.Person.NO_WIN_CONS))
@@ -87,25 +101,5 @@ class PersonGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDiff
         }
 
         return true
-    }
-
-    override fun scoreboard(player: NeoPlayer): List<Component>? {
-        val locale = player.locale()
-        return try {
-            listOf(
-                MiniMessage.miniMessage().deserialize("<bold><#328825>Block <#37BF1F>Battles <reset><#9D9D9D>Alpha " + NeoBB.VERSION),
-                Component.empty(),
-                locale.component("scoreboard.stats", color = Colors.PERSON_2, decoration = TextDecoration.BOLD),
-                Component.text("💎", Colors.PERSON_4).append(locale.component("scoreboard.rank", color = Colors.PERSON_0))
-                    .append(Rank.ofElo(player.databaseInfo.elo).toRankTranslations(locale)),
-                Component.text("⚔", Colors.PERSON_4).append(locale.component("scoreboard.elo", color = Colors.PERSON_0))
-                    .append(Component.text(player.databaseInfo.elo.toInt(), Colors.PERSON_3)),
-                Component.empty(),
-                Component.empty(),
-                Component.text("mc", Colors.PERSON_1).append(Component.text(".hectus", Colors.PERSON_2)).append(Component.text(".net", Colors.PERSON_3))
-            )
-        } catch (e: Exception) {
-            listOf(MiniMessage.miniMessage().deserialize("<bold><#328825>Block <#37BF1F>Battles <reset><#9D9D9D>Alpha " + NeoBB.VERSION))
-        }
     }
 }

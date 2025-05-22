@@ -3,7 +3,7 @@ package net.hectus.neobb.modes.turn.card_game
 import com.marcpg.libpg.storing.Cord
 import net.hectus.neobb.modes.turn.Turn
 import net.hectus.neobb.player.NeoPlayer
-import net.hectus.neobb.util.material
+import net.hectus.util.material
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 

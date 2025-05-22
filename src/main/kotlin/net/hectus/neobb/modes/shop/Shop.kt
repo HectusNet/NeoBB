@@ -6,7 +6,7 @@ import net.hectus.neobb.modes.turn.Turn
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Configuration
-import net.hectus.neobb.util.component
+import net.hectus.util.component
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.item.Item

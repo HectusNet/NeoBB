@@ -3,7 +3,7 @@ package net.hectus.neobb.player
 import net.hectus.neobb.NeoBB
 import net.hectus.neobb.external.cosmetic.PlaceParticle
 import net.hectus.neobb.external.cosmetic.PlayerAnimation
-import net.hectus.neobb.util.enumValueNoCase
+import net.hectus.util.enumValueNoCase
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Registry

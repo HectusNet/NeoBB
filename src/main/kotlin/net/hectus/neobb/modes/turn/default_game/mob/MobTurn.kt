@@ -3,9 +3,9 @@ package net.hectus.neobb.modes.turn.default_game.mob
 import com.marcpg.libpg.storing.Cord
 import net.hectus.neobb.modes.turn.Turn
 import net.hectus.neobb.player.NeoPlayer
-import net.hectus.neobb.util.camelToSnake
-import net.hectus.neobb.util.counterFilterName
-import net.hectus.neobb.util.enumValueNoCase
+import net.hectus.util.camelToSnake
+import net.hectus.util.counterFilterName
+import net.hectus.util.enumValueNoCase
 import org.bukkit.Material
 import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.ItemStack

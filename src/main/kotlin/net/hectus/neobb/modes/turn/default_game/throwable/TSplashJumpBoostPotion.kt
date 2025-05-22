@@ -8,7 +8,7 @@ import net.hectus.neobb.modes.turn.default_game.attribute.clazz.SupernaturalClaz
 import net.hectus.neobb.modes.turn.default_game.attribute.function.BuffFunction
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Modifiers
-import net.hectus.neobb.util.bukkitRunLater
+import net.hectus.util.bukkitRunLater
 import org.bukkit.Material
 import org.bukkit.entity.Projectile
 import org.bukkit.inventory.ItemStack

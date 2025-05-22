@@ -5,7 +5,7 @@ import com.marcpg.libpg.util.Randomizer
 import net.hectus.neobb.modes.shop.util.Items
 import net.hectus.neobb.modes.turn.Turn
 import net.hectus.neobb.modes.turn.person_game.categorization.Category
-import net.hectus.neobb.util.component
+import net.hectus.util.component
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.util.stream.IntStream

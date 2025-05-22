@@ -6,6 +6,8 @@ import net.hectus.neobb.modes.turn.Turn
 import net.hectus.neobb.modes.turn.default_game.attribute.function.BuffFunction
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.*
+import net.hectus.util.asString
+import net.hectus.util.string
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
