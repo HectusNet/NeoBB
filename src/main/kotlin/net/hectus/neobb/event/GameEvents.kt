@@ -52,7 +52,9 @@ class GameEvents : Listener {
             if (p.hasModifier(Modifiers.Player.NO_MOVE) && event.hasChangedPosition()) {
                 event.isCancelled = true
                 return@playerEventAction
-            } else if (p.game is HectusGame && event.to.clone().subtract(0.0, 1.0, 0.0).block.type == Material.MAGMA_BLOCK) {
+            } else if (p.game is HectusGame && event.to.clone()
+                    .subtract(0.0, 1.0, 0.0).block.type == Material.MAGMA_BLOCK
+            ) {
                 p.game.eliminate(p)
             } else if (event.hasChangedPosition() && p.game.outOfBounds(p.location(), event)) {
                 p.game.onOutOfBounds(p)
