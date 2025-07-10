@@ -1,7 +1,8 @@
 package net.hectus.neobb.player
 
-import com.marcpg.libpg.data.modifiable.ModifiableImpl
-import com.marcpg.libpg.storing.Cord
+import com.marcpg.libpg.display.PlayerMinecraftReceiver
+import com.marcpg.libpg.display.SimpleActionBar
+import com.marcpg.libpg.display.SimpleScoreboard
 import com.marcpg.libpg.util.MinecraftTime
 import com.marcpg.libpg.util.following
 import net.hectus.neobb.game.Game
@@ -12,13 +13,8 @@ import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.scoreboard.Team
-import java.util.*
 
-class NeoPlayer(val player: Player, val game: Game): ModifiableImpl(), Target, Single {
-    companion object {
-        val SCOREBOARD_MANAGER = Bukkit.getScoreboardManager()
-    }
-
+class NeoPlayer(player: Player, val game: Game): PlayerMinecraftReceiver(player) {
     val shop: Shop
     var inventory: NeoInventory = NeoInventory(this)
     var databaseInfo: DatabaseInfo = DatabaseInfo(player.uniqueId)
@@ -41,8 +37,8 @@ class NeoPlayer(val player: Player, val game: Game): ModifiableImpl(), Target, S
 
     val team: Team = Bukkit.getScoreboardManager().mainScoreboard.registerNewTeam("highlight-${player.uniqueId}")
 
-    val scoreboard: SimpleScoreboard? = game.scoreboard?.invoke(this)
-    val actionBar: SimpleActionBar? = game.actionBar?.invoke(this)
+    val simpleScoreboard: SimpleScoreboard? = game.scoreboard?.invoke(this)
+    val simpleActionBar: SimpleActionBar? = game.actionBar?.invoke(this)
 
     init {
         clean()
@@ -57,45 +53,11 @@ class NeoPlayer(val player: Player, val game: Game): ModifiableImpl(), Target, S
         } catch (e: ReflectiveOperationException) {
             throw RuntimeException(e)
         }
-
-        scoreboard?.start()
-        actionBar?.start()
     }
 
-    override fun audience(): Audience = player
-
-    override fun name(): String = player.name
-    override fun uuid(): UUID = player.uniqueId
-    override fun toString(): String = name()
-
-    override fun location(): Location = player.location
-
-    override fun playSound(sound: Sound, volume: Float) {
-        player.playSound(player, sound, volume, 1.0f)
-    }
-
-    override fun teleport(cord: Cord, yaw: Float, pitch: Float) {
-        teleport(Location(game.world, cord.x(), cord.y(), cord.z(), yaw, pitch))
-    }
-
-    override fun teleport(location: Location) {
-        player.teleport(location, TeleportFlag.EntityState.RETAIN_OPEN_INVENTORY)
-    }
-
-    override fun closeInv() {
-        player.closeInventory()
-    }
-
-    override fun eachBukkitPlayer(action: (Player) -> Unit) {
-        action.invoke(player)
-    }
-
-    override fun eachNeoPlayer(action: (NeoPlayer) -> Unit) {
-        action.invoke(this)
-    }
-
-    override fun sendMessage(key: String, vararg variables: String?, color: TextColor?, decoration: TextDecoration?) {
-        player.sendMessage(player.locale().component(key, *variables, color = color, decoration = decoration))
+    fun start() {
+        simpleScoreboard?.start()
+        simpleActionBar?.start()
     }
 
     fun nextPlayer(): NeoPlayer = game.players.following(this) ?: this
@@ -105,6 +67,9 @@ class NeoPlayer(val player: Player, val game: Game): ModifiableImpl(), Target, S
     }
 
     fun clean() {
+        simpleScoreboard?.stop()
+        simpleActionBar?.stop()
+
         player.scoreboard = Bukkit.getScoreboardManager().mainScoreboard
         player.closeInventory()
         player.inventory.clear()
