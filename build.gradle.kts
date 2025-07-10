@@ -1,9 +1,8 @@
 plugins {
     id("java")
-    id("idea")
 
-    kotlin("jvm") version "2.1.10"
-    kotlin("plugin.serialization") version "2.1.10"
+    kotlin("jvm") version "2.1.20"
+    kotlin("plugin.serialization") version "2.1.20"
 
     id("com.gradleup.shadow") version "8.3.6"
     id("xyz.jpenilla.run-paper") version "2.3.1"
@@ -21,17 +20,8 @@ kotlin {
     }
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_21
-java.targetCompatibility = JavaVersion.VERSION_21
-
-idea {
-    module {
-        isDownloadJavadoc = true
-        isDownloadSources = true
-    }
-}
-
 repositories {
+    mavenLocal()
     mavenCentral()
 
     maven("https://repo.papermc.io/repository/maven-public/")
@@ -42,13 +32,13 @@ repositories {
 dependencies {
     paperweight.paperDevBundle("1.21.5-no-moonrise-SNAPSHOT")
 
-    implementation("com.marcpg:libpg-paper:1.0.0")
-    implementation("com.marcpg:libpg-storage-database-sql:1.0.0")
-    implementation("com.marcpg:libpg-storage-json:1.0.0")
+    implementation("com.marcpg:ktlibpg-paper:2.0.0")
+    implementation("com.marcpg:ktlibpg-storage-database-sql:2.0.0")
+    implementation("com.marcpg:ktlibpg-storage-json:2.0.0")
 
-    compileOnly("xyz.xenondevs.invui:invui:1.44")
+    compileOnly("xyz.xenondevs.invui:invui:1.45")
 
-    compileOnly(kotlin("stdlib"))
+    implementation(kotlin("stdlib"))
     compileOnly(kotlin("reflect"))
     compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.8.1")
 }
