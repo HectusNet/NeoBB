@@ -1,9 +1,9 @@
 package net.hectus.neobb.player
 
+import com.marcpg.libpg.util.enumValueNoCase
 import net.hectus.neobb.NeoBB
 import net.hectus.neobb.external.cosmetic.PlaceParticle
 import net.hectus.neobb.external.cosmetic.PlayerAnimation
-import net.hectus.util.enumValueNoCase
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Registry
@@ -29,7 +29,7 @@ class DatabaseInfo(val uuid: UUID) {
     init {
         if (!NeoBB.DATABASE.contains(uuid)) {
             NeoBB.DATABASE.add(mapOf("uuid" to uuid))
-            NeoBB.LOG.info("Added player {} to database.", uuid)
+            NeoBB.LOG.info("Added player $uuid to database.")
         }
 
         elo = getDouble("elo")
@@ -49,25 +49,12 @@ class DatabaseInfo(val uuid: UUID) {
         deathAnimation = enumValueNoCase(getString("cosmetic_death_animation", PlayerAnimation.NONE.name))
     }
 
-    private fun getInt(column: String, default: Int = 0): Int {
-        return get(column, default) as Int
-    }
+    private fun get(column: String, default: Any): Any = NeoBB.DATABASE.get(uuid, column, default)
 
-    private fun getLong(column: String, default: Long = 0L): Long {
-        return get(column, default) as Long
-    }
-
-    private fun getDouble(column: String, default: Double = 0.0): Double {
-        return get(column, default) as Double
-    }
-
-    private fun getString(column: String, default: String = ""): String {
-        return get(column, default) as String
-    }
-
-    private fun get(column: String, default: Any): Any {
-        return NeoBB.DATABASE.get(uuid, column, default)
-    }
+    private fun getInt(column: String, default: Int = 0) = get(column, default) as Int
+    private fun getLong(column: String, default: Long = 0L) = get(column, default) as Long
+    private fun getDouble(column: String, default: Double = 0.0) = get(column, default) as Double
+    private fun getString(column: String, default: String = "") = get(column, default) as String
 
     fun setElo(elo: Double) {
         this.elo = elo

@@ -1,10 +1,10 @@
 package net.hectus.neobb.modes.lore
 
-import net.hectus.neobb.modes.turn.default_game.attribute.function.BuffFunction
-import net.hectus.neobb.modes.turn.default_game.attribute.function.CounterFunction
-import net.hectus.neobb.modes.turn.person_game.categorization.Category
-import net.hectus.neobb.modes.turn.person_game.warp.PWarpTurn
-import net.hectus.util.component
+import com.marcpg.libpg.util.component
+import net.hectus.neobb.modes.turn.default_game.attribute.BuffFunction
+import net.hectus.neobb.modes.turn.default_game.attribute.CounterFunction
+import net.hectus.neobb.modes.turn.person_game.Category
+import net.hectus.neobb.modes.turn.person_game.PWarpTurn
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import java.util.*

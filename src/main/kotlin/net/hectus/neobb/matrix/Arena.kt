@@ -1,9 +1,9 @@
 package net.hectus.neobb.matrix
 
+import com.marcpg.libpg.util.toCord
+import com.marcpg.libpg.util.toLocation
 import net.hectus.neobb.game.Game
 import net.hectus.neobb.util.Configuration
-import net.hectus.util.asCord
-import net.hectus.util.asLocation
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
@@ -20,7 +20,7 @@ class Arena(val game: Game) {
     }
 
     fun addBlock(block: Block) {
-        val cord = block.location.asCord().subtract(game.warp.lowCorner)
+        val cord = block.location.toCord() - game.warp.lowCorner
         this[cord.x.toInt(), cord.y.toInt(), cord.z.toInt()] = BlockInfo(cord, block.type)
         placedBlocks++
     }
@@ -28,7 +28,7 @@ class Arena(val game: Game) {
     fun clear() {
         completeSpace.forEach {
             game.playedWarps.forEach { w ->
-                w.lowCorner.add(it!!.cord).asLocation(game.world).block.type = Material.AIR
+                (w.lowCorner + it!!.cord).toLocation(game.world).block.type = Material.AIR
             }
         }
         game.history.forEach { t ->

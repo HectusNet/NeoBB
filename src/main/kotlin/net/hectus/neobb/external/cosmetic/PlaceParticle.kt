@@ -13,7 +13,10 @@ enum class PlaceParticle(private val particle: Particle, private val count: Int,
     STARS(Particle.WAX_OFF, 75, 0.2, 0.4, null);
 
     fun spawn(location: Location) {
-        val builder = ParticleBuilder(particle).count(count).location(location)
+        val builder = ParticleBuilder(particle).apply {
+            count(count)
+            location(location)
+        }
 
         if (offset != 0.0) builder.offset(offset, offset, offset)
         if (extra != 0.0) builder.extra(extra)

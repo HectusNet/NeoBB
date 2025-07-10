@@ -1,5 +1,8 @@
 package net.hectus.neobb.game.mode
 
+import com.marcpg.libpg.display.*
+import com.marcpg.libpg.lang.string
+import com.marcpg.libpg.util.component
 import net.hectus.neobb.NeoBB
 import net.hectus.neobb.game.Game
 import net.hectus.neobb.game.util.GameDifficulty
@@ -10,9 +13,6 @@ import net.hectus.neobb.modes.turn.Turn
 import net.hectus.neobb.modes.turn.card_game.*
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
-import net.hectus.util.component
-import net.hectus.util.display.*
-import net.hectus.util.string
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.World
@@ -41,7 +41,7 @@ class CardGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDiffic
         ),
     )
 
-    override val scoreboard: ((NeoPlayer) -> SimpleScoreboard)? = { p -> SimpleScoreboard(p.player, 5, MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"),
+    override val scoreboard: ((NeoPlayer) -> SimpleScoreboard)? = { p -> SimpleScoreboard(p, 5, MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"),
         ValueScoreboardEntry(p.locale().component("scoreboard.turning", color = Colors.BLUE)) { Component.text(if (currentPlayer() === p) p.locale().string("scoreboard.turning.you") else currentPlayer().name()) },
         ValueScoreboardEntry(p.locale().component("scoreboard.time", color = Colors.BLUE)) { Component.text(p.game.timeLeft.preciselyFormatted) },
         ValueScoreboardEntry(p.locale().component("scoreboard.health", color = Colors.BLUE)) { Component.text(p.health) },

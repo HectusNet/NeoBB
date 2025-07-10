@@ -1,18 +1,18 @@
 package net.hectus.neobb.modes.turn
 
+import com.marcpg.libpg.lang.string
 import com.marcpg.libpg.storing.Cord
+import com.marcpg.libpg.util.toLocation
 import net.hectus.neobb.game.util.ScheduleID
-import net.hectus.neobb.modes.turn.default_game.attribute.function.AttackFunction
-import net.hectus.neobb.modes.turn.default_game.attribute.function.CounterFunction
-import net.hectus.neobb.modes.turn.person_game.categorization.AttackCategory
-import net.hectus.neobb.modes.turn.person_game.categorization.CounterCategory
+import net.hectus.neobb.modes.turn.default_game.attribute.AttackFunction
+import net.hectus.neobb.modes.turn.default_game.attribute.CounterFunction
+import net.hectus.neobb.modes.turn.person_game.AttackCategory
+import net.hectus.neobb.modes.turn.person_game.CounterCategory
 import net.hectus.neobb.player.NeoPlayer
-import net.hectus.neobb.util.*
-import net.hectus.util.asLocation
-import net.hectus.util.camelToSnake
-import net.hectus.util.camelToTitle
-import net.hectus.util.counterFilterName
-import net.hectus.util.string
+import net.hectus.neobb.util.Modifiers
+import net.hectus.neobb.util.camelToSnake
+import net.hectus.neobb.util.camelToTitle
+import net.hectus.neobb.util.counterFilterName
 import org.bukkit.Location
 import org.bukkit.inventory.ItemStack
 import java.util.*
@@ -57,7 +57,7 @@ abstract class Turn<T>(val data: T?, val cord: Cord?, val player: NeoPlayer?) {
     }
 
     fun location(): Location {
-        return cord?.asLocation(player!!.game.world) ?: player!!.location()
+        return cord?.toLocation(player!!.game.world) ?: player!!.location()
     }
 
     fun isDummy(): Boolean = this == DUMMY || data == null

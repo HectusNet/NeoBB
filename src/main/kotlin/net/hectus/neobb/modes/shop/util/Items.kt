@@ -1,6 +1,6 @@
 package net.hectus.neobb.modes.shop.util
 
-import com.marcpg.libpg.util.ItemBuilder
+import com.marcpg.libpg.item.ItemBuilder
 import net.hectus.neobb.NeoBB
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -21,9 +21,7 @@ object Items {
     val BLACK_BACKGROUND: ItemStack = ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).name(Component.empty()).build()
 
     class ClickItem(private val item: ItemStack, private val clickConsumer: (Player, InventoryClickEvent) -> Unit) : AbstractItem() {
-        override fun getItemProvider(): ItemProvider {
-            return ItemWrapper(item)
-        }
+        override fun getItemProvider(): ItemProvider = ItemWrapper(item)
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             clickConsumer.invoke(player, event)

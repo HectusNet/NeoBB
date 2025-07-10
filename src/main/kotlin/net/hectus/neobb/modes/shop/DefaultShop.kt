@@ -1,25 +1,17 @@
 package net.hectus.neobb.modes.shop
 
-import com.marcpg.libpg.util.ItemBuilder
+import com.marcpg.libpg.item.ItemBuilder
+import com.marcpg.libpg.util.asString
+import com.marcpg.libpg.util.bukkitRun
+import com.marcpg.libpg.util.component
 import net.hectus.neobb.NeoBB
 import net.hectus.neobb.modes.shop.util.FilterState
 import net.hectus.neobb.modes.shop.util.Items
 import net.hectus.neobb.modes.turn.Turn
-import net.hectus.neobb.modes.turn.default_game.attribute.clazz.*
-import net.hectus.neobb.modes.turn.default_game.attribute.function.*
-import net.hectus.neobb.modes.turn.default_game.block.BlockTurn
-import net.hectus.neobb.modes.turn.default_game.flower.FlowerTurn
-import net.hectus.neobb.modes.turn.default_game.item.ItemTurn
-import net.hectus.neobb.modes.turn.default_game.mob.MobTurn
-import net.hectus.neobb.modes.turn.default_game.other.OtherTurn
-import net.hectus.neobb.modes.turn.default_game.structure.StructureTurn
-import net.hectus.neobb.modes.turn.default_game.structure.glass_wall.GlassWallTurn
-import net.hectus.neobb.modes.turn.default_game.throwable.ThrowableTurn
+import net.hectus.neobb.modes.turn.default_game.*
+import net.hectus.neobb.modes.turn.default_game.attribute.*
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
-import net.hectus.util.asString
-import net.hectus.util.bukkitRun
-import net.hectus.util.component
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
@@ -101,12 +93,12 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
             })
 
             .addIngredient('D', Items.ClickItem(
-                ItemBuilder(Material.LIME_DYE)
-                    .name(locale.component("shop.done.name", color = Colors.ACCENT, decoration = TextDecoration.BOLD))
-                    .addLore(locale.component("shop.done.lore.1", color = Colors.NEUTRAL))
-                    .addLore(locale.component("shop.done.lore.2", color = Colors.NEUTRAL))
-                    .build()
-            ) { _, _ -> player.closeInv() })
+                ItemBuilder(Material.LIME_DYE).apply {
+                    name(locale.component("shop.done.name", color = Colors.ACCENT, decoration = TextDecoration.BOLD))
+                    addLore(locale.component("shop.done.lore.1", color = Colors.NEUTRAL))
+                    addLore(locale.component("shop.done.lore.2", color = Colors.NEUTRAL))
+                }.build()
+            ) { _, _ -> player.closeInventory() })
 
             .addIngredient('^', Items.ScrollItem(true))
             .addIngredient('v', Items.ScrollItem(false))
@@ -149,13 +141,12 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
                     .name(locale.component("shop.done.name", color = Colors.ACCENT, decoration = TextDecoration.BOLD))
                     .build()
                 ) { _, _ ->
-                    player.closeInv()
+                    player.closeInventory()
                     open()
                 })
 
         val filterList: List<Map.Entry<String, Pair<Material, KClass<*>>>> = ArrayList(filters.entries)
         val offset = (9 - filterList.size) / 2
-        println("Filter Slot Offset: $offset")
         for (i in filterList.indices) {
             try {
                 val f = filterList[i]
@@ -167,7 +158,7 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
         }
 
         Window.single().setTitle("=== Filter ===").addCloseHandler {
-            player.closeInv()
+            player.closeInventory()
             open()
         }.setGui(gui.build()).open(player.player)
     }
@@ -186,7 +177,7 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
             } else {
                 filter.remove(name)
             }
-            player.closeInv()
+            player.closeInventory()
             filterUsageMenu(f, name.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0])
         }
     }

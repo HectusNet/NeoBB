@@ -3,21 +3,12 @@ package net.hectus.neobb.player
 import com.marcpg.libpg.data.modifiable.ModifiableImpl
 import com.marcpg.libpg.storing.Cord
 import com.marcpg.libpg.util.MinecraftTime
-import io.papermc.paper.entity.TeleportFlag
+import com.marcpg.libpg.util.following
 import net.hectus.neobb.game.Game
 import net.hectus.neobb.game.mode.PersonGame
 import net.hectus.neobb.modes.shop.Shop
-import net.hectus.util.component
-import net.hectus.util.display.SimpleActionBar
-import net.hectus.util.display.SimpleScoreboard
-import net.hectus.util.following
-import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.audience.ForwardingAudience.Single
-import net.kyori.adventure.text.format.TextColor
-import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
-import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.scoreboard.Team
@@ -32,9 +23,21 @@ class NeoPlayer(val player: Player, val game: Game): ModifiableImpl(), Target, S
     var inventory: NeoInventory = NeoInventory(this)
     var databaseInfo: DatabaseInfo = DatabaseInfo(player.uniqueId)
 
-    var luck: Int = 20 ; private set
-    var health: Double = game.info.startingHealth ; private set
-    var armor: Double = 0.0 ; private set
+    var luck: Int = 20
+
+    var health: Double = game.info.startingHealth
+        set(value) {
+            field = value.coerceAtLeast(0.0)
+            player.health = (field / game.info.startingHealth * 20).coerceIn(0.5, 20.0)
+
+            if (health <= 0.0)
+                game.eliminate(this)
+        }
+
+    var armor: Double = 0.0
+        set(value) {
+            field = value.coerceAtLeast(0.0)
+        }
 
     val team: Team = Bukkit.getScoreboardManager().mainScoreboard.registerNewTeam("highlight-${player.uniqueId}")
 
@@ -110,10 +113,6 @@ class NeoPlayer(val player: Player, val game: Game): ModifiableImpl(), Target, S
         player.isGlowing = false
     }
 
-    fun addLuck(luck: Int) {
-        this.luck += luck
-    }
-
     fun damage(damage: Double, raw: Boolean = false) {
         var finalDamage = damage
 
@@ -127,7 +126,7 @@ class NeoPlayer(val player: Player, val game: Game): ModifiableImpl(), Target, S
             playSound(Sound.ENCHANT_THORNS_HIT)
         }
 
-        health(health - finalDamage)
+        this.health = this.health - finalDamage
         if (finalDamage > 0.0)
             playSound(Sound.ENTITY_PLAYER_HURT, 0.5f)
     }
@@ -135,24 +134,12 @@ class NeoPlayer(val player: Player, val game: Game): ModifiableImpl(), Target, S
     fun heal(health: Double) {
         if (game is PersonGame && game.time == MinecraftTime.MIDNIGHT) return
 
-        health(this.health - health)
+        this.health = this.health - health
         if (health > 0.0)
             playSound(Sound.BLOCK_BEACON_ACTIVATE, 0.5f)
     }
 
-    fun health(health: Double) {
-        this.health = health.coerceAtLeast(0.0)
-        player.health = (this.health / game.info.startingHealth * 20).coerceIn(0.5, 20.0)
-
-        if (health <= 0.0)
-            game.eliminate(this)
-    }
-
     fun addArmor(armor: Double) {
-        armor(this.armor + armor)
-    }
-
-    fun armor(armor: Double) {
-        this.armor = armor.coerceAtLeast(0.0)
+        this.armor = this.armor + armor
     }
 }

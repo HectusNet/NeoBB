@@ -1,21 +1,23 @@
 package net.hectus.neobb.event
 
 import com.destroystokyo.paper.event.player.PlayerJumpEvent
-import com.marcpg.libpg.event.PlayerEvent.PlayerInventoryClickEvent
-import com.marcpg.libpg.event.PlayerEvent.PlayerInventoryInteractEvent
+import com.marcpg.libpg.util.asString
+import com.marcpg.libpg.util.extractNumber
+import com.marcpg.libpg.util.toLocation
 import net.hectus.neobb.game.GameManager
 import net.hectus.neobb.game.mode.DefaultGame
-import net.hectus.neobb.util.*
-import net.hectus.util.asLocation
-import net.hectus.util.asString
-import net.hectus.util.cancelEvent
-import net.hectus.util.extractNumber
-import net.hectus.util.playerEventAction
+import net.hectus.neobb.util.Configuration
+import net.hectus.neobb.util.Modifiers
+import net.hectus.neobb.util.cancelEvent
+import net.hectus.neobb.util.playerEventAction
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.ClickType
+import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.inventory.InventoryInteractEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent
 import org.bukkit.event.player.PlayerJoinEvent
@@ -24,16 +26,18 @@ import org.bukkit.event.player.PlayerQuitEvent
 class PlayerEvents : Listener {
     // ========== INVENTORY EVENTS ==========
     @EventHandler(ignoreCancelled = true)
-    fun onPlayerInventoryInteract(event: PlayerInventoryInteractEvent) {
-        cancelEvent(event, event.player(), true) {
+    fun onInventoryInteract(event: InventoryInteractEvent) {
+        if (event.whoClicked !is Player) return
+        cancelEvent(event, event.whoClicked as Player, true) {
             event.inventory.type == InventoryType.PLAYER
         }
     }
 
     @EventHandler(ignoreCancelled = true)
-    fun onPlayerInventoryClick(event: PlayerInventoryClickEvent) {
+    fun onInventoryClick(event: InventoryClickEvent) {
+        if (event.whoClicked !is Player) return
         if (event.slotType == InventoryType.SlotType.QUICKBAR && event.click == ClickType.DROP) {
-            playerEventAction(event.player(), false, { !it.game.started }, { p ->
+            playerEventAction(event.whoClicked as Player, false, { !it.game.started }, { p ->
                 runCatching {
                     val line = event.currentItem?.lore()?.get(1) ?: return@runCatching
                     p.inventory.addCoins(line.asString().extractNumber())
@@ -66,7 +70,7 @@ class PlayerEvents : Listener {
         if (Configuration.PRODUCTION && available.size >= Configuration.STARTING_PLAYERS) {
             DefaultGame(player.world, available)
         } else {
-            player.teleport(Configuration.SPAWN_CORD.asLocation(player.world))
+            player.teleport(Configuration.SPAWN_CORD.toLocation(player.world))
         }
     }
 

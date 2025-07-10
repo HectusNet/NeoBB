@@ -1,45 +1,40 @@
 package net.hectus.neobb.buff
 
+import com.marcpg.libpg.display.MinecraftReceiver
+import com.marcpg.libpg.display.receiver
+import com.marcpg.libpg.lang.string
 import com.marcpg.libpg.util.Randomizer
-import net.hectus.neobb.player.ForwardingTarget
+import com.marcpg.libpg.util.component
 import net.hectus.neobb.player.NeoPlayer
-import net.hectus.neobb.player.Target
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Constants
-import net.hectus.util.string
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import java.util.*
 
 abstract class Buff<T>(protected val data: T, protected val target: BuffTarget) {
-    enum class BuffTarget(private val getter: (NeoPlayer) -> Target) {
+    enum class BuffTarget(private val getter: (NeoPlayer) -> MinecraftReceiver) {
         YOU({ it }),
         NEXT({ it.nextPlayer() }),
-        OPPONENTS({ ForwardingTarget(it.opponents()) }),
+        OPPONENTS({ it.opponents().receiver() }),
         ALL({ it.game.target() });
 
-        fun get(source: NeoPlayer): Target {
-            return getter.invoke(source)
-        }
+        operator fun invoke(source: NeoPlayer) = getter(source)
     }
 
-    abstract fun apply(source: NeoPlayer)
+    abstract operator fun invoke(source: NeoPlayer)
     abstract fun text(locale: Locale): String
     abstract fun color(): TextColor
 
-    fun line(locale: Locale): Component {
-        return Component.text("${Constants.MINECRAFT_TAB_CHAR}| ${text(locale)}${target(locale)}", color())
-    }
+    fun line(locale: Locale): Component = component("${Constants.MINECRAFT_TAB_CHAR}| ${text(locale)}${target(locale)}", color())
 
-    fun target(locale: Locale): String {
-        return if (target == BuffTarget.YOU) "" else " " + locale.string("item-lore.buff.${target.name.lowercase()}")
-    }
+    fun target(locale: Locale): String = if (target == BuffTarget.YOU) "" else " " + locale.string("item-lore.buff.${target.name.lowercase()}")
 }
 
 class ChancedBuff(data: Double, val buff: Buff<*>, target: BuffTarget = BuffTarget.YOU): Buff<Double>(data, target) {
-    override fun apply(source: NeoPlayer) {
+    override operator fun invoke(source: NeoPlayer) {
         if (Randomizer.boolByChance(data))
-            buff.apply(source)
+            buff(source)
 
         source.sendMessage("gameplay.info.chance.fail", buff.text(source.locale()), color = Colors.NEUTRAL)
     }

@@ -2,30 +2,22 @@ package net.hectus.neobb.game
 
 import com.marcpg.libpg.data.modifiable.ModifiableImpl
 import com.marcpg.libpg.data.time.Time
+import com.marcpg.libpg.display.*
 import com.marcpg.libpg.storing.Cord
-import com.marcpg.libpg.util.MinecraftTime
-import com.marcpg.libpg.util.Randomizer
+import com.marcpg.libpg.util.*
 import net.hectus.neobb.NeoBB
 import net.hectus.neobb.external.cosmetic.EffectManager
 import net.hectus.neobb.external.rating.Rating
 import net.hectus.neobb.game.util.*
 import net.hectus.neobb.matrix.Arena
 import net.hectus.neobb.modes.turn.Turn
+import net.hectus.neobb.modes.turn.default_game.StructureTurn
+import net.hectus.neobb.modes.turn.default_game.TDefaultWarp
 import net.hectus.neobb.modes.turn.default_game.TTimeLimit
-import net.hectus.neobb.modes.turn.default_game.structure.StructureTurn
-import net.hectus.neobb.modes.turn.default_game.warp.TDefaultWarp
-import net.hectus.neobb.modes.turn.default_game.warp.WarpTurn
-import net.hectus.neobb.modes.turn.person_game.categorization.WinConCategory
-import net.hectus.neobb.player.ForwardingTarget
+import net.hectus.neobb.modes.turn.default_game.WarpTurn
+import net.hectus.neobb.modes.turn.person_game.WinConCategory
 import net.hectus.neobb.player.NeoPlayer
-import net.hectus.neobb.player.Target
 import net.hectus.neobb.util.*
-import net.hectus.util.asCord
-import net.hectus.util.bukkitRunLater
-import net.hectus.util.bukkitRunTimer
-import net.hectus.util.component
-import net.hectus.util.display.SimpleActionBar
-import net.hectus.util.display.SimpleScoreboard
 import net.kyori.adventure.title.Title
 import org.bukkit.*
 import org.bukkit.entity.BlockDisplay
@@ -42,7 +34,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
     val turnScheduler = TurnScheduler()
 
     lateinit var initialPlayers: List<NeoPlayer> private set
-    private lateinit var initialTarget: ForwardingTarget
+    private lateinit var initialTarget: ForwardingMinecraftReceiver
     lateinit var players: MutableList<NeoPlayer> private set
     val history: MutableList<Turn<*>> = mutableListOf()
 
@@ -83,8 +75,10 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
     // ==================================================
 
     fun init() {
+        Bukkit.getScoreboardManager().mainScoreboard.teams.forEach { it.unregister() }
+
         initialPlayers = bukkitPlayers.map { NeoPlayer(it, this) }.shuffled()
-        initialTarget = ForwardingTarget(initialPlayers.toMutableList())
+        initialTarget = initialPlayers.toList().receiver()
         players = initialPlayers.toMutableList()
 
         arena = Arena(this)
@@ -96,7 +90,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         for (i in 0..<playerCount) {
             val angle = 2 * Math.PI * i / playerCount
             players[i].teleport(
-                Cord(warp.center.x() + Constants.SPAWN_POINT_RADIUS * cos(angle), warp.center.y(), warp.center.z() + Constants.SPAWN_POINT_RADIUS * sin(angle)),
+                Cord(warp.center.x + Constants.SPAWN_POINT_RADIUS * cos(angle), warp.center.y, warp.center.z + Constants.SPAWN_POINT_RADIUS * sin(angle)), world,
                 Math.toDegrees(angle + Math.PI / 2).toFloat(), 0f // No, I am not a math guy...
             )
         }
@@ -156,7 +150,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
     open fun onOutOfBounds(player: NeoPlayer) = eliminate(player)
 
     open fun allows(turn: Turn<*>): Boolean {
-        return !difficulty.completeRules || allowed.all { it.isInstance(turn) && (turn !is WarpTurn || !hasModifier(Modifiers.Game.NO_WARP.name + "_" + turn.name)) }
+        return !difficulty.completeRules || turn is WarpTurn || allowed.any { it.isInstance(turn) }
     }
 
     // ==================================================
@@ -168,7 +162,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
      * @return `false` if the turn method should abort, `true` if it can continue.
      */
     fun outOfBounds(location: Location, event: Cancellable? = null): Boolean {
-        if (!location.asCord().inBounds(warp.lowCorner, warp.highCorner)) {
+        if (!location.toCord().inBounds(warp.lowCorner, warp.highCorner)) {
             if (event != null)
                 event.isCancelled = true
             return true
@@ -219,14 +213,14 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
             }
         }
 
-        info("${turn.player?.name()} used $turn.")
+        info("${turn.player?.name()} used ${turn.namespace()}.")
     }
 
     // ==================================================
     // ============== CLOSED BASIC METHODS ==============
     // ==================================================
 
-    fun target(onlyAlive: Boolean = true): Target = if (onlyAlive) ForwardingTarget(players) else initialTarget
+    fun target(onlyAlive: Boolean = true): MinecraftReceiver = if (onlyAlive) players.receiver() else initialTarget
 
     fun currentPlayer(): NeoPlayer {
         if (turningIndex >= players.size)
@@ -259,7 +253,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         if (!started) return
 
         if (tick.isSecond()) {
-            timeLeft.decrement()
+            timeLeft--
             if (timeLeft.get() == 0L)
                 draw(false)
 
@@ -269,12 +263,12 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         extraTick(tick)
     }
 
-    fun eliminate(target: Target) {
+    fun eliminate(target: MinecraftReceiver) {
         if (target.hasModifier(Modifiers.Player.REVIVE)) {
             target.removeModifier(Modifiers.Player.REVIVE)
             target.eachBukkitPlayer { it.playEffect(EntityEffect.PROTECTED_FROM_DEATH) }
 
-            target.eachNeoPlayer { it.sendMessage(it.locale().component("gameplay.info.revive.use", color = Colors.POSITIVE)) }
+            target.sendMessage("gameplay.info.revive.use", color = Colors.POSITIVE)
             info("${target.name()} has used a revive.")
             return
         }
@@ -296,49 +290,44 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         info("${target.name()} got eliminated.")
     }
 
-    fun turn(turn: Turn<*>, event: Cancellable? = null) {
+    fun turn(turn: Turn<*>?, event: Cancellable? = null) {
+        if (turn == null) return
+
         val player = turn.player!!
         val nextPlayer = player.nextPlayer()
         val turnNamespace = turn.namespace()
 
-        if (Constants.CHECK_WARP_CLASSES && !allows(turn)) {
-            info("${player.name()} can't use $turnNamespace in the current warp.")
-            player.sendMessage("gameplay.info.wrong_warp", color = Colors.NEGATIVE)
-            player.playSound(Sound.ENTITY_VILLAGER_NO)
-            return
+        var allowed = false
+
+        when {
+            Constants.CHECK_WARP_CLASSES && !allows(turn) -> {
+                notAllowed(turn, "${player.name()} can't use $turnNamespace in the current warp.", "gameplay.info.not_allowed.class", Utilities.clazz(turn::class).toTitleCase(), warp.name(player.locale()))
+            }
+            turn is WarpTurn && !hasModifier(Modifiers.Game.NO_WARP.name + "_" + turn.name) -> {
+                notAllowed(turn, "${player.name()} can't use $turnNamespace right now.", "gameplay.info.not_allowed.warp_filter", turn.name(player.locale()))
+            }
+            outOfBounds(turn.location(), event) -> {
+                notAllowed(turn, "${player.name()} tried using $turnNamespace out of bounds.", "gameplay.info.out_of_bounds")
+            }
+            turn.unusable() -> {
+                notAllowed(turn, "${player.name()} used $turnNamespace incorrectly.", "gameplay.info.wrong_usage")
+            }
+            else -> allowed = true
         }
 
-        if (outOfBounds(turn.location(), event)) {
-            info("${player.name()} used $turnNamespace out of bounds.")
-            player.sendMessage("gameplay.info.out_of_bounds", color = Colors.NEGATIVE)
-            player.playSound(Sound.ENTITY_VILLAGER_NO)
-            return
-        }
+        if (turn is TTimeLimit)
+            allowed = true
+
+        if (!allowed) return
 
         if (turn.isDummy()) {
             history += turn
             return
         }
 
-        if (turn.unusable()) {
-            info("${player.name()} used $turnNamespace incorrectly.")
-            player.sendMessage(player.locale().component("gameplay.info.wrong_usage", color = Colors.NEGATIVE))
-            player.playSound(Sound.ENTITY_VILLAGER_NO)
-            nextTurn(turn)
-            return
-        }
-
         val skipped = preTurn(turn)
 
-        if (turn !is TTimeLimit) {
-            runCatching {
-                if (turn is StructureTurn) {
-                    turn.referenceStructure.materials.forEach { m, a -> player.inventory.clearFirst { i, _ -> i.type == m && i.amount == a } }
-                } else {
-                    player.inventory.clearSlot(player.player.inventory.heldItemSlot)
-                }
-            }
-        }
+        clearSlot(turn)
 
         if (!skipped && executeTurn(turn)) {
             turn.apply()
@@ -354,6 +343,27 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
 
         nextTurn(turn)
         postTurn(turn, skipped)
+    }
+
+    private fun notAllowed(turn: Turn<*>, msg: String, key: String, vararg variables: String?) {
+        info(msg)
+        turn.player?.sendMessage(turn.player.locale().component(key, *variables, color = Colors.NEGATIVE))
+        turn.player?.opponents(false)?.forEach { it.sendMessage(it.locale().component("gameplay.info.wrong_usage.other", turn.player.name(), color = Colors.NEUTRAL)) }
+        turn.player?.playSound(Sound.ENTITY_VILLAGER_NO)
+        clearSlot(turn)
+        nextTurn(turn)
+    }
+
+    private fun clearSlot(turn: Turn<*>) {
+        if (turn !is TTimeLimit) {
+            runCatching {
+                if (turn is StructureTurn) {
+                    turn.referenceStructure.materials.forEach { m, a -> turn.player?.inventory?.clearFirst { i, _ -> i.type == m && i.amount == a } }
+                } else {
+                    turn.player?.inventory?.clearSlot(turn.player.player.inventory.heldItemSlot)
+                }
+            }
+        }
     }
 
     fun warp(warp: WarpTurn) {
@@ -378,11 +388,13 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
 
     fun start() {
         timeLeft = Time((info.totalTime.get() * difficulty.timeFactor).toLong())
-        timeLeft.setAllowNegatives(true)
+        timeLeft.allowNegatives = true
         resetTurnCountdown()
 
         info("Game has been started.")
         started = true
+
+        players.forEach { it.start() }
 
         if (info.showIntro) {
             val currentPlayer = players.first()

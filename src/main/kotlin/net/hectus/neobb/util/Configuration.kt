@@ -29,7 +29,7 @@ object Configuration {
         NeoBB.PLUGIN.saveDefaultConfig()
         CONFIG = NeoBB.PLUGIN.config
 
-        SPAWN_CORD = Cord.ofList(CONFIG.getIntegerList("warps.default")).add(Cord(4.5, 0.0, 4.5))
+        SPAWN_CORD = Cord.ofList(CONFIG.getIntegerList("warps.default")) + Cord(4.5, 0.0, 4.5)
 
         STRUCTURE_MODE = StructureMode.valueOf(CONFIG.getString("structure-mode", "local")!!.uppercase())
         PRODUCTION = CONFIG.getBoolean("production")

@@ -1,19 +1,15 @@
 package net.hectus.neobb.modes.shop
 
+import com.marcpg.libpg.item.ItemBuilder
 import com.marcpg.libpg.storing.Cord
-import com.marcpg.libpg.util.ItemBuilder
+import com.marcpg.libpg.util.asString
+import com.marcpg.libpg.util.bukkitRun
+import com.marcpg.libpg.util.component
 import net.hectus.neobb.modes.shop.util.Items
 import net.hectus.neobb.modes.turn.Turn
-import net.hectus.neobb.modes.turn.person_game.block.*
-import net.hectus.neobb.modes.turn.person_game.categorization.*
-import net.hectus.neobb.modes.turn.person_game.structure.PTCandleCircle
-import net.hectus.neobb.modes.turn.person_game.structure.PTTorchCircle
-import net.hectus.neobb.modes.turn.person_game.warp.PTAmethystWarp
+import net.hectus.neobb.modes.turn.person_game.*
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
-import net.hectus.util.asString
-import net.hectus.util.bukkitRun
-import net.hectus.util.component
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.bukkit.Sound
@@ -69,7 +65,7 @@ class PersonShop(player: NeoPlayer) : Shop(player) {
                 .addLore(locale.component("shop.done.lore.1", color = Colors.NEUTRAL))
                 .addLore(locale.component("shop.done.lore.2", color = Colors.NEUTRAL))
                 .build()
-            ) { _, _ -> player.closeInv() })
+            ) { _, _ -> player.closeInventory() })
 
             .addIngredient('<', Items.PageItem(false))
             .addIngredient('>', Items.PageItem(true))

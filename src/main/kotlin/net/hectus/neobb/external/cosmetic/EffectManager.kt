@@ -1,9 +1,9 @@
 package net.hectus.neobb.external.cosmetic
 
 import net.hectus.neobb.modes.turn.Turn
-import net.hectus.neobb.modes.turn.default_game.block.BlockTurn
-import net.hectus.neobb.modes.turn.default_game.mob.MobTurn
-import net.hectus.neobb.modes.turn.default_game.structure.StructureTurn
+import net.hectus.neobb.modes.turn.default_game.BlockTurn
+import net.hectus.neobb.modes.turn.default_game.MobTurn
+import net.hectus.neobb.modes.turn.default_game.StructureTurn
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Constants
 import org.bukkit.Location

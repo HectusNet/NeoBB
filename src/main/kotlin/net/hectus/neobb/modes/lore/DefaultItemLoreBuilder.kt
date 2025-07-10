@@ -1,8 +1,8 @@
 package net.hectus.neobb.modes.lore
 
-import net.hectus.neobb.modes.turn.default_game.attribute.function.BuffFunction
-import net.hectus.neobb.modes.turn.default_game.attribute.function.CounterFunction
-import net.hectus.util.component
+import com.marcpg.libpg.util.component
+import net.hectus.neobb.modes.turn.default_game.attribute.BuffFunction
+import net.hectus.neobb.modes.turn.default_game.attribute.CounterFunction
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import java.util.*

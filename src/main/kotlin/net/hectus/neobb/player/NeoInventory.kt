@@ -1,11 +1,10 @@
 package net.hectus.neobb.player
 
-import com.marcpg.libpg.util.ItemBuilder
-import com.marcpg.libpg.util.Randomizer
+import com.marcpg.libpg.item.ItemBuilder
+import com.marcpg.libpg.util.component
 import net.hectus.neobb.modes.shop.util.Items
 import net.hectus.neobb.modes.turn.Turn
-import net.hectus.neobb.modes.turn.person_game.categorization.Category
-import net.hectus.util.component
+import net.hectus.neobb.modes.turn.person_game.Category
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.util.stream.IntStream
@@ -84,17 +83,17 @@ class NeoInventory(private var player: NeoPlayer) {
         if (isFull()) return
 
         runCatching {
-            add(Randomizer.fromCollection(player.shop.dummyTurns))
+            add(player.shop.dummyTurns.random())
         }
     }
 
     fun removeRandom() {
         if (isEmpty()) return
 
-        setSlot(Randomizer.fromCollection(IntStream.range(0, deck.size)
+        setSlot(IntStream.range(0, deck.size)
             .filter { i -> deck[i] != null }
             .boxed()
-            .toList()), null, null)
+            .toList().random(), null, null)
     }
 
     fun fillInRandomly() {
@@ -140,9 +139,9 @@ class NeoInventory(private var player: NeoPlayer) {
             inv.setItem(i, item)
         }
 
-        inv.setItem(13, ItemBuilder((if (coins == 0) Material.RESIN_BRICK else Material.GOLD_INGOT))
-            .amount(coins.coerceIn(1, 64))
-            .name(player.locale().component("item-lore.cost.value", coins.toString()))
-            .build())
+        inv.setItem(13, ItemBuilder((if (coins == 0) Material.RESIN_BRICK else Material.GOLD_INGOT)).apply {
+            amount(coins.coerceIn(1, 64))
+            name(player.locale().component("item-lore.cost.value", coins.toString()))
+        }.build())
     }
 }

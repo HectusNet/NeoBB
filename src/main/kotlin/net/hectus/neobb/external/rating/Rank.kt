@@ -1,7 +1,7 @@
 package net.hectus.neobb.external.rating
 
-import net.hectus.util.component
-import net.hectus.util.makeCapitalized
+import com.marcpg.libpg.util.component
+import com.marcpg.libpg.util.toTitleCase
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Material
@@ -51,7 +51,7 @@ enum class Rank(val minElo: Double, val levels: Int, val league: Int, val materi
             return Rank.DIRT to 1
         }
 
-        fun Pair<Rank, Int>.toRankString() = first.name.makeCapitalized() + " " + second
+        fun Pair<Rank, Int>.toRankString() = first.name.toTitleCase() + " " + second
 
         fun Pair<Rank, Int>.toRankTranslations(locale: Locale) = locale
             .component("rating.rank.${first.name.lowercase()}")

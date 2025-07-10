@@ -1,13 +1,14 @@
 package net.hectus.neobb.event
 
 import com.destroystokyo.paper.event.server.ServerTickEndEvent
+import com.marcpg.libpg.util.bukkitRun
+import com.marcpg.libpg.util.bukkitRunLater
 import net.hectus.neobb.NeoBB
 import net.hectus.neobb.game.GameManager
 import net.hectus.neobb.game.mode.HectusGame
-import net.hectus.neobb.util.*
-import net.hectus.util.bukkitRun
-import net.hectus.util.bukkitRunLater
-import net.hectus.util.playerEventAction
+import net.hectus.neobb.util.Modifiers
+import net.hectus.neobb.util.Ticking
+import net.hectus.neobb.util.playerEventAction
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -55,9 +56,9 @@ class GameEvents : Listener {
             if (p.hasModifier(Modifiers.Player.NO_MOVE) && event.hasChangedPosition()) {
                 event.isCancelled = true
                 return@playerEventAction
-            } else if (p.game is HectusGame && event.to.clone()
-                    .subtract(0.0, 1.0, 0.0).block.type == Material.MAGMA_BLOCK
-            ) {
+            }
+
+            if (p.game is HectusGame && event.to.clone().subtract(0.0, 0.1, 0.0).block.type == Material.MAGMA_BLOCK) {
                 p.game.eliminate(p)
             } else if (event.hasChangedPosition() && p.game.outOfBounds(p.location(), event)) {
                 p.game.onOutOfBounds(p)
@@ -92,7 +93,7 @@ class GameEvents : Listener {
             try {
                 p.game.arena.addBlock(event.block)
             } catch (e: IndexOutOfBoundsException) {
-                NeoBB.LOG.warn("Placed blocks out of bounds: {}", e.message)
+                NeoBB.LOG.warn("Placed blocks out of bounds: ${e.message}")
                 event.isCancelled = true
             }
             game = true
@@ -113,7 +114,6 @@ class GameEvents : Listener {
         if (event.block.isLiquid)
             event.isCancelled = true
     }
-
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     fun onEntityTargetLivingEntity(event: EntityTargetLivingEntityEvent) {

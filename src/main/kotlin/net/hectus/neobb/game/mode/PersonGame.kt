@@ -1,5 +1,10 @@
 package net.hectus.neobb.game.mode
 
+import com.marcpg.libpg.display.BlankScoreboardEntry
+import com.marcpg.libpg.display.SimpleScoreboard
+import com.marcpg.libpg.display.StaticScoreboardEntry
+import com.marcpg.libpg.display.ValueScoreboardEntry
+import com.marcpg.libpg.util.component
 import net.hectus.neobb.NeoBB
 import net.hectus.neobb.external.rating.Rank
 import net.hectus.neobb.external.rating.Rank.Companion.toRankTranslations
@@ -9,23 +14,10 @@ import net.hectus.neobb.game.util.GameInfo
 import net.hectus.neobb.modes.lore.PersonItemLoreBuilder
 import net.hectus.neobb.modes.shop.PersonShop
 import net.hectus.neobb.modes.turn.Turn
-import net.hectus.neobb.modes.turn.person_game.block.*
-import net.hectus.neobb.modes.turn.person_game.categorization.*
-import net.hectus.neobb.modes.turn.person_game.item.PTSuspiciousStew
-import net.hectus.neobb.modes.turn.person_game.other.PTArmorStand
-import net.hectus.neobb.modes.turn.person_game.other.PTPainting
-import net.hectus.neobb.modes.turn.person_game.structure.*
-import net.hectus.neobb.modes.turn.person_game.throwable.PTSnowball
-import net.hectus.neobb.modes.turn.person_game.throwable.PTSplashPotion
-import net.hectus.neobb.modes.turn.person_game.warp.*
+import net.hectus.neobb.modes.turn.person_game.*
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Modifiers
-import net.hectus.util.component
-import net.hectus.util.display.BlankScoreboardEntry
-import net.hectus.util.display.SimpleScoreboard
-import net.hectus.util.display.StaticScoreboardEntry
-import net.hectus.util.display.ValueScoreboardEntry
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -58,7 +50,7 @@ class PersonGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDiff
         ),
     )
 
-    override val scoreboard: ((NeoPlayer) -> SimpleScoreboard)? = { p -> SimpleScoreboard(p.player, 5, MiniMessage.miniMessage().deserialize("<bold><#328825>Block <#37BF1F>Battles <reset><#9D9D9D>Alpha " + NeoBB.VERSION),
+    override val scoreboard: ((NeoPlayer) -> SimpleScoreboard)? = { p -> SimpleScoreboard(p, 5, MiniMessage.miniMessage().deserialize("<bold><#328825>Block <#37BF1F>Battles <reset><#9D9D9D>Alpha " + NeoBB.VERSION),
         BlankScoreboardEntry(),
         StaticScoreboardEntry(p.locale().component("scoreboard.stats", color = Colors.PERSON_2, decoration = TextDecoration.BOLD)),
         ValueScoreboardEntry(Component.text("💎", Colors.PERSON_4).append(p.locale().component("scoreboard.rank", color = Colors.PERSON_0))) { Rank.ofElo(p.databaseInfo.elo).toRankTranslations(p.locale()) },
@@ -83,7 +75,7 @@ class PersonGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDiff
         if (turn is BuffCategory) {
             val buffs = turn.buffs()
             info("Applying ${buffs.size} buffs from turn.")
-            buffs.forEach { it.apply(turn.player!!) }
+            buffs.forEach { it(turn.player!!) }
         }
 
         if (turn is CounterCategory) {

@@ -1,6 +1,9 @@
 package net.hectus.neobb.game.mode
 
 import com.marcpg.libpg.data.time.Time
+import com.marcpg.libpg.display.*
+import com.marcpg.libpg.lang.string
+import com.marcpg.libpg.util.component
 import net.hectus.neobb.NeoBB
 import net.hectus.neobb.external.rating.Rank
 import net.hectus.neobb.external.rating.Rank.Companion.toRankTranslations
@@ -8,23 +11,10 @@ import net.hectus.neobb.game.util.GameDifficulty
 import net.hectus.neobb.game.util.GameInfo
 import net.hectus.neobb.modes.lore.DefaultItemLoreBuilder
 import net.hectus.neobb.modes.shop.DefaultShop
-import net.hectus.neobb.modes.turn.default_game.block.*
-import net.hectus.neobb.modes.turn.default_game.flower.*
-import net.hectus.neobb.modes.turn.default_game.item.TChorusFruit
-import net.hectus.neobb.modes.turn.default_game.item.TIronShovel
-import net.hectus.neobb.modes.turn.default_game.mob.*
-import net.hectus.neobb.modes.turn.default_game.other.TBoat
-import net.hectus.neobb.modes.turn.default_game.other.TNoteBlock
-import net.hectus.neobb.modes.turn.default_game.structure.*
-import net.hectus.neobb.modes.turn.default_game.structure.glass_wall.*
-import net.hectus.neobb.modes.turn.default_game.throwable.*
-import net.hectus.neobb.modes.turn.default_game.warp.*
+import net.hectus.neobb.modes.turn.default_game.*
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Modifiers
-import net.hectus.util.component
-import net.hectus.util.display.*
-import net.hectus.util.string
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.World
@@ -68,7 +58,7 @@ class DefaultGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDif
         ),
     )
 
-    override val scoreboard: ((NeoPlayer) -> SimpleScoreboard)? = { p -> SimpleScoreboard(p.player, 5, MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"),
+    override val scoreboard: ((NeoPlayer) -> SimpleScoreboard)? = { p -> SimpleScoreboard(p, 5, MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"),
         ValueScoreboardEntry(p.locale().component("scoreboard.turning", color = Colors.ACCENT)) { Component.text(if (currentPlayer() === p) p.locale().string("scoreboard.turning.you") else currentPlayer().name()) },
         ValueScoreboardEntry(p.locale().component("scoreboard.time", color = Colors.ACCENT)) { Component.text(p.game.timeLeft.preciselyFormatted) },
         ValueScoreboardEntry(p.locale().component("scoreboard.luck", color = Colors.ACCENT)) { Component.text(p.luck) },
@@ -80,7 +70,7 @@ class DefaultGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDif
         StaticScoreboardEntry(Component.text("mc.hectus.net", Colors.LINK)),
     ) }
 
-    override val actionBar: ((NeoPlayer) -> SimpleActionBar)? = { p -> SimpleActionBar(p.player, 1) { if (currentPlayer() === p) {
+    override val actionBar: ((NeoPlayer) -> SimpleActionBar)? = { p -> SimpleActionBar(p, 1) { if (currentPlayer() === p) {
         if (p.hasModifier(Modifiers.Player.Default.ATTACKED)) {
             if (p.hasModifier(Modifiers.Player.Default.DEFENDED)) {
                 p.locale().component("actionbar.defended_attack", color = Colors.NEUTRAL)
@@ -93,8 +83,4 @@ class DefaultGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDif
     } else {
         p.locale().component("actionbar.other_turning", currentPlayer().name(), color = Colors.NEUTRAL)
     } } }
-
-    override fun onOutOfBounds(player: NeoPlayer) {
-        player.damage(2.0)
-    }
 }

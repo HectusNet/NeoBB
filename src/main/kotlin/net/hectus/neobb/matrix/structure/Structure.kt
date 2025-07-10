@@ -1,14 +1,14 @@
 package net.hectus.neobb.matrix.structure
 
-import com.marcpg.libpg.storage.JsonUtils
 import com.marcpg.libpg.storing.Cord
+import com.marcpg.libpg.util.toCord
+import com.marcpg.storage.JsonUtils
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import net.hectus.neobb.NeoBB
 import net.hectus.neobb.matrix.BlockInfo
 import net.hectus.neobb.matrix.BlockSpace
 import net.hectus.neobb.util.Configuration
-import net.hectus.util.asCord
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
@@ -29,8 +29,8 @@ open class Structure(
     companion object {
         private fun blocks(world: World, corner1: Cord, corner2: Cord): BlockSpace {
             val corners = Cord.corners(corner1, corner2)
-            val low = corners.left()
-            val high = corners.right()
+            val low = corners.first
+            val high = corners.second
 
             val blocks = BlockSpace(
                 high.x.toInt() - low.x.toInt() + 1,
@@ -106,7 +106,7 @@ open class Structure(
             if (!realBlock.isEmpty || replace)
                 realBlock.type = block.material
             else
-                NeoBB.LOG.info("Skipped block ${block.material.name} at ${realBlock.location.asCord()} because it was not empty.")
+                NeoBB.LOG.info("Skipped block ${block.material.name} at ${realBlock.location.toCord()} because it was not empty.")
         }
     }
 

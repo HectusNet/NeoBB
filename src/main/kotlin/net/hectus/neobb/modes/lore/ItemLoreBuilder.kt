@@ -1,11 +1,11 @@
 package net.hectus.neobb.modes.lore
 
-import com.marcpg.libpg.text.Formatter
+import com.marcpg.libpg.lang.string
+import com.marcpg.libpg.util.component
+import com.marcpg.libpg.util.lineWrap
 import net.hectus.neobb.modes.turn.Turn
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Constants
-import net.hectus.util.component
-import net.hectus.util.string
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import java.util.*
@@ -42,7 +42,7 @@ abstract class ItemLoreBuilder {
 
     protected fun longText(l: Locale, type: String): List<Component> {
         val text = l.string("$type." + turn?.namespace())
-        return Formatter.lineWrap(text, Constants.MAX_LORE_WIDTH).map { Component.text("${Constants.MINECRAFT_TAB_CHAR}| $it", Colors.BLUE).decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE) }
+        return text.lineWrap(Constants.MAX_LORE_WIDTH).map { Component.text("${Constants.MINECRAFT_TAB_CHAR}| $it", Colors.BLUE).decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE) }
     }
 
     protected fun keybindPrefix(key: String): Component = Component.text("[")

@@ -1,11 +1,10 @@
 package net.hectus.neobb.external.cosmetic
 
 import com.marcpg.libpg.storing.Cord
-import com.marcpg.libpg.util.Randomizer
+import com.marcpg.libpg.util.bukkitRunTimer
+import com.marcpg.libpg.util.toLocation
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Utilities
-import net.hectus.util.asLocation
-import net.hectus.util.bukkitRunTimer
 import org.bukkit.Color
 import org.bukkit.FireworkEffect
 import org.bukkit.Material
@@ -32,7 +31,7 @@ enum class PlayerAnimation(private val action: (Player, Cord) -> Unit) {
         val mobsLeft = AtomicInteger(10)
         bukkitRunTimer(0, 5) { r ->
             if (mobsLeft.decrementAndGet() <= 0) r.cancel()
-            p.world.spawnEntity(c.add(Cord(Random.nextDouble(9.0), 5.0, Random.nextDouble(9.0))).asLocation(p.world), Randomizer.fromCollection(Utilities.ENTITY_TYPES))
+            p.world.spawnEntity((c + Cord(Random.nextDouble(9.0), 5.0, Random.nextDouble(9.0))).toLocation(p.world), Utilities.ENTITY_TYPES.random())
         }
     });
 

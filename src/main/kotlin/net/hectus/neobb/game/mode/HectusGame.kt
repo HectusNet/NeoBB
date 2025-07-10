@@ -3,8 +3,8 @@ package net.hectus.neobb.game.mode
 import net.hectus.neobb.game.BossBarGame
 import net.hectus.neobb.game.util.GameDifficulty
 import net.hectus.neobb.modes.turn.Turn
-import net.hectus.neobb.modes.turn.default_game.attribute.function.*
-import net.hectus.neobb.modes.turn.default_game.mob.TPhantom
+import net.hectus.neobb.modes.turn.default_game.TPhantom
+import net.hectus.neobb.modes.turn.default_game.attribute.*
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Modifiers
 import org.bukkit.World
@@ -39,7 +39,7 @@ abstract class HectusGame(world: World, bukkitPlayers: List<Player>, difficulty:
         if (turn is BuffFunction) {
             val buffs = turn.buffs()
             info("Applying ${buffs.size} buffs from turn.")
-            buffs.forEach { it.apply(player) }
+            buffs.forEach { it(player) }
         }
 
         if (turn is DefenseFunction) {
