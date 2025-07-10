@@ -1,8 +1,19 @@
 package net.hectus.neobb.util
 
+import com.marcpg.libpg.display.MinecraftReceiver
+import com.marcpg.libpg.util.enumValueNoCase
+import net.hectus.neobb.game.GameManager
+import net.hectus.neobb.modes.turn.Turn
+import net.hectus.neobb.player.NeoPlayer
+import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.EntityType.*
+import org.bukkit.entity.Player
+import org.bukkit.event.Cancellable
 import java.time.*
+import kotlin.reflect.KClass
+import kotlin.reflect.full.allSuperclasses
 
 object Utilities {
     val ENTITY_TYPES: List<EntityType> = listOf(
@@ -39,5 +50,33 @@ object Utilities {
         val time = ZonedDateTime.now(ZoneOffset.UTC).toLocalTime()
         return time.isAfter(LocalTime.of(8, 0)) && time.isBefore(LocalTime.of(20, 0))
     }
+
+    fun clazz(clazz: KClass<out Turn<*>>): String = clazz.allSuperclasses.firstOrNull { it.simpleName!!.endsWith("Clazz") && it.simpleName!!.length > 5 }?.simpleName?.removeSuffix("Clazz")?.lowercase() ?: "other"
 }
 
+fun cancelEvent(event: Cancellable, eventPlayer: Player, requireStarted: Boolean, additionalPredicate: (NeoPlayer) -> Boolean) {
+    playerEventAction(eventPlayer, requireStarted, additionalPredicate) { p ->
+        event.isCancelled = true
+        p.playSound(Sound.ENTITY_VILLAGER_NO, 0.5f)
+    }
+}
+
+fun playerEventAction(eventPlayer: Player, requireStarted: Boolean, additionalPredicate: (NeoPlayer) -> Boolean = { true }, action: (NeoPlayer) -> Unit) {
+    val player = GameManager.player(eventPlayer)
+    if (player != null && (!requireStarted || player.game.started) && additionalPredicate.invoke(player))
+        action.invoke(player)
+}
+
+fun KClass<out Turn<*>>.material(): Material = enumValueNoCase(simpleName!!.counterFilterName().camelToSnake())
+
+private val COUNTER_FILTER_REGEX = Regex("^.?T(?!.*(Function|Usage|Clazz)$)|Function$|Usage$|Clazz$")
+private val CAMEL_CASE_REGEX = Regex("([a-z])([A-Z]+)")
+
+fun String.camelToSnake(): String = replace(CAMEL_CASE_REGEX, "$1_$2").lowercase()
+fun String.camelToTitle(): String = replace(CAMEL_CASE_REGEX, "$1 $2")
+fun String.counterFilterName(): String = replaceFirst(COUNTER_FILTER_REGEX, "")
+
+fun MinecraftReceiver.eachNeoPlayer(action: (NeoPlayer) -> Unit) = eachReceiver {
+    if (it is NeoPlayer)
+        action(it)
+}
