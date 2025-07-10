@@ -2,11 +2,10 @@ package net.hectus.neobb.modes.turn.default_game
 
 import com.marcpg.libpg.data.time.Time
 import com.marcpg.libpg.storing.Cord
-import net.hectus.neobb.modes.turn.default_game.attribute.clazz.NeutralClazz
-import net.hectus.neobb.modes.turn.default_game.other.OtherTurn
+import com.marcpg.libpg.util.component
+import net.hectus.neobb.modes.turn.default_game.attribute.NeutralClazz
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
-import net.hectus.util.component
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 

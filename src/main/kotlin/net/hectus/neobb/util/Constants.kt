@@ -24,7 +24,7 @@ object Constants {
     const val HIGHLIGHT_SCALE = 0.95f
     const val SPAWN_POINT_RADIUS = 3.0
 
-    const val CHECK_WARP_CLASSES = false
+    const val CHECK_WARP_CLASSES = true
 
     val JSON: Json = @OptIn(ExperimentalSerializationApi::class) (Json {
         prettyPrint = true
