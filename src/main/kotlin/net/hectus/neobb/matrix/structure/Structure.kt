@@ -1,7 +1,6 @@
 package net.hectus.neobb.matrix.structure
 
 import com.marcpg.libpg.storing.Cord
-import com.marcpg.libpg.util.toCord
 import com.marcpg.storage.JsonUtils
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -16,6 +15,7 @@ import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.math.roundToInt
 
 data class PlacedStructure(val structure: Structure, val lastBlock: Block)
 
@@ -100,14 +100,17 @@ open class Structure(
         return structure
     }
 
-    fun place(location: Location, replace: Boolean) {
+    fun place(location: Location, replace: Boolean): Int {
+        var total = 0.0
+        var obstructed = 0.0
         blocks.forEach { block ->
+            total++
             val realBlock: Block = location.clone().add(block!!.cord.x, block.cord.y, block.cord.z).block
-            if (!realBlock.isEmpty || replace)
+            if (realBlock.isEmpty || replace)
                 realBlock.type = block.material
-            else
-                NeoBB.LOG.info("Skipped block ${block.material.name} at ${realBlock.location.toCord()} because it was not empty.")
+            else obstructed++
         }
+        return ((obstructed / total) * 100).roundToInt()
     }
 
     fun isInSpace(space: BlockSpace): Boolean {

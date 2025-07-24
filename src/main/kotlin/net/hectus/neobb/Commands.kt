@@ -1,13 +1,12 @@
+@file:Suppress("UnstableApiUsage")
+
 package net.hectus.neobb
 
+import com.marcpg.libpg.sarge.*
 import com.marcpg.libpg.storing.Cord
+import com.marcpg.libpg.util.*
 import com.mojang.brigadier.arguments.StringArgumentType
-import com.mojang.brigadier.tree.LiteralCommandNode
-import io.papermc.paper.command.brigadier.CommandSourceStack
-import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes
-import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolver
-import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver
 import net.hectus.neobb.external.cosmetic.PlaceParticle
 import net.hectus.neobb.external.cosmetic.PlayerAnimation
 import net.hectus.neobb.game.GameManager
@@ -18,267 +17,193 @@ import net.hectus.neobb.game.util.GameDifficulty
 import net.hectus.neobb.matrix.structure.Structure
 import net.hectus.neobb.matrix.structure.StructureManager
 import net.hectus.neobb.util.Colors
-import net.hectus.util.asCord
-import net.hectus.util.component
-import net.hectus.util.enumValueNoCase
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
-import org.bukkit.World
-import org.bukkit.entity.Player
-import java.util.*
 
-@Suppress("UnstableApiUsage")
 object Commands {
     val MODES = listOf("default", "card", "person98")
 
-    fun games() : LiteralCommandNode<CommandSourceStack> = Commands.literal("game")
-        .requires { source -> source.sender.hasPermission("neobb.games") }
-        .then(Commands.literal("start")
-            .then(Commands.argument("mode", StringArgumentType.word())
-                .suggests { _, builder ->
-                    MODES.forEach { builder.suggest(it) }
-                    return@suggests builder.buildFuture()
-                }
-                .then(Commands.argument("difficulty", StringArgumentType.word())
-                    .suggests { _, builder ->
-                        GameDifficulty.entries.forEach { builder.suggest(it.name.lowercase()) }
-                        return@suggests builder.buildFuture()
-                    }
-                    .then(Commands.argument("players", ArgumentTypes.players())
-                        .executes { context ->
-                            val source = context.source.sender
-                            val locale = if (source is Player) source.locale() else Locale.getDefault()
+    val game = command("game") {
+        require("neobb.games")
+        subcommand("start") {
+            argument("mode", ExtendedArgumentTypes.valued { MODES }.paper()) {
+                argument("difficulty", ExtendedArgumentTypes.enum(GameDifficulty::class.java).paper()) {
+                    argument("players", ArgumentTypes.players()) {
+                        action { context ->
+                            val source = context.exec()
 
-                            val difficulty: GameDifficulty = enumValueNoCase(context.getArgument("difficulty", String::class.java))
-                            val players = context.getArgument("players", PlayerSelectorArgumentResolver::class.java).resolve(context.source)
+                            val difficulty = context.arg("difficulty", GameDifficulty::class.java)
+                            val players = context.arg("players", ArgumentTypes.players()).resolve(context.source)
 
-                            if (players.size < 2) {
-                                source.sendMessage(locale.component("command.games.start.not_enough_players", color = Colors.NEGATIVE))
-                                return@executes 1
-                            }
+                            if (players.size < 2)
+                                return@action source.locale().component("command.games.start.not_enough_players", color = Colors.NEGATIVE)
 
-                            source.sendMessage(locale.component("command.games.start.starting", color = Colors.POSITIVE))
                             runCatching {
-                                when (context.getArgument("mode", String::class.java)) {
+                                when (context.arg("mode", StringArgumentType.word())) {
                                     "default" -> DefaultGame(players.last().world, players, difficulty).init()
                                     "card" -> CardGame(players.last().world, players, difficulty).init()
                                     "person98" -> PersonGame(players.last().world, players, difficulty).init()
-                                    else -> source.sendMessage(locale.component("command.games.start.unknown_mode", color = Colors.NEGATIVE))
+                                    else -> return@action source.locale().component("command.games.start.unknown_mode", color = Colors.NEGATIVE)
                                 }
-                            }.onFailure { e ->
-                                source.sendMessage(locale.component("command.games.start.error", color = Colors.NEGATIVE))
-                                NeoBB.LOG.error("Could not start match!", e)
+                            }.onFailure {
+                                NeoBB.LOG.error("Could not start match!", it)
+                                return@action source.locale().component("command.games.start.error", color = Colors.NEGATIVE)
                             }
-                            return@executes 1
+                            return@action source.locale().component("command.games.start.starting", color = Colors.POSITIVE)
                         }
-                    )
-                )
-            )
-        )
-        .then(Commands.literal("stop")
-            .then(Commands.argument("id", StringArgumentType.word())
-                .suggests { _, builder ->
-                    GameManager.GAMES.keys.forEach { builder.suggest(it) }
-                    return@suggests builder.buildFuture()
-                }
-                .executes { context ->
-                    val source = context.source.sender
-                    val locale = if (source is Player) source.locale() else Locale.getDefault()
-
-                    val game = GameManager[context.getArgument("id", String::class.java)]
-
-                    if (game == null) {
-                        source.sendMessage(locale.component("command.games.start.not_enough_players", color = Colors.NEGATIVE))
-                        return@executes 1
                     }
+                }
+            }
+        }
+        subcommand("stop") {
+            argument("id", ExtendedArgumentTypes.valued { GameManager.GAMES.keys }.paper()) {
+                action { context ->
+                    val id = context.arg("id", StringArgumentType.word())
+                    val game = GameManager[id] ?: return@action context.exec().locale().component("command.games.start.not_found", id, color = Colors.NEGATIVE)
 
                     game.end(true)
-                    source.sendMessage(locale.component("command.games.stop.success", game.id, color = Colors.NEUTRAL))
-
-                    return@executes 1
+                    return@action context.exec().locale().component("command.games.stop.success", id, color = Colors.NEUTRAL)
                 }
-            )
-        )
-        .then(Commands.literal("list")
-            .executes { context ->
-                val source = context.source.sender
-                if (GameManager.GAMES.isEmpty()) {
-                    source.sendMessage(Component.text("There are no games running.", Colors.NEUTRAL))
-                } else {
-                    source.sendMessage(Component.text("Running Games:"))
-                    for (game in GameManager.GAMES.values) {
-                        source.sendMessage(Component.text("==== ", Colors.EXTRA).append(Component.text(game.id, Colors.ACCENT)).append(Component.text(" ====", Colors.EXTRA)))
-                        source.sendMessage(Component.text("> Players: ", Colors.EXTRA).append(Component.text("${game.players.size}/${game.initialPlayers.size}", Colors.SECONDARY)))
-                        source.sendMessage(Component.text("> Time: ", Colors.EXTRA).append(Component.text(game.timeLeft.preciselyFormatted, Colors.SECONDARY)))
-                        source.sendMessage(Component.text("> Difficulty: ", Colors.EXTRA).append(Component.text(game.difficulty.name, Colors.SECONDARY)))
-                        source.sendMessage(Component.text("> Played Turns: ", Colors.EXTRA).append(Component.text(game.history.size, Colors.SECONDARY)))
-                        source.sendMessage(Component.text("> Turning: ", Colors.EXTRA).append(Component.text(game.currentPlayer().name(), Colors.SECONDARY)))
-                    }
-                }
-                return@executes 1
             }
-        )
-        .build()
-
-    fun giveup() : LiteralCommandNode<CommandSourceStack> = Commands.literal("giveup")
-        .requires { source -> source.sender is Player }
-        .executes { context ->
-            val sender = context.source.sender
-            if (sender !is Player) return@executes 1
-
-            val player = GameManager.player(sender)
-
-            if (player != null && player.game.started) {
-                sender.sendMessage(sender.locale().component("command.giveup.confirm", color = Colors.NEUTRAL))
-                player.game.eliminate(player)
-                return@executes 1
-            }
-            sender.sendMessage(sender.locale().component("command.not_in_game", color = Colors.NEGATIVE))
-            return@executes 1
         }
-        .build()
+        subcommand("list") {
+            action { context ->
+                val source = context.exec()
+                if (GameManager.GAMES.isEmpty())
+                    return@action component("There are no games running.", Colors.NEUTRAL)
 
-    fun structure() : LiteralCommandNode<CommandSourceStack> = Commands.literal("structure")
-        .requires { source -> source.sender.hasPermission("neobb.structures") }
-        .then(Commands.literal("save")
-            .then(Commands.argument("name", StringArgumentType.word())
-                .then(Commands.argument("world", ArgumentTypes.world())
-                    .then(Commands.argument("corner1", ArgumentTypes.blockPosition())
-                        .then(Commands.argument("corner2", ArgumentTypes.blockPosition())
-                            .executes { context ->
-                                val source = context.source.sender
-                                val name = context.getArgument("name", String::class.java)
+                source.sendMessage(component("Loaded Structures:"))
+                for (game in GameManager.GAMES.values) {
+                    source.sendMessage(component("==== ", Colors.EXTRA).append(component(game.id, Colors.ACCENT)).append(component(" ====", Colors.EXTRA)))
+                    source.sendMessage(component("> Players: ", Colors.EXTRA).append(component("${game.players.size}/${game.initialPlayers.size}", Colors.SECONDARY)))
+                    source.sendMessage(component("> Time: ", Colors.EXTRA).append(component(game.timeLeft.preciselyFormatted, Colors.SECONDARY)))
+                    source.sendMessage(component("> Difficulty: ", Colors.EXTRA).append(component(game.difficulty.name, Colors.SECONDARY)))
+                    source.sendMessage(component("> Played Turns: ", Colors.EXTRA).append(Component.text(game.history.size, Colors.SECONDARY)))
+                    source.sendMessage(component("> Turning: ", Colors.EXTRA).append(component(game.currentPlayer().name(), Colors.SECONDARY)))
+                }
+                return@action null
+            }
+        }
+    }
+
+    val giveup = command("giveup") {
+        requirePlayer()
+        playerAction { context, player ->
+            val neoPlayer = GameManager.player(player)
+            if (neoPlayer != null && neoPlayer.game.started) {
+                neoPlayer.game.eliminate(neoPlayer)
+                return@playerAction player.locale().component("command.giveup.confirm", color = Colors.NEUTRAL)
+            }
+            return@playerAction player.locale().component("command.not_in_game", color = Colors.NEGATIVE)
+        }
+    }
+
+    val structure = command("structure") {
+        require("neobb.structures")
+        subcommand("save") {
+            argument("name", StringArgumentType.word()) {
+                argument("world", ArgumentTypes.world()) {
+                    argument("corner1", ArgumentTypes.blockPosition()) {
+                        argument("corner2", ArgumentTypes.blockPosition()) {
+                            action { context ->
+                                val source = context.exec()
+                                val name = context.arg("name", StringArgumentType.word())
 
                                 if (StructureManager[name] != null) {
-                                    source.sendMessage(Component.text("Structure with name \"$name\" already exists!", Colors.NEUTRAL))
-                                    source.sendMessage(Component.text("You can remove it using \"/structure remove $name\"!", Colors.EXTRA))
-                                    return@executes 1
+                                    source.sendMessage(component("Structure with name \"$name\" already exists!", Colors.NEUTRAL))
+                                    source.sendMessage(component("You can remove it using \"/structure remove $name\"!", Colors.EXTRA))
+                                    return@action null
                                 }
 
-                                val world = context.getArgument("world", World::class.java)
-                                val corner1 = context.getArgument("corner1", BlockPositionResolver::class.java).resolve(context.source).toLocation(world)
-                                val corner2 = context.getArgument("corner2", BlockPositionResolver::class.java).resolve(context.source).toLocation(world)
+                                val world = context.arg("world", ArgumentTypes.world())
+                                val corner1 = context.arg("corner1", ArgumentTypes.blockPosition()).resolve(context.source).toLocation(world)
+                                val corner2 = context.arg("corner2", ArgumentTypes.blockPosition()).resolve(context.source).toLocation(world)
 
-                                val structure = Structure(name, world, corner1.asCord(), corner2.asCord())
+                                val structure = Structure(name, world, corner1.toCord(), corner2.toCord())
                                 structure.save()
                                 StructureManager.add(structure)
 
-                                source.sendMessage(Component.text("Successfully saved structure with name \"${structure.name}\".", Colors.POSITIVE))
-                                return@executes 1
+                                return@action component("Successfully saved structure with name \"${structure.name}\".", Colors.POSITIVE)
                             }
-                        )
-                    )
-                )
-            )
-        )
-        .then(Commands.literal("remove")
-            .then(Commands.argument("name", StringArgumentType.word())
-                .suggests { _, builder ->
-                    StructureManager.LOADED.forEach { builder.suggest(it.name) }
-                    return@suggests builder.buildFuture()
-                }
-                .executes { context ->
-                    val source = context.source.sender
-                    val name = context.getArgument("name", String::class.java)
-
-                    val structure = StructureManager[name]
-                    if (structure != null) {
-                        StructureManager.remove(structure)
-                        context.source.sender.sendMessage(Component.text("Successfully removed structure with name: $name", Colors.NEUTRAL))
-                    } else {
-                        context.source.sender.sendMessage(Component.text("Could not find structure with name: $name", Colors.NEGATIVE))
-                        return@executes 1
-                    }
-
-                    source.sendMessage(Component.text("Successfully removed structure with name \"${structure.name}\".", Colors.NEUTRAL))
-                    return@executes 1
-                }
-            )
-        )
-        .then(Commands.literal("list")
-            .executes { context ->
-                val source = context.source.sender
-                if (StructureManager.LOADED.isEmpty()) {
-                    source.sendMessage(Component.text("There are no structures loaded.", Colors.NEUTRAL))
-                } else {
-                    source.sendMessage(Component.text("Loaded Structures:"))
-                    for (structure in StructureManager.LOADED) {
-                        source.sendMessage(Component.text("- " + structure.name + "(" + structure.materials.size + ")"))
+                        }
                     }
                 }
-                return@executes 1
             }
-        )
-        .then(Commands.literal("place")
-            .then(Commands.argument("name", StringArgumentType.word())
-                .suggests { _, builder ->
-                    StructureManager.LOADED.forEach { builder.suggest(it.name) }
-                    return@suggests builder.buildFuture()
+        }
+        subcommand("remove") {
+            argument("name", ExtendedArgumentTypes.valued { StructureManager.LOADED.map { it.name } }.paper()) {
+                action { context ->
+                    val name = context.arg("name", String::class.java)
+                    val structure = StructureManager[name]
+                    if (structure == null)
+                        return@action component("Could not find structure with name: $name", Colors.NEGATIVE)
+
+                    StructureManager.remove(structure)
+                    return@action component("Successfully removed structure with name: ${structure.name}", Colors.NEUTRAL)
                 }
-                .then(Commands.argument("location", ArgumentTypes.blockPosition())
-                    .executes { context ->
-                        val source = context.source.sender
-                        val name = context.getArgument("name", String::class.java)
-                        val location = context.getArgument("location", BlockPositionResolver::class.java).resolve(context.source).toLocation(context.source.location.world)
+            }
+        }
+        subcommand("list") {
+            action { context ->
+                if (StructureManager.LOADED.isEmpty())
+                    return@action component("There are no structures loaded.", Colors.NEUTRAL)
+
+                context.feedback(component("Loaded Structures:"))
+                return@action component(StructureManager.LOADED.joinToString("\n") { "- ${it.name} (${it.materials.size})" })
+            }
+        }
+        subcommand("place") {
+            argument("name", ExtendedArgumentTypes.valued { StructureManager.LOADED.map { it.name } }.paper()) {
+                argument("location", ArgumentTypes.blockPosition()) {
+                    action { context ->
+                        val name = context.arg("name", String::class.java)
+                        val location = context.arg("location", ArgumentTypes.blockPosition()).resolve(context.source).toLocation(context.source.location.world)
 
                         val structure = StructureManager[name]
-                        if (structure != null) {
-                            structure.place(location, false)
-                            context.source.sender.sendMessage(Component.text("Successfully placed structure with name: $name", Colors.POSITIVE))
-                        } else {
-                            context.source.sender.sendMessage(Component.text("Could not find structure with name: $name", Colors.NEGATIVE))
-                            return@executes 1
-                        }
+                        if (structure == null)
+                            return@action component("Could not find structure with name: $name", Colors.NEGATIVE)
 
-                        source.sendMessage(Component.text("Successfully placed structure with name \"${structure.name}\".", Colors.NEUTRAL))
-                        return@executes 1
+                        val obstructed = structure.place(location, false)
+                        return@action when {
+                            obstructed >= 1.0 -> component("Could not place structure $name, as it was fully obstructed.", Colors.NEGATIVE)
+                            obstructed > 0.0 -> component("Partially placed structure $name - ~$obstructed% were obstructed.", Colors.NEUTRAL)
+                            else -> component("Successfully placed structure $name.", Colors.POSITIVE)
+                        }
                     }
-                )
-            )
-        )
-        .build()
+                }
+            }
+        }
+    }
 
-    fun debug() : LiteralCommandNode<CommandSourceStack> = Commands.literal("debug")
-        .requires { source -> source.sender.hasPermission("neobb.debug") }
-        .then(Commands.literal("effect")
-            .then(Commands.literal("player-animation")
-                .then(Commands.argument("player", ArgumentTypes.player())
-                    .then(Commands.argument("animation", StringArgumentType.word())
-                        .suggests { _, builder ->
-                            PlayerAnimation.entries.forEach { builder.suggest(it.name.lowercase()) }
-                            return@suggests builder.buildFuture()
-                        }
-                        .executes { context ->
-                            val animation: PlayerAnimation = enumValueNoCase(context.getArgument("animation", String::class.java))
-                            val target = context.getArgument("player", PlayerSelectorArgumentResolver::class.java).resolve(context.source).first()
-                            animation.play(target, target.location.asCord().subtract(Cord(4.0, 0.0, 4.0)))
+    val debug = command("debug") {
+        require("neobb.debug")
+        subcommand("effect") {
+            subcommand("player-animation") {
+                argument("player", ArgumentTypes.player()) {
+                    argument("animation", ExtendedArgumentTypes.enum(PlayerAnimation::class.java).paper()) {
+                        action { context ->
+                            val animation = context.arg("animation", PlayerAnimation::class.java)
+                            val target = context.arg("player", ArgumentTypes.player()).resolve(context.source).first()
 
-                            context.source.sender.sendMessage(Component.text("Successfully played player-animation with name \"${animation.name}\".", Colors.POSITIVE))
-                            return@executes 1
+                            animation.play(target, target.location.toCord() - Cord(4.0, 0.0, 4.0))
+                            return@action component("Successfully played player-animation with name \"${animation.name}\".", Colors.POSITIVE)
                         }
-                    )
-                )
-            )
-            .then(Commands.literal("place-particle")
-                .then(Commands.argument("block", ArgumentTypes.blockPosition())
-                    .then(Commands.argument("particle", StringArgumentType.word())
-                        .suggests { _, builder ->
-                            PlaceParticle.entries.forEach { builder.suggest(it.name.lowercase()) }
-                            return@suggests builder.buildFuture()
-                        }
-                        .executes { context ->
-                            val world = context.source.executor?.world ?: Bukkit.getWorld("world")!!
-                            val block = context.getArgument("block", BlockPositionResolver::class.java).resolve(context.source).toLocation(world)
+                    }
+                }
+            }
+            subcommand("place-particle") {
+                argument("block", ArgumentTypes.blockPosition()) {
+                    argument("particle", ExtendedArgumentTypes.enum(PlaceParticle::class.java).paper()) {
+                        action { context ->
+                            val world = context.source.location.world ?: Bukkit.getWorld("world")!!
+                            val block = context.arg("block", ArgumentTypes.blockPosition()).resolve(context.source).toLocation(world)
 
-                            val particle: PlaceParticle = enumValueNoCase(context.getArgument("particle", String::class.java))
-                            particle.spawn(block)
-
-                            context.source.sender.sendMessage(Component.text("Successfully shown place-particle with name \"${particle.name}\".", Colors.POSITIVE))
-                            return@executes 1
+                            context.arg("particle", PlaceParticle::class.java).spawn(block)
+                            return@action component("Successfully shown place-particle with name \"${context.arg("particle", PlaceParticle::class.java).name}\".", Colors.POSITIVE)
                         }
-                    )
-                )
-            )
-        )
-        .build()
+                    }
+                }
+            }
+        }
+    }
 }
