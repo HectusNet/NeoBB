@@ -12,6 +12,7 @@ import net.hectus.neobb.event.PlayerEvents
 import net.hectus.neobb.event.TurnEvents
 import net.hectus.neobb.game.GameManager
 import net.hectus.neobb.matrix.structure.StructureManager
+import net.hectus.neobb.modes.turn.TurnRegistry
 import net.hectus.neobb.util.Configuration
 import org.bukkit.Bukkit
 import xyz.xenondevs.invui.InvUI
@@ -43,6 +44,8 @@ class NeoBB : KotlinPlugin(NeoBB.Companion) {
             ServerUtils.Cmd(Commands.giveup, "Give up this game.", "surrender"),
             ServerUtils.Cmd(Commands.structure, "Manage the NeoBB structures.", "neobb-structure"),
         )
+
+        /* Force call of `init {}` block: */ TurnRegistry
     }
 
     override fun disable() {

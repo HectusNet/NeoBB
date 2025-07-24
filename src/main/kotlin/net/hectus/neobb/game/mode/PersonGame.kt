@@ -13,8 +13,11 @@ import net.hectus.neobb.game.util.GameDifficulty
 import net.hectus.neobb.game.util.GameInfo
 import net.hectus.neobb.modes.lore.PersonItemLoreBuilder
 import net.hectus.neobb.modes.shop.PersonShop
-import net.hectus.neobb.modes.turn.Turn
-import net.hectus.neobb.modes.turn.person_game.*
+import net.hectus.neobb.modes.turn.TurnExec
+import net.hectus.neobb.modes.turn.person_game.ArmorCategory
+import net.hectus.neobb.modes.turn.person_game.CounterCategory
+import net.hectus.neobb.modes.turn.person_game.DefensiveCategory
+import net.hectus.neobb.modes.turn.person_game.WinConCategory
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Modifiers
@@ -34,20 +37,6 @@ class PersonGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDiff
         turnTimer = 10,
         shop = PersonShop::class,
         loreBuilder = PersonItemLoreBuilder::class,
-        turns = listOf(
-            PTAmethystBlock::class, PTAmethystWarp::class, PTArmorStand::class, PTBambooButton::class, PTBarrel::class,
-            PTBeeNest::class, PTBirchLog::class, PTBlackCarpet::class, PTBlueConcrete::class, PTBlueIce::class,
-            PTBlueStainedGlass::class, PTBrainCoral::class, PTBrownStainedGlass::class, PTCake::class, PTCandleCircle::class,
-            PTCherryButton::class, PTCherryPressurePlate::class, PTDaylightDetector::class, PTDiamondBlock::class,
-            PTDripstone::class, PTFenceGate::class, PTFireWarp::class, PTFletchingTable::class, PTGlowstone::class,
-            PTGoldBlock::class, PTGrayWool::class, PTGreenCarpet::class, PTHoneyBlock::class, PTIceWarp::class,
-            PTIronTrapdoor::class, PTLever::class, PTLightBlueCarpet::class, PTNoteBlock::class, PTOrangeWool::class,
-            PTPainting::class, PTPinkCarpet::class, PTPumpkinWall::class, PTPurpleWool::class, PTRedStainedGlass::class,
-            PTRedWool::class, PTSeaLantern::class, PTSnowWarp::class, PTSnowball::class, PTSplashPotion::class,
-            PTStoneWall::class, PTStonecutter::class, PTSuspiciousStew::class, PTTorchCircle::class, PTTurtling::class,
-            PTVerdantFroglight::class, PTVillagerWarp::class, PTVoidWarp::class, PTWhiteStainedGlass::class,
-            PTWhiteWool::class, PTWoodWall::class
-        ),
     )
 
     override val scoreboard: ((NeoPlayer) -> SimpleScoreboard)? = { p -> SimpleScoreboard(p, 5, MiniMessage.miniMessage().deserialize("<bold><#328825>Block <#37BF1F>Battles <reset><#9D9D9D>Alpha " + NeoBB.VERSION),
@@ -60,26 +49,26 @@ class PersonGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDiff
         StaticScoreboardEntry(Component.text("mc", Colors.PERSON_1).append(Component.text(".hectus", Colors.PERSON_2)).append(Component.text(".net", Colors.PERSON_3))),
     ) }
 
-    override fun preTurn(turn: Turn<*>): Boolean {
-        if (turn is WinConCategory && turn.player!!.game.hasModifier(Modifiers.Game.Person.NO_WIN_CONS))
+    override fun preTurn(exec: TurnExec<*>): Boolean {
+        if (exec.turn is WinConCategory && exec.game.hasModifier(Modifiers.Game.Person.NO_WIN_CONS))
             return true
 
-        return super.preTurn(turn)
+        return super.preTurn(exec)
     }
 
-    override fun executeTurn(turn: Turn<*>): Boolean {
-        if (turn is ArmorCategory) {
-            turn.player!!.addArmor(turn.armor().toDouble())
+    override fun executeTurn(exec: TurnExec<*>): Boolean {
+        if (exec.turn is ArmorCategory) {
+            exec.player.addArmor(exec.turn.armor().toDouble())
         }
 
-        if (turn is BuffCategory) {
-            val buffs = turn.buffs()
+        val buffs = exec.turn.buffs
+        if (buffs.isNotEmpty()) {
             info("Applying ${buffs.size} buffs from turn.")
-            buffs.forEach { it(turn.player!!) }
+            buffs.forEach { it(exec.player) }
         }
 
-        if (turn is CounterCategory) {
-            if (turn.counterLogic(turn)) {
+        if (exec.turn is CounterCategory) {
+            if (exec.turn.counterLogic(exec)) {
                 info("Misplaced/misused counter.")
                 return false
             } else {
@@ -87,9 +76,9 @@ class PersonGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDiff
             }
         }
 
-        if (turn is DefensiveCategory) {
+        if (exec.turn is DefensiveCategory) {
             info("{}: Applying defense from turn.")
-            turn.applyDefense()
+            exec.turn.applyDefense(exec)
         }
 
         return true

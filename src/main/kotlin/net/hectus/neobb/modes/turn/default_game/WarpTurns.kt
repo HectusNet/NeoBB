@@ -1,159 +1,209 @@
 package net.hectus.neobb.modes.turn.default_game
 
+import com.marcpg.libpg.display.teleport
 import com.marcpg.libpg.storing.Cord
 import com.marcpg.libpg.util.Randomizer
+import net.hectus.neobb.event.TurnEvent
 import net.hectus.neobb.matrix.structure.PlacedStructure
 import net.hectus.neobb.matrix.structure.StaticStructure
 import net.hectus.neobb.matrix.structure.StaticStructures
-import net.hectus.neobb.modes.turn.default_game.attribute.*
-import net.hectus.neobb.player.NeoPlayer
+import net.hectus.neobb.modes.turn.TurnExec
+import net.hectus.neobb.modes.turn.default_game.attribute.TurnClazz
+import net.hectus.neobb.modes.turn.default_game.attribute.WarpFunction
+import net.hectus.neobb.util.Bounds
 import net.hectus.neobb.util.Configuration
 import net.hectus.neobb.util.Modifiers
-import kotlin.reflect.KClass
 
-abstract class WarpTurn(data: PlacedStructure?, cord: Cord, val name: String, player: NeoPlayer?) : StructureTurn(data, cord, player), WarpFunction {
+abstract class WarpTurn(namespace: String) : StructureTurn(namespace), WarpFunction {
     enum class Temperature { COLD, NORMAL, HOT }
 
     override val maxAmount: Int = 1
 
     abstract val chance: Double
-    abstract val allows: List<KClass<out Clazz>>
+    abstract val allows: List<TurnClazz>
     abstract val temperature: Temperature
 
-    val lowCorner: Cord = Cord.ofList(Configuration.CONFIG.getIntegerList("warps.$name"))
-    val center: Cord = lowCorner + Cord(4.5, 0.0, 4.5)
-    val highCorner: Cord = lowCorner + Cord(9.0, Configuration.MAX_ARENA_HEIGHT.toDouble(), 9.0)
+    val bounds: Bounds = Bounds(
+        dimensions = Cord(9.0, Configuration.MAX_ARENA_HEIGHT.toDouble(), 9.0),
+        low = Cord.ofList(Configuration.CONFIG.getIntegerList("warps.${namespace.removeSuffix("_warp")}"))
+    )
 
-    open fun canBePlayed(): Boolean = true
+    open fun canBePlayed(exec: TurnExec<PlacedStructure>): Boolean = true
 
-    override fun apply() {
-        if (canBePlayed() && (Randomizer.boolByChance(chance) || player!!.hasModifier(Modifiers.Player.Default.ALWAYS_WARP))) {
-            player!!.removeModifier(Modifiers.Player.Default.ALWAYS_WARP)
-            player.game.players.forEach { it.teleport(it.cord() - player.game.warp.lowCorner + lowCorner) }
-            player.game.warp(this)
+    override fun apply(exec: TurnExec<PlacedStructure>) {
+        if (canBePlayed(exec) && (Randomizer.boolByChance(chance) || exec.player.hasModifier(Modifiers.Player.Default.ALWAYS_WARP))) {
+            exec.player.removeModifier(Modifiers.Player.Default.ALWAYS_WARP)
+            exec.game.players.forEach { it.teleport(it.cord() - exec.game.warp.bounds.low + bounds.low) }
+            exec.game.warp(exec.player, this)
         }
     }
 }
 
-class TAmethystWarp(data: PlacedStructure?, cord: Cord, player: NeoPlayer?) : WarpTurn(data, cord, "amethyst", player) {
+object TAmethystWarp : WarpTurn("amethyst_warp") {
+    override val mode: String = "default"
+    override val cost: Int = 4
+    
     override val staticStructure: StaticStructure = StaticStructures.Default.Warp.AMETHYST
-    override val cost: Int = 4
+    
     override val chance: Double = 20.0
-    override val allows: List<KClass<out Clazz>> = listOf(NeutralClazz::class, WaterClazz::class, NatureClazz::class, SupernaturalClazz::class)
+    override val allows: List<TurnClazz> = listOf(TurnClazz.NEUTRAL, TurnClazz.WATER, TurnClazz.NATURE, TurnClazz.SUPERNATURAL)
     override val temperature: Temperature = Temperature.NORMAL
 }
 
-class TCliffWarp(data: PlacedStructure?, cord: Cord, player: NeoPlayer?) : WarpTurn(data, cord, "cliff", player) {
-    override val staticStructure: StaticStructure = StaticStructures.Default.Warp.CLIFF
+object TCliffWarp : WarpTurn("cliff_warp") {
+    override val mode: String = "default"
     override val cost: Int = 4
+
+    override val staticStructure: StaticStructure = StaticStructures.Default.Warp.CLIFF
+
     override val chance: Double = 60.0
-    override val allows: List<KClass<out Clazz>> = listOf(NeutralClazz::class, RedstoneClazz::class)
+    override val allows: List<TurnClazz> = listOf(TurnClazz.NEUTRAL, TurnClazz.REDSTONE)
     override val temperature: Temperature = Temperature.NORMAL
 }
 
-class TDefaultWarp(data: PlacedStructure?, cord: Cord, player: NeoPlayer?) : WarpTurn(data, cord, "default", player) {
+object TDefaultWarp : WarpTurn("default_warp") {
+    override val mode: String = "default"
+    override val event: TurnEvent = TurnEvent.NONE
+
     // Just anything that exists will be ignored anyways.
     override val staticStructure: StaticStructure = StaticStructures.Default.PUMPKIN_WALL
+
     override val chance: Double = 0.0
-    override val allows: List<KClass<out Clazz>> = listOf(NeutralClazz::class, WaterClazz::class, NatureClazz::class)
+    override val allows: List<TurnClazz> = listOf(TurnClazz.NEUTRAL, TurnClazz.WATER, TurnClazz.NATURE)
     override val temperature: Temperature = Temperature.NORMAL
-    override fun canBePlayed(): Boolean = false
-    override fun apply() {}
+
+    override fun canBePlayed(exec: TurnExec<PlacedStructure>): Boolean = false
+    override fun apply(exec: TurnExec<PlacedStructure>) {}
 }
 
-class TDesertWarp(data: PlacedStructure?, cord: Cord, player: NeoPlayer?) : WarpTurn(data, cord, "desert", player) {
+object TDesertWarp : WarpTurn("desert_warp") {
+    override val mode: String = "default"
+    override val cost: Int = 4
+
     override val staticStructure: StaticStructure = StaticStructures.Default.Warp.DESERT
-    override val cost: Int = 4
+
     override val chance: Double = 80.0
-    override val allows: List<KClass<out Clazz>> = listOf(HotClazz::class, RedstoneClazz::class)
+    override val allows: List<TurnClazz> = listOf(TurnClazz.HOT, TurnClazz.REDSTONE)
     override val temperature: Temperature = Temperature.HOT
 }
 
-class TEndWarp(data: PlacedStructure?, cord: Cord, player: NeoPlayer?) : WarpTurn(data, cord, "end", player) {
+object TEndWarp : WarpTurn("end_warp") {
+    override val mode: String = "default"
+    override val cost: Int = 4
+
     override val staticStructure: StaticStructure = StaticStructures.Default.Warp.END
-    override val cost: Int = 4
+
     override val chance: Double = 60.0
-    override val allows: List<KClass<out Clazz>> = listOf(ColdClazz::class, SupernaturalClazz::class)
+    override val allows: List<TurnClazz> = listOf(TurnClazz.COLD, TurnClazz.SUPERNATURAL)
     override val temperature: Temperature = Temperature.COLD
 }
 
-class TFrozenWarp(data: PlacedStructure?, cord: Cord, player: NeoPlayer?) : WarpTurn(data, cord, "frozen", player) {
+object TFrozenWarp : WarpTurn("frozen_warp") {
+    override val mode: String = "default"
+    override val cost: Int = 4
+
     override val staticStructure: StaticStructure = StaticStructures.Default.Warp.FROZEN
-    override val cost: Int = 4
+
     override val chance: Double = 70.0
-    override val allows: List<KClass<out Clazz>> = listOf(ColdClazz::class, WaterClazz::class)
+    override val allows: List<TurnClazz> = listOf(TurnClazz.COLD, TurnClazz.WATER)
     override val temperature: Temperature = Temperature.COLD
 }
 
-class TMeadowWarp(data: PlacedStructure?, cord: Cord, player: NeoPlayer?) : WarpTurn(data, cord, "meadow", player) {
+object TMeadowWarp : WarpTurn("meadow_warp") {
+    override val mode: String = "default"
+    override val cost: Int = 4
+
     override val staticStructure: StaticStructure = StaticStructures.Default.Warp.MEADOW
-    override val cost: Int = 4
+
     override val chance: Double = 30.0
-    override val allows: List<KClass<out Clazz>> = listOf(NeutralClazz::class, NatureClazz::class, SupernaturalClazz::class)
+    override val allows: List<TurnClazz> = listOf(TurnClazz.NEUTRAL, TurnClazz.NATURE, TurnClazz.SUPERNATURAL)
     override val temperature: Temperature = Temperature.NORMAL
 }
 
-class TMushroomWarp(data: PlacedStructure?, cord: Cord, player: NeoPlayer?) : WarpTurn(data, cord, "mushroom", player) {
+object TMushroomWarp : WarpTurn("mushroom_warp") {
+    override val mode: String = "default"
+    override val cost: Int = 4
+
     override val staticStructure: StaticStructure = StaticStructures.Default.Warp.MUSHROOM
-    override val cost: Int = 4
+
     override val chance: Double = 50.0
-    override val allows: List<KClass<out Clazz>> = listOf(NeutralClazz::class, NatureClazz::class, SupernaturalClazz::class)
+    override val allows: List<TurnClazz> = listOf(TurnClazz.NEUTRAL, TurnClazz.NATURE, TurnClazz.SUPERNATURAL)
     override val temperature: Temperature = Temperature.NORMAL
 }
 
-class TNerdWarp(data: PlacedStructure?, cord: Cord, player: NeoPlayer?) : WarpTurn(data, cord, "nerd", player) {
+object TNerdWarp : WarpTurn("nerd_warp") {
+    override val mode: String = "default"
+    override val cost: Int = 4
+
     override val staticStructure: StaticStructure = StaticStructures.Default.Warp.NERD
-    override val cost: Int = 4
+
     override val chance: Double = 20.0
-    override val allows: List<KClass<out Clazz>> = listOf(NeutralClazz::class, NatureClazz::class, RedstoneClazz::class, SupernaturalClazz::class)
+    override val allows: List<TurnClazz> = listOf(TurnClazz.NEUTRAL, TurnClazz.NATURE, TurnClazz.REDSTONE, TurnClazz.SUPERNATURAL)
     override val temperature: Temperature = Temperature.NORMAL
 }
 
-class TNetherWarp(data: PlacedStructure?, cord: Cord, player: NeoPlayer?) : WarpTurn(data, cord, "nether", player) {
+object TNetherWarp : WarpTurn("nether_warp") {
+    override val mode: String = "default"
+    override val cost: Int = 4
+
     override val staticStructure: StaticStructure = StaticStructures.Default.Warp.NETHER
-    override val cost: Int = 4
+
     override val chance: Double = 80.0
-    override val allows: List<KClass<out Clazz>> = listOf(HotClazz::class, RedstoneClazz::class)
+    override val allows: List<TurnClazz> = listOf(TurnClazz.HOT, TurnClazz.REDSTONE)
     override val temperature: Temperature = Temperature.HOT
 }
 
-class TOceanWarp(data: PlacedStructure?, cord: Cord, player: NeoPlayer?) : WarpTurn(data, cord, "ocean", player) {
-    override val staticStructure: StaticStructure = StaticStructures.Default.Warp.OCEAN
+object TOceanWarp : WarpTurn("ocean_warp") {
+    override val mode: String = "default"
     override val cost: Int = 4
+
+    override val staticStructure: StaticStructure = StaticStructures.Default.Warp.OCEAN
+
     override val chance: Double = 70.0
-    override val allows: List<KClass<out Clazz>> = listOf(NeutralClazz::class, WaterClazz::class)
+    override val allows: List<TurnClazz> = listOf(TurnClazz.NEUTRAL, TurnClazz.WATER)
     override val temperature: Temperature = Temperature.NORMAL
 }
 
-class TRedstoneWarp(data: PlacedStructure?, cord: Cord, player: NeoPlayer?) : WarpTurn(data, cord, "redstone", player) {
+object TRedstoneWarp : WarpTurn("redstone_warp") {
+    override val mode: String = "default"
+    override val cost: Int = 4
+
     override val staticStructure: StaticStructure = StaticStructures.Default.Warp.REDSTONE
-    override val cost: Int = 4
+
     override val chance: Double = 60.0
-    override val allows: List<KClass<out Clazz>> = listOf(HotClazz::class, RedstoneClazz::class)
+    override val allows: List<TurnClazz> = listOf(TurnClazz.HOT, TurnClazz.REDSTONE)
     override val temperature: Temperature = Temperature.HOT
 }
 
-class TSunWarp(data: PlacedStructure?, cord: Cord, player: NeoPlayer?) : WarpTurn(data, cord, "sun", player) {
+object TSunWarp : WarpTurn("sun_warp") {
+    override val mode: String = "default"
+    override val cost: Int = 4
+
     override val staticStructure: StaticStructure = StaticStructures.Default.Warp.SUN
-    override val cost: Int = 4
+
     override val chance: Double = 40.0
-    override val allows: List<KClass<out Clazz>> = listOf(HotClazz::class, RedstoneClazz::class, SupernaturalClazz::class)
+    override val allows: List<TurnClazz> = listOf(TurnClazz.HOT, TurnClazz.REDSTONE, TurnClazz.SUPERNATURAL)
     override val temperature: Temperature = Temperature.HOT
 }
 
-class TVoidWarp(data: PlacedStructure?, cord: Cord, player: NeoPlayer?) : WarpTurn(data, cord, "void", player) {
-    override val staticStructure: StaticStructure = StaticStructures.Default.Warp.VOID
+object TVoidWarp : WarpTurn("void_warp") {
+    override val mode: String = "default"
     override val cost: Int = 4
+
+    override val staticStructure: StaticStructure = StaticStructures.Default.Warp.VOID
+
     override val chance: Double = 10.0
-    override val allows: List<KClass<out Clazz>> = listOf(ColdClazz::class, NeutralClazz::class, WaterClazz::class, RedstoneClazz::class, SupernaturalClazz::class)
+    override val allows: List<TurnClazz> = listOf(TurnClazz.COLD, TurnClazz.NEUTRAL, TurnClazz.WATER, TurnClazz.REDSTONE, TurnClazz.SUPERNATURAL)
     override val temperature: Temperature = Temperature.COLD
 }
 
-class TWoodWarp(data: PlacedStructure?, cord: Cord, player: NeoPlayer?
-                ) : WarpTurn(data, cord, "wood", player) {
-    override val staticStructure: StaticStructure = StaticStructures.Default.Warp.WOOD
+object TWoodWarp : WarpTurn("wood_warp") {
+    override val mode: String = "default"
     override val cost: Int = 4
+
+    override val staticStructure: StaticStructure = StaticStructures.Default.Warp.WOOD
+
     override val chance: Double = 100.0
-    override val allows: List<KClass<out Clazz>> = listOf(NeutralClazz::class, NatureClazz::class)
+    override val allows: List<TurnClazz> = listOf(TurnClazz.NEUTRAL, TurnClazz.NATURE)
     override val temperature: Temperature = Temperature.NORMAL
 }

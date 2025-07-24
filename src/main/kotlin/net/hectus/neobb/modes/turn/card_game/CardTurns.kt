@@ -1,57 +1,57 @@
 package net.hectus.neobb.modes.turn.card_game
 
-import com.marcpg.libpg.storing.Cord
 import com.marcpg.libpg.util.MinecraftTime
+import net.hectus.neobb.event.TurnEvent
 import net.hectus.neobb.modes.turn.Turn
+import net.hectus.neobb.modes.turn.TurnExec
 import net.hectus.neobb.player.NeoPlayer
-import net.hectus.neobb.util.material
-import org.bukkit.Material
 import org.bukkit.block.Block
-import org.bukkit.inventory.ItemStack
 
-abstract class CardTurn(data: Block?, cord: Cord?, player: NeoPlayer?) : Turn<Block>(data, cord?.plus(Cord(0.5, 0.5, 0.5)), player) {
-    abstract override val damage: Double
-
-    override fun item(): ItemStack = ItemStack(this::class.material())
+abstract class CardTurn(namespace: String) : Turn<Block>(namespace) {
+    override val mode: String = "card"
+    override val event: TurnEvent = TurnEvent.BLOCK
 
     // Prevent the suggestion system from doing anything:
     override fun goodChoice(player: NeoPlayer): Boolean = false
 }
 
-class CTChest(data: Block?, cord: Cord?, player: NeoPlayer?) : CardTurn(data, cord, player) {
-    override val damage: Double = 5.0
+object CTChest : CardTurn("chest") {
+    override val damage: Double? = 5.0
 }
 
-class CTDaylightDetector(data: Block?, cord: Cord?, player: NeoPlayer?) : CardTurn(data, cord, player) {
-    override val damage: Double = 3.0
+object CTDaylightDetector : CardTurn("daylight_detector") {
+    override val damage: Double? = 3.0
 }
 
-class CTFlowerPot(data: Block?, cord: Cord?, player: NeoPlayer?) : CardTurn(data, cord, player) {
-    override val damage: Double = 2.0
+object CTFlowerPot : CardTurn("flower_pot") {
+    override val damage: Double? = 2.0
 }
 
-class CTJackOLantern(data: Block?, cord: Cord?, player: NeoPlayer?) : CardTurn(data, cord, player) {
-    override val damage: Double
-        get() = if (player?.game?.time == MinecraftTime.MIDNIGHT) 5.0 else 2.0
-    override fun item(): ItemStack = ItemStack(Material.JACK_O_LANTERN)
+object CTJackOLantern : CardTurn("jack_o_lantern") {
+    override val damage: Double? = 2.0
+
+    override fun apply(exec: TurnExec<Block>) {
+        if (exec.player.game.time == MinecraftTime.MIDNIGHT)
+            exec.player.damage(3.0)
+    }
 }
 
-class CTOakTrapdoor(data: Block?, cord: Cord?, player: NeoPlayer?) : CardTurn(data, cord, player) {
-    override val damage: Double = 8.0
+object CTOakTrapdoor : CardTurn("oak_trapdoor") {
+    override val damage: Double? = 8.0
 }
 
-class CTPointedDripstone(data: Block?, cord: Cord?, player: NeoPlayer?) : CardTurn(data, cord, player) {
-    override val damage: Double = 6.0
+object CTPointedDripstone : CardTurn("pointed_dripstone") {
+    override val damage: Double? = 6.0
 }
 
-class CTRedstoneLamp(data: Block?, cord: Cord?, player: NeoPlayer?) : CardTurn(data, cord, player) {
-    override val damage: Double = 5.0
+object CTRedstoneLamp : CardTurn("redstone_lamp") {
+    override val damage: Double? = 5.0
 }
 
-class CTTorch(data: Block?, cord: Cord?, player: NeoPlayer?) : CardTurn(data, cord, player) {
-    override val damage: Double = 6.0
+object CTTorch : CardTurn("torch") {
+    override val damage: Double? = 6.0
 }
 
-class CTWaxedExposedCutCopperStairs(data: Block?, cord: Cord?, player: NeoPlayer?) : CardTurn(data, cord, player) {
-    override val damage: Double = 5.0
+object CTWaxedExposedCutCopperStairs : CardTurn("waxed_exposed_cut_copper_stairs") {
+    override val damage: Double? = 5.0
 }

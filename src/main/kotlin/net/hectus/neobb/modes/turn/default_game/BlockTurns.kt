@@ -3,553 +3,526 @@ package net.hectus.neobb.modes.turn.default_game
 import com.marcpg.libpg.storing.Cord
 import com.marcpg.libpg.util.Randomizer
 import com.marcpg.libpg.util.component
-import com.marcpg.libpg.util.toCord
 import net.hectus.neobb.buff.*
+import net.hectus.neobb.event.TurnEvent
 import net.hectus.neobb.game.util.ScheduleID
 import net.hectus.neobb.modes.turn.Turn
+import net.hectus.neobb.modes.turn.TurnExec
 import net.hectus.neobb.modes.turn.default_game.attribute.*
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Modifiers
-import net.hectus.neobb.util.material
 import org.bukkit.Material
 import org.bukkit.block.Block
-import org.bukkit.block.data.Directional
 import org.bukkit.block.data.Waterlogged
 import org.bukkit.entity.Bee
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
 
-abstract class BlockTurn(data: Block?, cord: Cord?, player: NeoPlayer?) : Turn<Block>(data, cord?.plus(Cord(0.5, 0.5, 0.5)), player) {
-    override fun item(): ItemStack = ItemStack(this::class.material())
+abstract class BlockTurn(namespace: String) : Turn<Block>(namespace) {
+    override val event: TurnEvent = TurnEvent.BLOCK
 }
 
-class TBeeNest(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), AttackFunction,
-    NatureClazz {
-    override val cost: Int = 4
-    override fun apply() {
+object TBeeNest : BlockTurn("bee_nest"), AttackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.NATURE
+    override val cost: Int? = 4
+
+    override fun apply(exec: TurnExec<Block>) {
         if (Randomizer.boolByChance(20.0)) {
-            val bee = TBee(player!!.game.world.spawn(location(), Bee::class.java), location().toCord(), player)
-            bee.buffs().forEach { it(player) }
-            bee.apply()
+            val exec = TurnExec(TBee, exec.player, exec.cord, exec.game.world.spawn(exec.location!!, Bee::class.java))
+            exec.turn.buffs.forEach { it(exec.player) }
+            exec.turn.apply(exec)
         }
     }
 }
 
-class TBlackWool(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterattackFunction,
-    BuffFunction, NeutralClazz {
+object TBlackWool : BlockTurn("black_wool"), CounterattackFunction, BuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.NEUTRAL
+    override val cost: Int? = 5
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.COLD, TurnClazz.SUPERNATURAL)
+    override val buffs: List<Buff<*>> = listOf(Effect(PotionEffectType.BLINDNESS, target = Buff.BuffTarget.ALL))
+}
+
+object TBlueBed : BlockTurn("blue_bed"), CounterbuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.SUPERNATURAL
+    override val cost: Int = 4
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.COLD, TurnClazz.WATER, TurnClazz.NATURE, TurnClazz.SUPERNATURAL)
+    override val buffs: List<Buff<*>> = listOf(Luck(5))
+}
+
+object TBlueIce : BlockTurn("blue_ice"), CounterFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.COLD
+    override val cost: Int = 4
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.COLD, TurnClazz.WATER, TurnClazz.SUPERNATURAL)
+}
+
+object TBrainCoralBlock : BlockTurn("brain_coral_block"), CounterattackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.WATER
+    override val cost: Int = 4
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.REDSTONE)
+}
+
+object TCampfire : BlockTurn("campfire"), CounterattackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.HOT
     override val cost: Int = 5
-    override fun counters(): List<CounterFilter> {
-        return listOf(CounterFilter.clazz(ColdClazz::class), CounterFilter.clazz(SupernaturalClazz::class))
-    }
-    override fun buffs(): List<Buff<*>> {
-        return listOf(Effect(PotionEffectType.BLINDNESS, target = Buff.BuffTarget.ALL))
-    }
-}
 
-class TBlueBed(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterbuffFunction,
-    SupernaturalClazz {
-    override val cost: Int = 4
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(ColdClazz::class), CounterFilter.clazz(WaterClazz::class), CounterFilter.clazz(
-            NatureClazz::class), CounterFilter.clazz(SupernaturalClazz::class))
-    }
-    override fun buffs(): List<Buff<*>> {
-        return listOf(Luck(5))
-    }
-}
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NEUTRAL, TurnClazz.HOT, TurnClazz.COLD)
 
-class TBlueIce(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterFunction,
-    ColdClazz {
-    override val cost: Int = 4
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(ColdClazz::class), CounterFilter.clazz(WaterClazz::class), CounterFilter.clazz(
-            SupernaturalClazz::class))
-    }
-}
-
-class TBrainCoralBlock(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player),
-    CounterattackFunction, WaterClazz {
-    override val cost: Int = 4
-    override fun counters(): List<CounterFilter> {
-        return listOf(CounterFilter.clazz(RedstoneClazz::class))
-    }
-}
-
-class TCampfire(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterattackFunction,
-    HotClazz {
-    override val cost: Int = 5
-    override fun apply() {
-        if (player!!.game.history.isEmpty()) return
-        if (player.game.history.last() is TBeeNest) {
-            Luck(10).invoke(player)
-            ExtraTurn().invoke(player)
+    override fun apply(exec: TurnExec<Block>) {
+        if (exec.hist.isEmpty()) return
+        if (exec.hist.last().turn === TBeeNest) {
+            Luck(10).invoke(exec.player)
+            ExtraTurn().invoke(exec.player)
         }
     }
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(NeutralClazz::class), CounterFilter.clazz(HotClazz::class), CounterFilter.clazz(
-            ColdClazz::class))
-    }
 }
 
-class TCauldron(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), AttackFunction,
-    NeutralClazz {
+object TCauldron : BlockTurn("cauldron"), AttackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.NEUTRAL
     override val cost: Int = 2
 }
 
-class TComposter(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), AttackFunction,
-    NatureClazz {
+object TComposter : BlockTurn("composter"), AttackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.NATURE
     override val cost: Int = 2
 }
 
-class TCyanCarpet(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterbuffFunction,
-    NeutralClazz {
+object TCyanCarpet : BlockTurn("cyan_carpet"), CounterbuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.NEUTRAL
     override val cost: Int = 4
-    override fun counters(): List<CounterFilter> {
-        return listOf(CounterFilter.clazz(RedstoneClazz::class), CounterFilter.clazz(SupernaturalClazz::class))
-    }
-    override fun buffs(): List<Buff<*>> {
-        return listOf(ExtraTurn())
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.REDSTONE, TurnClazz.SUPERNATURAL)
+    override val buffs: List<Buff<*>> = listOf(ExtraTurn())
 }
 
-class TDragonHead(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), BuffFunction,
-    SupernaturalClazz {
+object TDragonHead : BlockTurn("dragon_head"), BuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.SUPERNATURAL
     override val cost: Int = 6
-    override fun buffs(): List<Buff<*>> {
-        return listOf(
-            Effect(PotionEffectType.BLINDNESS, target = Buff.BuffTarget.OPPONENTS),
-            Effect(PotionEffectType.SLOWNESS, target = Buff.BuffTarget.OPPONENTS),
-            Luck(-20, Buff.BuffTarget.OPPONENTS)
-        )
-    }
+
+    override val buffs: List<Buff<*>> = listOf(
+        Effect(PotionEffectType.BLINDNESS, target = Buff.BuffTarget.OPPONENTS),
+        Effect(PotionEffectType.SLOWNESS, target = Buff.BuffTarget.OPPONENTS),
+        Luck(-20, Buff.BuffTarget.OPPONENTS)
+    )
 }
 
-class TDriedKelpBlock(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), BuffFunction,
-    WaterClazz {
+object TDriedKelpBlock : BlockTurn("dried_kelp_block"), BuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.WATER
     override val cost: Int = 3
-    override fun buffs(): List<Buff<*>> {
-        return listOf(Effect(PotionEffectType.JUMP_BOOST, 2))
-    }
+
+    override val buffs: List<Buff<*>> = listOf(Effect(PotionEffectType.JUMP_BOOST, 2))
 }
 
-class TFenceGate(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterattackFunction,
-    RedstoneClazz {
+object TFenceGate : BlockTurn("fence_gate"), CounterattackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.REDSTONE
     override val cost: Int = 4
-    override fun item(): ItemStack = ItemStack(Material.OAK_FENCE_GATE)
-    override fun counters(): List<CounterFilter> {
-        return listOf(CounterFilter.clazz(NeutralClazz::class), CounterFilter.clazz(HotClazz::class))
-    }
+
+    override val mainItem: ItemStack = ItemStack.of(Material.OAK_FENCE_GATE)
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NEUTRAL, TurnClazz.HOT)
 }
 
-class TFire(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterbuffFunction,
-    HotClazz {
+object TFire : BlockTurn("fire"), CounterbuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.HOT
     override val cost: Int = 4
-    override fun item(): ItemStack = ItemStack(Material.FLINT_AND_STEEL)
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(ColdClazz::class), CounterFilter.clazz(RedstoneClazz::class), CounterFilter.clazz(
-            NatureClazz::class))
-    }
-    override fun buffs(): List<Buff<*>> {
-        return listOf(Effect(PotionEffectType.BLINDNESS, target = Buff.BuffTarget.ALL), Effect(PotionEffectType.GLOWING, target = Buff.BuffTarget.ALL))
-    }
+
+    override val mainItem: ItemStack = ItemStack.of(Material.FLINT_AND_STEEL)
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.COLD, TurnClazz.REDSTONE, TurnClazz.NATURE)
+    override val buffs: List<Buff<*>> = listOf(
+        Effect(PotionEffectType.BLINDNESS, target = Buff.BuffTarget.ALL),
+        Effect(PotionEffectType.GLOWING, target = Buff.BuffTarget.ALL)
+    )
 }
 
-class TFireCoral(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterattackFunction,
-    WaterClazz {
+object TFireCoral : BlockTurn("fire_coral"), CounterattackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.WATER
     override val cost: Int = 4
-    override fun counters(): List<CounterFilter> {
-        return listOf(CounterFilter.clazz(HotClazz::class), CounterFilter.clazz(RedstoneClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.HOT, TurnClazz.REDSTONE)
 }
 
-class TFireCoralFan(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterbuffFunction,
-    WaterClazz {
+object TFireCoralFan : BlockTurn("fire_coral_fan"), CounterbuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.WATER
     override val cost: Int = 5
-    override fun buffs(): List<Buff<*>> {
-        return listOf(ChancedBuff(80.0, ExtraTurn()))
-    }
-    override fun counters(): List<CounterFilter> {
-        return listOf(CounterFilter.clazz(HotClazz::class), CounterFilter.clazz(RedstoneClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.HOT, TurnClazz.REDSTONE)
+    override val buffs: List<Buff<*>> = listOf(ChancedBuff(80.0, ExtraTurn()))
 }
 
-class TGoldBlock(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterattackFunction,
-    NeutralClazz {
+object TGoldBlock : BlockTurn("gold_block"), CounterattackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.NEUTRAL
     override val cost: Int = 5
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(NeutralClazz::class), CounterFilter.clazz(HotClazz::class), CounterFilter.clazz(
-            NatureClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NEUTRAL, TurnClazz.HOT, TurnClazz.NATURE)
 }
 
-class TGreenBed(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterattackFunction,
-    SupernaturalClazz {
+object TGreenBed : BlockTurn("green_bed"), CounterattackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.SUPERNATURAL
     override val cost: Int = 2
-    override fun counters(): List<CounterFilter> {
-        return listOf(CounterFilter.clazz(NeutralClazz::class), CounterFilter.clazz(NatureClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NEUTRAL, TurnClazz.NATURE)
 }
 
-class TGreenCarpet(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player),
-    CounterattackFunction, NeutralClazz {
+object TGreenCarpet : BlockTurn("green_carpet"), CounterattackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.NEUTRAL
     override val cost: Int = 3
-    override fun counters(): List<CounterFilter> {
-        return listOf(CounterFilter.of("wool") { it::class.simpleName!!.endsWith("Wool") })
-    }
+
+    override val counters: List<CounterFilter> = listOf(CounterFilter.of("wool") { it.turn.namespace.endsWith("wool") })
 }
 
-class TGreenWool(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterattackFunction,
-    NatureClazz {
+object TGreenWool : BlockTurn("green_wool"), CounterattackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.NATURE
     override val cost: Int = 5
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(NatureClazz::class), CounterFilter.clazz(HotClazz::class), CounterFilter.clazz(
-            ColdClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NATURE, TurnClazz.HOT, TurnClazz.COLD)
 }
 
-class THayBlock(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterattackFunction,
-    NatureClazz {
+object THayBlock : BlockTurn("hay_block"), CounterattackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.NATURE
     override val cost: Int = 3
-    override fun counters(): List<CounterFilter> {
-        return listOf(CounterFilter.clazz(ColdClazz::class), CounterFilter.clazz(WaterClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.COLD, TurnClazz.WATER)
 }
 
-class THoneyBlock(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterFunction,
-    NatureClazz {
+object THoneyBlock : BlockTurn("honey_block"), CounterFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.NATURE
     override val cost: Int = 5
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(NatureClazz::class), CounterFilter.clazz(WaterClazz::class), CounterFilter.clazz(
-            RedstoneClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NATURE, TurnClazz.WATER, TurnClazz.REDSTONE)
 }
 
-class THornCoral(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterattackFunction,
-    WaterClazz {
+object THornCoral : BlockTurn("horn_coral"), CounterattackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.WATER
     override val cost: Int = 4
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(NatureClazz::class), CounterFilter.clazz(NatureClazz::class), CounterFilter.clazz(
-            WaterClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NATURE, TurnClazz.NATURE, TurnClazz.WATER)
 }
 
-class TIronTrapdoor(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player),
-    CounterattackFunction, NeutralClazz {
+object TIronTrapdoor : BlockTurn("iron_trapdoor"), CounterattackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.NEUTRAL
     override val cost: Int = 4
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(NeutralClazz::class), CounterFilter.clazz(WaterClazz::class), CounterFilter.clazz(
-            RedstoneClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NEUTRAL, TurnClazz.WATER, TurnClazz.REDSTONE)
 }
 
-class TLava(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), BuffFunction, HotClazz {
-    override val cost: Int = 6
+object TLava : BlockTurn("lava"), BuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.HOT
     override val maxAmount: Int = 1
-    override fun item(): ItemStack = ItemStack(Material.LAVA_BUCKET)
-    override fun apply() {
-        player!!.nextPlayer().player.fireTicks = 6000
-        player.game.turnScheduler.runTaskLater(ScheduleID.BURN, 3) {
-            player.game.eliminate(player.nextPlayer())
+    override val cost: Int = 6
+
+    override val mainItem: ItemStack = ItemStack.of(Material.LAVA_BUCKET)
+
+    override fun apply(exec: TurnExec<Block>) {
+        exec.player.nextPlayer().player.fireTicks = 6000
+        exec.game.turnScheduler.runTaskLater(ScheduleID.BURN, 3) {
+            exec.game.eliminate(exec.player.nextPlayer())
         }
     }
-    override fun buffs(): List<Buff<*>> = emptyList()
 }
 
-class TLever(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterFunction,
-    RedstoneClazz {
+object TLever : BlockTurn("lever"), CounterFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.REDSTONE
     override val cost: Int = 3
-    override fun counters(): List<CounterFilter> {
-        return listOf(CounterFilter.clazz(NeutralClazz::class), CounterFilter.clazz(RedstoneClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NEUTRAL, TurnClazz.REDSTONE)
 }
 
-class TLightBlueWool(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), AttackFunction,
-    ColdClazz {
+object TLightBlueWool : BlockTurn("light_blue_wool"), AttackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.COLD
     override val cost: Int = 3
 }
 
-class TLightningRod(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player),
-    CounterattackFunction, RedstoneClazz {
+object TLightningRod : BlockTurn("lightning_rod"), CounterattackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.REDSTONE
     override val cost: Int = 6
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(NeutralClazz::class), CounterFilter.clazz(HotClazz::class), CounterFilter.clazz(
-            RedstoneClazz::class), CounterFilter.clazz(SupernaturalClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NEUTRAL, TurnClazz.HOT, TurnClazz.REDSTONE, TurnClazz.SUPERNATURAL)
 }
 
-class TMagentaGlazedTerracotta(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player),
-    CounterattackFunction, NeutralClazz {
+object TMagentaGlazedTerracotta : BlockTurn("magenta_glazed_terracotta"), CounterattackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.NEUTRAL
     override val cost: Int = 4
-    override fun unusable(): Boolean {
-        if (isDummy()) return true
-        return if (player!!.game.history.isNotEmpty() && player.game.history.last() is BlockTurn) {
-            data!!.getRelative((data.blockData as Directional).facing.oppositeFace) != player.game.history.last().data
+
+    override fun unusable(player: NeoPlayer): Boolean {
+        return if (player.game.history.isNotEmpty() && player.game.history.last().turn is BlockTurn) {
+            // TODO: Find a method of replacing this check!
+            false
+            // exec.data.getRelative((exec.data.blockData as Directional).facing.oppositeFace) != exec.hist.last().data
         } else true
     }
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(NeutralClazz::class), CounterFilter.clazz(HotClazz::class), CounterFilter.clazz(
-            ColdClazz::class), CounterFilter.clazz(WaterClazz::class), CounterFilter.clazz(NatureClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NEUTRAL, TurnClazz.HOT, TurnClazz.COLD, TurnClazz.WATER, TurnClazz.NATURE)
 }
 
-class TMagmaBlock(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), AttackFunction,
-    HotClazz {
+object TMagmaBlock : BlockTurn("magma_block"), AttackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.HOT
     override val cost: Int = 4
 }
 
-class TMangroveRoots(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterFunction,
-    NatureClazz {
+object TMangroveRoots : BlockTurn("mangrove_roots"), CounterFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.NATURE
     override val cost: Int = 5
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(NeutralClazz::class), CounterFilter.clazz(WaterClazz::class), CounterFilter.clazz(
-            NatureClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NEUTRAL, TurnClazz.WATER, TurnClazz.NATURE)
 }
 
-class TNetherrack(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterattackFunction,
-    HotClazz {
+object TNetherrack : BlockTurn("netherrack"), CounterattackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.HOT
     override val cost: Int = 4
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(HotClazz::class), CounterFilter.clazz(ColdClazz::class), CounterFilter.clazz(
-            WaterClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.HOT, TurnClazz.COLD, TurnClazz.WATER)
 }
 
-class TOakStairs(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterbuffFunction,
-    NatureClazz {
+object TOakStairs : BlockTurn("oak_stairs"), CounterbuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.NATURE
     override val cost: Int = 5
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(HotClazz::class), CounterFilter.clazz(NatureClazz::class), CounterFilter.clazz(
-            SupernaturalClazz::class))
-    }
-    override fun buffs(): List<Buff<*>> {
-        return listOf(ExtraTurn())
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.HOT, TurnClazz.NATURE, TurnClazz.SUPERNATURAL)
+    override val buffs: List<Buff<*>> = listOf(ExtraTurn())
 }
 
-class TOrangeWool(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterattackFunction,
-    HotClazz {
+object TOrangeWool : BlockTurn("orange_wool"), CounterattackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.HOT
     override val cost: Int = 4
-    override fun counters(): List<CounterFilter> {
-        return listOf(CounterFilter.clazz(RedstoneClazz::class), CounterFilter.clazz(SupernaturalClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.REDSTONE, TurnClazz.SUPERNATURAL)
 }
 
-class TPackedIce(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), AttackFunction,
-    ColdClazz {
+object TPackedIce : BlockTurn("packed_ice"), AttackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.COLD
     override val cost: Int = 3
 }
 
-class TPinkBed(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), BuffFunction,
-    SupernaturalClazz {
+object TPinkBed : BlockTurn("pink_bed"), BuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.SUPERNATURAL
     override val cost: Int = 4
-    override fun apply() {
+
+    override fun apply(exec: TurnExec<Block>) {
         if (Randomizer.boolByChance(70.0)) {
-            player!!.player.clearActivePotionEffects()
+            exec.player.player.clearActivePotionEffects()
         }
     }
-    override fun buffs(): List<Buff<*>> = emptyList()
 }
 
-class TPiston(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterFunction,
-    RedstoneClazz {
+object TPiston : BlockTurn("piston"), CounterFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.REDSTONE
     override val cost: Int = 6
-    override fun counters(): List<CounterFilter> {
-        return listOf(CounterFilter.of("all") { true })
-    }
+
+    override val counters: List<CounterFilter> = listOf(CounterFilter.of("all") { true })
 }
 
-class TPowderSnow(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), BuffFunction,
-    ColdClazz {
+object TPowderSnow : BlockTurn("powder_snow"), BuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.COLD
     override val cost: Int = 5
     override val maxAmount: Int = 1
-    override fun item(): ItemStack = ItemStack(Material.POWDER_SNOW_BUCKET)
-    override fun apply() {
-        player!!.nextPlayer().player.freezeTicks = 6000
-        player.game.turnScheduler.runTaskLater(ScheduleID.FREEZE, 3) {
-            player.game.eliminate(player.nextPlayer())
+
+    override val mainItem: ItemStack = ItemStack.of(Material.POWDER_SNOW_BUCKET)
+
+    override fun apply(exec: TurnExec<Block>) {
+        exec.player.nextPlayer().player.freezeTicks = 6000
+        exec.game.turnScheduler.runTaskLater(ScheduleID.FREEZE, 3) {
+            exec.game.eliminate(exec.player.nextPlayer())
         }
     }
-    override fun buffs(): List<Buff<*>> = emptyList()
 }
 
-class TPurpleWool(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), AttackFunction,
-    NeutralClazz {
+object TPurpleWool : BlockTurn("purple_wool"), AttackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.NEUTRAL
     override val cost: Int = 4
-    override fun unusable(): Boolean {
-        if (isDummy()) return true
-        val history = player!!.game.history
-        if (history.size < 5) return true
-        return history.subList(history.size - 5, history.size).any { it is AttackFunction }
+
+    override fun unusable(player: NeoPlayer): Boolean {
+        val hist = player.game.history
+        if (hist.size < 5) return true
+        return hist.subList(hist.size - 5, hist.size).any { it.turn is AttackFunction }
     }
-    override fun apply() {
-        player!!.game.win(player)
+
+    override fun apply(exec: TurnExec<Block>) {
+        exec.game.win(exec.player)
     }
 }
 
-class TRedBed(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterattackFunction,
-    SupernaturalClazz {
+object TRedBed : BlockTurn("red_bed"), CounterattackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.SUPERNATURAL
     override val cost: Int = 4
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(NeutralClazz::class), CounterFilter.clazz(ColdClazz::class), CounterFilter.clazz(
-            SupernaturalClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NEUTRAL, TurnClazz.COLD, TurnClazz.SUPERNATURAL)
 }
 
-class TRedCarpet(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterbuffFunction,
-    RedstoneClazz {
+object TRedCarpet : BlockTurn("red_carpet"), CounterbuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.REDSTONE
     override val cost: Int = 5
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(NeutralClazz::class), CounterFilter.clazz(ColdClazz::class), CounterFilter.clazz(
-            SupernaturalClazz::class))
-    }
-    override fun buffs(): List<Buff<*>> {
-        return listOf(ExtraTurn(), ChancedBuff(10.0, Give(TRedBed(null, null, player))))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NEUTRAL, TurnClazz.COLD, TurnClazz.SUPERNATURAL)
+    override val buffs: List<Buff<*>> = listOf(ExtraTurn(), ChancedBuff(10.0, Give(TRedBed)))
 }
 
-class TRepeater(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterattackFunction,
-    RedstoneClazz {
+object TRepeater : BlockTurn("repeater"), CounterattackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.REDSTONE
     override val cost: Int = 4
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(NeutralClazz::class), CounterFilter.clazz(ColdClazz::class), CounterFilter.clazz(
-            NatureClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NEUTRAL, TurnClazz.COLD, TurnClazz.NATURE)
 }
 
-class TRespawnAnchor(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), BuffFunction,
-    HotClazz {
+object TRespawnAnchor : BlockTurn("respawn_anchor"), BuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.HOT
     override val cost: Int = 4
-    override fun buffs(): List<Buff<*>> {
-        return listOf(Teleport(player!!.game.history.lastOrNull()?.location()?.toCord() ?: Cord(0.0, 0.0, 0.0)), ChancedBuff(50.0, ExtraTurn()))
-    }
+
+    override val buffs: List<Buff<*>> = listOf(
+        Teleport({ it.game.history.lastOrNull()?.cord ?: Cord(0.0, 0.0, 0.0) }),
+        ChancedBuff(50.0, ExtraTurn())
+    )
 }
 
-class TSculk(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterbuffFunction,
-    NeutralClazz {
+object TSculk : BlockTurn("sculk"), CounterbuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.NEUTRAL
     override val cost: Int = 4
-    override fun counters(): List<CounterFilter> {
-        return listOf(CounterFilter.clazz(NeutralClazz::class), CounterFilter.clazz(SupernaturalClazz::class))
-    }
-    override fun buffs(): List<Buff<*>> {
-        return listOf(Luck(10, Buff.BuffTarget.OPPONENTS), Effect(PotionEffectType.DARKNESS, target = Buff.BuffTarget.OPPONENTS))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NEUTRAL, TurnClazz.SUPERNATURAL)
+    override val buffs: List<Buff<*>> = listOf(
+        Luck(10, Buff.BuffTarget.OPPONENTS),
+        Effect(PotionEffectType.DARKNESS, target = Buff.BuffTarget.OPPONENTS)
+    )
 }
 
-class TSeaLantern(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), BuffFunction,
-    WaterClazz {
+object TSeaLantern : BlockTurn("sea_lantern"), BuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.WATER
     override val cost: Int = 7
-    override fun apply() {
-        player!!.addModifier(Modifiers.Player.REVIVE)
-        player.sendMessage(player.locale().component("gameplay.info.revive.start", color = Colors.POSITIVE))
-        player.game.turnScheduler.runTaskLater(ScheduleID.REVIVE, 3) {
-            player.removeModifier(Modifiers.Player.REVIVE)
-            player.sendMessage(player.locale().component("gameplay.info.revive.end", color = Colors.NEGATIVE))
+
+    override fun apply(exec: TurnExec<Block>) {
+        exec.player.addModifier(Modifiers.Player.REVIVE)
+        exec.player.sendMessage(exec.player.locale().component("gameplay.info.revive.start", color = Colors.POSITIVE))
+        exec.game.turnScheduler.runTaskLater(ScheduleID.REVIVE, 3) {
+            exec.player.removeModifier(Modifiers.Player.REVIVE)
+            exec.player.sendMessage(exec.player.locale().component("gameplay.info.revive.end", color = Colors.NEGATIVE))
         }
     }
-    override fun buffs(): List<Buff<*>> = emptyList()
 }
 
-class TSoulSand(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), AttackFunction,
-    SupernaturalClazz {
+object TSoulSand : BlockTurn("soul_sand"), AttackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.SUPERNATURAL
     override val cost: Int = 3
 }
 
-class TSponge(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterbuffFunction,
-    WaterClazz {
+object TSponge : BlockTurn("sponge"), CounterbuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.WATER
     override val cost: Int = 5
-    override fun apply() {
-        if (player!!.game.history.isEmpty()) return
-        if (player.game.history.last() is TWater) {
-            player.game.world.setStorm(true)
-            Luck(10).invoke(player)
-            Effect(PotionEffectType.JUMP_BOOST).invoke(player)
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NEUTRAL, TurnClazz.WATER, TurnClazz.SUPERNATURAL)
+    override val buffs: List<Buff<*>> = listOf(ExtraTurn(), Luck(5))
+
+    override fun apply(exec: TurnExec<Block>) {
+        if (exec.hist.isEmpty()) return
+        if (exec.hist.last().turn === TWater) {
+            exec.game.world.setStorm(true)
+            Luck(10).invoke(exec.player)
+            Effect(PotionEffectType.JUMP_BOOST).invoke(exec.player)
         }
     }
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(NeutralClazz::class), CounterFilter.clazz(WaterClazz::class), CounterFilter.clazz(
-            SupernaturalClazz::class))
-    }
-    override fun buffs(): List<Buff<*>> {
-        return listOf(ExtraTurn(), Luck(5))
-    }
 }
 
-class TSpruceLeaves(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player),
-    CounterattackFunction, ColdClazz {
+object TSpruceLeaves : BlockTurn("spruce_leaves"), CounterattackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.COLD
     override val cost: Int = 4
-    override fun counters(): List<CounterFilter> {
-        return listOf(CounterFilter.clazz(NeutralClazz::class), CounterFilter.clazz(NatureClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NEUTRAL, TurnClazz.NATURE)
 }
 
-class TSpruceTrapdoor(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player),
-    CounterattackFunction, ColdClazz {
+object TSpruceTrapdoor : BlockTurn("spruce_trapdoor"), CounterattackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.COLD
     override val cost: Int = 4
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(NeutralClazz::class), CounterFilter.clazz(WaterClazz::class), CounterFilter.clazz(
-            NatureClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NEUTRAL, TurnClazz.WATER, TurnClazz.NATURE)
 }
 
-class TStonecutter(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterFunction,
-    NeutralClazz {
+object TStonecutter : BlockTurn("stonecutter"), CounterFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.NEUTRAL
     override val cost: Int = 4
-    override fun counters(): List<CounterFilter> {
-        return listOf(CounterFilter.of("walls") { it::class.simpleName!!.endsWith("Wall") })
-    }
-    override fun counter(source: NeoPlayer, countered: Turn<*>) {
+
+    override val counters: List<CounterFilter> = listOf(CounterFilter.of("walls") { it.turn.namespace.endsWith("wall") })
+
+    override fun counter(source: NeoPlayer, countered: TurnExec<*>) {
         super.counter(source, countered)
         source.opponents().forEach { it.removeModifier(Modifiers.Player.Default.DEFENDED) }
     }
 }
 
-class TVerdantFroglight(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterFunction,
-    NeutralClazz {
+object TVerdantFroglight : BlockTurn("verdant_froglight"), CounterFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.NEUTRAL
     override val cost: Int = 2
-    override fun counters(): List<CounterFilter> {
-        return listOf(CounterFilter.clazz(SupernaturalClazz::class))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.SUPERNATURAL)
 }
 
-class TWater(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterFunction,
-    WaterClazz {
+object TWater : BlockTurn("water"), CounterFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.WATER
     override val cost: Int = 3
-    override fun item(): ItemStack = ItemStack(Material.WATER_BUCKET)
-    override fun counters(): List<CounterFilter> {
-        return listOf(CounterFilter.of("waterloggable") { it is BlockTurn && it.data?.blockData is Waterlogged })
-    }
+
+    override val mainItem: ItemStack = ItemStack.of(Material.WATER_BUCKET)
+
+    override val counters: List<CounterFilter> = listOf(CounterFilter.of("waterloggable") { it.turn is BlockTurn && (it.data as Block).blockData is Waterlogged })
 }
 
-class TWhiteWool(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterbuffFunction,
-    ColdClazz {
+object TWhiteWool : BlockTurn("white_wool"), CounterbuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.COLD
     override val cost: Int = 5
-    override fun counters(): List<CounterFilter> {
-        return listOf(
-            CounterFilter.clazz(NeutralClazz::class), CounterFilter.clazz(WaterClazz::class), CounterFilter.clazz(
-            RedstoneClazz::class), CounterFilter.clazz(SupernaturalClazz::class))
-    }
-    override fun buffs(): List<Buff<*>> {
-        return listOf(Effect(PotionEffectType.SLOWNESS, 9, Buff.BuffTarget.ALL))
-    }
+
+    override val counters: List<CounterFilter> = listOf(TurnClazz.NEUTRAL, TurnClazz.WATER, TurnClazz.REDSTONE, TurnClazz.SUPERNATURAL)
+    override val buffs: List<Buff<*>> = listOf(Effect(PotionEffectType.SLOWNESS, 9, Buff.BuffTarget.ALL))
 }

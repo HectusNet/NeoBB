@@ -11,7 +11,6 @@ import net.hectus.neobb.game.util.GameDifficulty
 import net.hectus.neobb.game.util.GameInfo
 import net.hectus.neobb.modes.lore.DefaultItemLoreBuilder
 import net.hectus.neobb.modes.shop.DefaultShop
-import net.hectus.neobb.modes.turn.default_game.*
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Modifiers
@@ -32,30 +31,6 @@ class DefaultGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDif
         turnTimer = 5,
         shop = DefaultShop::class,
         loreBuilder = DefaultItemLoreBuilder::class,
-        turns = listOf(
-            TAllium::class, TAmethystWarp::class, TAxolotl::class, TAzureBluet::class, TBee::class, TBeeNest::class,
-            TBlackWool::class, TBlaze::class, TBlueBed::class, TBlueGlassWall::class, TBlueIce::class, TBlueOrchid::class,
-            TBoat::class, TBrainCoralBlock::class, TCampfire::class, TCauldron::class, TChorusFruit::class,
-            TCliffWarp::class, TComposter::class, TCornflower::class, TCyanCarpet::class, TDaylightSensorLine::class,
-            TDesertWarp::class, TDirt::class, TDragonHead::class, TDriedKelpBlock::class, TEndWarp::class,
-            TEnderPearl::class, TEvoker::class, TFenceGate::class, TFire::class, TFireCoral::class, TFireCoralFan::class,
-            TFlowerPot::class, TFrozenWarp::class, TGlassWall::class, TGoldBlock::class, TGreenBed::class,
-            TGreenCarpet::class, TGreenGlassWall::class, TGreenWool::class, THayBlock::class, THoneyBlock::class,
-            THornCoral::class, TIronBarJail::class, TIronShovel::class, TIronTrapdoor::class, TLava::class, TLever::class,
-            TLightBlueWool::class, TLightningRod::class, TMagentaGlazedTerracotta::class, TMagmaBlock::class,
-            TMangroveRoots::class, TMeadowWarp::class, TMushroomWarp::class, TNerdWarp::class, TNetherWarp::class,
-            TNetherrack::class, TNoteBlock::class, TOakDoorTurtling::class, TOakStairs::class, TOceanWarp::class,
-            TOrangeGlassWall::class, TOrangeTulip::class, TOrangeWool::class, TOxeyeDaisy::class, TPackedIce::class,
-            TPhantom::class, TPiglin::class, TPinkBed::class, TPinkGlassWall::class, TPinkTulip::class, TPiston::class,
-            TPolarBear::class, TPoppy::class, TPowderSnow::class, TPufferfish::class, TPumpkinWall::class,
-            TPurpleWool::class, TRedBed::class, TRedCarpet::class, TRedGlassWall::class, TRedTulip::class,
-            TRedstoneWall::class, TRedstoneWarp::class, TRepeater::class, TRespawnAnchor::class, TSculk::class,
-            TSeaLantern::class, TSheep::class, TSnowball::class, TSoulSand::class, TSplashJumpBoostPotion::class,
-            TSplashLevitationPotion::class, TSplashWaterBottle::class, TSponge::class, TSpruceLeaves::class,
-            TSpruceTrapdoor::class, TStonecutter::class, TSunWarp::class, TSunflower::class, TVerdantFroglight::class,
-            TVoidWarp::class, TWater::class, TWhiteGlassWall::class, TWhiteTulip::class, TWhiteWool::class,
-            TWitherRose::class, TWoodWarp::class
-        ),
     )
 
     override val scoreboard: ((NeoPlayer) -> SimpleScoreboard)? = { p -> SimpleScoreboard(p, 5, MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"),

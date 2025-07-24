@@ -10,7 +10,7 @@ import net.hectus.neobb.game.util.GameInfo
 import net.hectus.neobb.modes.lore.CardItemLoreBuilder
 import net.hectus.neobb.modes.shop.RandomizedShop
 import net.hectus.neobb.modes.turn.Turn
-import net.hectus.neobb.modes.turn.card_game.*
+import net.hectus.neobb.modes.turn.TurnExec
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
 import net.kyori.adventure.text.Component
@@ -33,12 +33,7 @@ class CardGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDiffic
         deckSize = 5,
         turnTimer = 15,
         shop = RandomizedShop::class,
-        loreBuilder = CardItemLoreBuilder::class,
-        turns = listOf(
-            CTChest::class, CTDaylightDetector::class, CTFlowerPot::class, CTJackOLantern::class, CTOakDoor::class,
-            CTOakFenceGate::class, CTPointedDripstone::class, CTRedstoneLamp::class, CTTorch::class,
-            CTWaxedExposedCutCopperStairs::class
-        ),
+        loreBuilder = CardItemLoreBuilder::class
     )
 
     override val scoreboard: ((NeoPlayer) -> SimpleScoreboard)? = { p -> SimpleScoreboard(p, 5, MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"),
@@ -50,8 +45,8 @@ class CardGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDiffic
         StaticScoreboardEntry(Component.text("mc.hectus.net", Colors.LINK)),
     ) }
 
-    override fun postTurn(turn: Turn<*>, skipped: Boolean) {
-        turn.player!!.inventory.fillInRandomly()
+    override fun postTurn(exec: TurnExec<*>, skipped: Boolean) {
+        exec.player.inventory.fillInRandomly()
     }
 
     // Always return true, basically disabling any usage rules:

@@ -1,142 +1,160 @@
 package net.hectus.neobb.modes.turn.default_game
 
-import com.marcpg.libpg.storing.Cord
-import com.marcpg.libpg.util.enumValueNoCase
+import com.marcpg.libpg.util.component
 import net.hectus.neobb.buff.Buff
 import net.hectus.neobb.buff.Effect
 import net.hectus.neobb.buff.ExtraTurn
 import net.hectus.neobb.buff.Luck
+import net.hectus.neobb.event.TurnEvent
 import net.hectus.neobb.game.util.ScheduleID
 import net.hectus.neobb.modes.turn.Turn
+import net.hectus.neobb.modes.turn.TurnExec
 import net.hectus.neobb.modes.turn.default_game.attribute.*
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Modifiers
-import net.hectus.neobb.util.camelToSnake
-import net.hectus.neobb.util.counterFilterName
-import net.kyori.adventure.text.Component
 import org.bukkit.DyeColor
 import org.bukkit.Material
 import org.bukkit.entity.*
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
-import kotlin.reflect.KClass
 
-abstract class MobTurn<T : LivingEntity>(data: T?, cord: Cord?, player: NeoPlayer?) : Turn<T>(data, cord, player) {
-    override fun item(): ItemStack = ItemStack(enumValueNoCase<Material>((this::class.simpleName ?: "unknown").counterFilterName().camelToSnake() + "_SPAWN_EGG"))
+abstract class MobTurn<T : LivingEntity>(namespace: String) : Turn<T>(namespace) {
+    override val mainItem: ItemStack = ItemStack.of(enumValueOf<Material>("${namespace.uppercase()}_SPAWN_EGG"))
+
+    override val event: TurnEvent = TurnEvent.CUSTOM
 }
 
-class TAxolotl(data: Axolotl?, cord: Cord?, player: NeoPlayer?) : MobTurn<Axolotl>(data, cord, player), BuffFunction, WaterClazz {
+object TAxolotl : MobTurn<Axolotl>("axolotl"), BuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.WATER
     override val cost: Int = 4
-    override fun apply() {
-        when (data!!.variant) {
-            Axolotl.Variant.LUCY -> randomWarp(HotClazz::class)
-            Axolotl.Variant.WILD -> randomWarp(NatureClazz::class)
-            Axolotl.Variant.GOLD -> randomWarp(SupernaturalClazz::class)
-            Axolotl.Variant.CYAN -> randomWarp(WaterClazz::class)
-            Axolotl.Variant.BLUE -> player!!.game.win(player)
+
+    override val buffs: List<Buff<*>> = listOf(
+        Luck(10),
+        Luck(-10, Buff.BuffTarget.OPPONENTS)
+    )
+
+    override fun apply(exec: TurnExec<Axolotl>) {
+        when (exec.data.variant) {
+            Axolotl.Variant.LUCY -> randomWarp(exec.player, TurnClazz.HOT)
+            Axolotl.Variant.WILD -> randomWarp(exec.player, TurnClazz.NATURE)
+            Axolotl.Variant.GOLD -> randomWarp(exec.player, TurnClazz.SUPERNATURAL)
+            Axolotl.Variant.CYAN -> randomWarp(exec.player, TurnClazz.WATER)
+            Axolotl.Variant.BLUE -> exec.player.game.win(exec.player)
         }
     }
-    override fun buffs(): List<Buff<*>> {
-        return listOf(Luck(10), Luck(-10, Buff.BuffTarget.OPPONENTS))
-    }
-    private fun randomWarp(allows: KClass<out Clazz>) {
-        player!!.game.warp(player.shop.dummyTurns
-            .filter { it is WarpTurn && it.allows.contains(allows) }
-            .map { it as WarpTurn }
-            .random())
+    private fun randomWarp(player: NeoPlayer, allows: TurnClazz) {
+        player.game.warp(player, player.game.info.turns.filterIsInstance<WarpTurn>().filter { allows in it.allows }.random())
     }
 }
 
-class TBee(data: Bee?, cord: Cord?, player: NeoPlayer?) : MobTurn<Bee>(data, cord, player), BuffFunction, NatureClazz {
+object TBee : MobTurn<Bee>("bee"), BuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.NATURE
     override val cost: Int = 3
-    override fun apply() {
+
+    override val buffs: List<Buff<*>> = listOf(Effect(PotionEffectType.SLOWNESS, target = Buff.BuffTarget.OPPONENTS))
+
+    override fun apply(exec: TurnExec<Bee>) {
         // TODO: Remove all flower effects.
-        player!!.sendMessage(Component.text("This feature is not yet implemented.", Colors.NEGATIVE))
-    }
-    override fun buffs(): List<Buff<*>> {
-        return listOf(Effect(PotionEffectType.SLOWNESS, target = Buff.BuffTarget.OPPONENTS))
+        exec.player.sendMessage(component("This feature is not yet implemented.", Colors.NEGATIVE))
     }
 }
 
-class TBlaze(data: Blaze?, cord: Cord?, player: NeoPlayer?) : MobTurn<Blaze>(data, cord, player), AttackFunction,
-    HotClazz {
+object TBlaze : MobTurn<Blaze>("blaze"), AttackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.HOT
     override val cost: Int = 5
-    override fun apply() {
-        player!!.game.addModifier(Modifiers.Game.NO_WARP.name + "_cold")
-        player.game.addModifier(Modifiers.Game.NO_WARP.name + "_water")
+
+    override fun apply(exec: TurnExec<Blaze>) {
+        exec.player.game.addModifier(Modifiers.Game.NO_WARP.name + "_cold")
+        exec.player.game.addModifier(Modifiers.Game.NO_WARP.name + "_water")
     }
 }
 
-class TEvoker(data: Evoker?, cord: Cord?, player: NeoPlayer?) : MobTurn<Evoker>(data, cord, player), CounterbuffFunction,
-    SupernaturalClazz {
+object TEvoker : MobTurn<Evoker>("evoker"), CounterbuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.SUPERNATURAL
     override val cost: Int = 4
-    override fun buffs(): List<Buff<*>> {
-        return listOf(Luck(20), ExtraTurn())
-    }
-    override fun counters(): List<CounterFilter> {
-        return listOf(CounterFilter.of("blue-sheep") { turn -> turn is TSheep && turn.data!!.color == DyeColor.BLUE })
-    }
+
+    override val buffs: List<Buff<*>> = listOf(
+        Luck(20),
+        ExtraTurn()
+    )
+
+    override val counters: List<CounterFilter> = listOf(CounterFilter.of("blue-sheep") { it.turn === TSheep && (it.data as Sheep).color == DyeColor.BLUE })
 }
 
-class TPhantom(data: Phantom?, cord: Cord?, player: NeoPlayer?) : MobTurn<Phantom>(data, cord, player), AttackFunction,
-    SupernaturalClazz {
+object TPhantom : MobTurn<Phantom>("phantom"), AttackFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.SUPERNATURAL
     override val cost: Int = 5
 }
 
-class TPiglin(data: Piglin?, cord: Cord?, player: NeoPlayer?) : MobTurn<Piglin>(data, cord, player), EventFunction,
-    HotClazz {
+object TPiglin : MobTurn<Piglin>("piglin"), EventFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.HOT
     override val cost: Int = 3
-    override fun triggerEvent() {
-        data!!.addScoreboardTag(player!!.game.id)
-    }
-    fun buffs(): List<Buff<*>> {
-        return listOf(Effect(PotionEffectType.BLINDNESS), Effect(PotionEffectType.SLOWNESS), Luck(30))
+
+    override val event: TurnEvent = TurnEvent.CUSTOM
+
+    override val buffs: List<Buff<*>> = listOf(
+        Effect(PotionEffectType.BLINDNESS),
+        Effect(PotionEffectType.SLOWNESS),
+        Luck(30)
+    )
+
+    override fun triggerEvent(exec: TurnExec<*>) {
+        (exec.data as PolarBear).addScoreboardTag(exec.player.game.id)
     }
 }
 
-class TPolarBear(data: PolarBear?, cord: Cord?, player: NeoPlayer?) : MobTurn<PolarBear>(data, cord, player), BuffFunction,
-    ColdClazz {
+object TPolarBear : MobTurn<PolarBear>("polar_bear"), BuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.COLD
     override val cost: Int = 4
-    override fun apply() {
-        player!!.addModifier(Modifiers.Player.NO_JUMP)
-    }
-    override fun buffs(): List<Buff<*>> {
-        return listOf(Effect(PotionEffectType.SPEED, 3, Buff.BuffTarget.ALL))
+
+    override val buffs: List<Buff<*>> = listOf(Effect(PotionEffectType.SPEED, 3, Buff.BuffTarget.ALL))
+
+    override fun apply(exec: TurnExec<PolarBear>) {
+        exec.player.addModifier(Modifiers.Player.NO_JUMP)
     }
 }
 
-class TPufferfish(data: PufferFish?, cord: Cord?, player: NeoPlayer?) : MobTurn<PufferFish>(data, cord, player), BuffFunction,
-    WaterClazz {
+object TPufferfish : MobTurn<PufferFish>("pufferfish"), BuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.WATER
     override val cost: Int = 6
-    override fun apply() {
-        player!!.game.turnScheduler.runTaskLater(ScheduleID.POISON, 2) {
-            if (player.nextPlayer().player.hasPotionEffect(PotionEffectType.POISON))
-                player.game.eliminate(player.nextPlayer())
+
+    override val buffs: List<Buff<*>> = listOf(Effect(PotionEffectType.POISON, target = Buff.BuffTarget.NEXT))
+
+    override fun apply(exec: TurnExec<PufferFish>) {
+        exec.player.game.turnScheduler.runTaskLater(ScheduleID.POISON, 2) {
+            if (exec.player.nextPlayer().player.hasPotionEffect(PotionEffectType.POISON))
+                exec.player.game.eliminate(exec.player.nextPlayer())
         }
     }
-    override fun buffs(): List<Buff<*>> {
-        return listOf(Effect(PotionEffectType.POISON, target = Buff.BuffTarget.NEXT))
-    }
 }
 
-class TSheep(data: Sheep?, cord: Cord?, player: NeoPlayer?) : MobTurn<Sheep>(data, cord, player), BuffFunction,
-    SupernaturalClazz {
+object TSheep : MobTurn<Sheep>("sheep"), BuffFunction {
+    override val mode: String = "default"
+    override val clazz: TurnClazz? = TurnClazz.SUPERNATURAL
     override val cost: Int = 4
-    override fun apply() {
-        when (data!!.color) {
-            DyeColor.PINK -> player!!.game.win(player)
-            DyeColor.LIGHT_GRAY -> ExtraTurn().invoke(player!!)
-            DyeColor.GRAY -> Luck(25).invoke(player!!)
-            DyeColor.BLACK -> Luck(-15, Buff.BuffTarget.OPPONENTS).invoke(player!!)
-            DyeColor.BROWN -> player!!.inventory.addRandom()
+
+    override val buffs: List<Buff<*>> = listOf(Luck(5))
+
+    override fun apply(exec: TurnExec<Sheep>) {
+        when (exec.data.color) {
+            DyeColor.PINK -> exec.player.game.win(exec.player)
+            DyeColor.LIGHT_GRAY -> ExtraTurn().invoke(exec.player)
+            DyeColor.GRAY -> Luck(25).invoke(exec.player)
+            DyeColor.BLACK -> Luck(-15, Buff.BuffTarget.OPPONENTS).invoke(exec.player)
+            DyeColor.BROWN -> exec.player.inventory.addRandom()
             else -> {
-                if (player!!.game.allowed.contains(ColdClazz::class))
-                    ExtraTurn().invoke(player)
+                if (TurnClazz.COLD in exec.player.game.allowed)
+                    ExtraTurn().invoke(exec.player)
             }
         }
-    }
-    override fun buffs(): List<Buff<*>> {
-        return listOf(Luck(5))
     }
 }

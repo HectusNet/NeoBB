@@ -84,9 +84,11 @@ class Effect(data: PotionEffect, target: BuffTarget = BuffTarget.YOU): Buff<Poti
     }
 }
 
-class Teleport(data: Cord, target: BuffTarget = BuffTarget.YOU): Buff<Cord>(data, target) {
+class Teleport(data: (NeoPlayer) -> Cord, target: BuffTarget = BuffTarget.YOU): Buff<(NeoPlayer) -> Cord>(data, target) {
     override fun invoke(source: NeoPlayer) {
-        this.target(source).teleport(data)
+        this.target(source).eachNeoPlayer {
+            it.teleport(data(it))
+        }
     }
 
     override fun text(locale: Locale): String = locale.string("item-lore.buff.teleportation")
@@ -97,7 +99,7 @@ class Give(data: Turn<*>, target: BuffTarget = BuffTarget.YOU): Buff<Turn<*>>(da
     override fun invoke(source: NeoPlayer) {
         source.eachNeoPlayer { it.inventory.add(data) }
 
-        source.game.initialPlayers.forEach { it.sendMessage("gameplay.info.give", target(source).name(), data.name(it.locale()), color = Colors.NEUTRAL) }
+        source.game.initialPlayers.forEach { it.sendMessage("gameplay.info.give", target(source).name(), data.translation(it.locale()), color = Colors.NEUTRAL) }
     }
 
     override fun text(locale: Locale): String = locale.string("item-lore.buff.give", data.items().stream().mapToInt { it.amount }.sum().toString(), data.items().first().displayName().asString())

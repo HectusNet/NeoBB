@@ -11,10 +11,12 @@ import net.hectus.neobb.external.rating.Rating
 import net.hectus.neobb.game.util.*
 import net.hectus.neobb.matrix.Arena
 import net.hectus.neobb.modes.turn.Turn
+import net.hectus.neobb.modes.turn.TurnExec
 import net.hectus.neobb.modes.turn.default_game.StructureTurn
 import net.hectus.neobb.modes.turn.default_game.TDefaultWarp
 import net.hectus.neobb.modes.turn.default_game.TTimeLimit
 import net.hectus.neobb.modes.turn.default_game.WarpTurn
+import net.hectus.neobb.modes.turn.default_game.attribute.TurnClazz
 import net.hectus.neobb.modes.turn.person_game.WinConCategory
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.*
@@ -25,7 +27,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 import kotlin.math.cos
 import kotlin.math.sin
-import kotlin.reflect.KClass
 
 abstract class Game(val world: World, private val bukkitPlayers: List<Player>, val difficulty: GameDifficulty = Constants.DEFAULT_DIFFICULTY): ModifiableImpl(), Ticking {
     val id: String = Randomizer.generateRandomString(Constants.GAME_ID_LENGTH, Constants.GAME_ID_CHARSET)
@@ -36,9 +37,9 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
     lateinit var initialPlayers: List<NeoPlayer> private set
     private lateinit var initialTarget: ForwardingMinecraftReceiver
     lateinit var players: MutableList<NeoPlayer> private set
-    val history: MutableList<Turn<*>> = mutableListOf()
+    val history: MutableList<TurnExec<*>> = mutableListOf()
 
-    val allowed: MutableSet<KClass<*>> = mutableSetOf()
+    val allowed: MutableSet<TurnClazz> = mutableSetOf()
 
     abstract val info: GameInfo
 
@@ -49,7 +50,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
     // ============ PUBLIC GETTER VARIABLES =============
     // ==================================================
 
-    var warp: WarpTurn = TDefaultWarp(null, Configuration.SPAWN_CORD, null)
+    var warp: WarpTurn = TDefaultWarp
     var playedWarps: List<WarpTurn> = mutableListOf(warp)
 
     var time: MinecraftTime = MinecraftTime.MIDNIGHT
@@ -110,7 +111,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
      * This is called after the placement and usability were validated.
      * @return `true` if the turn should be skipped, `false` otherwise.
      */
-    open fun preTurn(turn: Turn<*>): Boolean {
+    open fun preTurn(exec: TurnExec<*>): Boolean {
         return false
     }
 
@@ -119,7 +120,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
      * If the turn is skipped, this will never be executed.
      * @return `true` if [Turn.apply] should be called, `false` otherwise.
      */
-    open fun executeTurn(turn: Turn<*>): Boolean {
+    open fun executeTurn(exec: TurnExec<*>): Boolean {
         return true
     }
 
@@ -128,7 +129,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
      * It will be called no matter if the turn got skipped or not.
      * @param skipped If this turn was skipped.
      */
-    open fun postTurn(turn: Turn<*>, skipped: Boolean) {}
+    open fun postTurn(exec: TurnExec<*>, skipped: Boolean) {}
 
     /**
      * This is called after the `init {}` block finished.
@@ -150,7 +151,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
     open fun onOutOfBounds(player: NeoPlayer) = eliminate(player)
 
     open fun allows(turn: Turn<*>): Boolean {
-        return !difficulty.completeRules || turn is WarpTurn || allowed.any { it.isInstance(turn) }
+        return turn.clazz == null || !difficulty.completeRules || turn is WarpTurn || turn.clazz in allowed
     }
 
     // ==================================================
@@ -178,11 +179,11 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
 
     fun turnCountdownTick() {
         if (--turnCountdown <= 0) {
-            if (history.size >= players.size && history.subList(history.size - players.size, history.size).all { it is TTimeLimit }) {
+            if (history.size >= players.size && history.subList(history.size - players.size, history.size).all { it.turn === TTimeLimit }) {
                 players.forEach { it.sendMessage(it.locale().component("gameplay.info.ending.too-slow", color = Colors.NEUTRAL)) }
                 draw(false)
             } else {
-                turn(TTimeLimit(Time(turnCountdown.toLong()), null, currentPlayer()))
+                turn(TurnExec(TTimeLimit, currentPlayer(), null, Time(turnCountdown.toLong())))
             }
         }
     }
@@ -191,9 +192,9 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         turnCountdown = (info.turnTimer * difficulty.timeFactor).toInt()
     }
 
-    fun nextTurn(turn: Turn<*>) {
-        history.add(turn)
-        turn.player?.databaseInfo?.addTurn()
+    fun nextTurn(exec: TurnExec<*>) {
+        history += exec
+        exec.player.databaseInfo.addTurn()
 
         arena.resetCurrentBlocks()
         resetTurnCountdown()
@@ -201,19 +202,17 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
 
         players.forEach { it.inventory.sync() }
 
-        if (turn.player != null) {
-            if (turn.player.hasModifier(Modifiers.Player.EXTRA_TURN)) {
-                turn.player.removeModifier(Modifiers.Player.EXTRA_TURN)
-            } else {
-                moveToNextPlayer()
-            }
-
-            if (turn.player.hasModifier(Modifiers.Player.Default.ATTACKED)) {
-                eliminate(turn.player)
-            }
+        if (exec.player.hasModifier(Modifiers.Player.EXTRA_TURN)) {
+            exec.player.removeModifier(Modifiers.Player.EXTRA_TURN)
+        } else {
+            moveToNextPlayer()
         }
 
-        info("${turn.player?.name()} used ${turn.namespace()}.")
+        if (exec.player.hasModifier(Modifiers.Player.Default.ATTACKED)) {
+            eliminate(exec.player)
+        }
+
+        info("${exec.player.name()} used ${exec.turn.namespace}.")
     }
 
     // ==================================================
@@ -244,6 +243,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
 
     fun info(msg: String) = NeoBB.LOG.info("[${Constants.GAME_LOG_PREFIX}$id] $msg")
     fun warn(msg: String) = NeoBB.LOG.warn("[${Constants.GAME_LOG_PREFIX}$id] $msg")
+    fun warn(msg: String, e: Throwable) = NeoBB.LOG.warn("[${Constants.GAME_LOG_PREFIX}$id] $msg", e)
 
     // ==================================================
     // =============== CLOSED GAME LOGIC ================
@@ -290,84 +290,83 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         info("${target.name()} got eliminated.")
     }
 
-    fun turn(turn: Turn<*>?, event: Cancellable? = null) {
-        if (turn == null) return
-
-        val player = turn.player!!
+    fun <T> turn(exec: TurnExec<T>, event: Cancellable? = null) {
+        val player = exec.player
         val nextPlayer = player.nextPlayer()
-        val turnNamespace = turn.namespace()
+        val turn = exec.turn
 
         var allowed = false
 
         when {
             Constants.CHECK_WARP_CLASSES && !allows(turn) -> {
-                notAllowed(turn, "${player.name()} can't use $turnNamespace in the current warp.", "gameplay.info.not_allowed.class", Utilities.clazz(turn::class).toTitleCase(), warp.name(player.locale()))
+                notAllowed(exec, "${player.name()} can't use ${turn.name} in the current warp.", "gameplay.info.not_allowed.class", turn.clazz?.name?.lowercase() ?: "unknown", warp.name)
             }
-            turn is WarpTurn && !hasModifier(Modifiers.Game.NO_WARP.name + "_" + turn.name) -> {
-                notAllowed(turn, "${player.name()} can't use $turnNamespace right now.", "gameplay.info.not_allowed.warp_filter", turn.name(player.locale()))
+            turn is WarpTurn && !hasModifier(Modifiers.Game.NO_WARP.name + "_" + turn.namespace) -> {
+                notAllowed(exec, "${player.name()} can't use ${turn.name} right now.", "gameplay.info.not_allowed.warp_filter", turn.name)
             }
-            outOfBounds(turn.location(), event) -> {
-                notAllowed(turn, "${player.name()} tried using $turnNamespace out of bounds.", "gameplay.info.out_of_bounds")
+            outOfBounds(exec.cord ?: warp.bounds.center3D, event) -> {
+                notAllowed(exec, "${player.name()} tried using ${turn.name} out of bounds.", "gameplay.info.out_of_bounds")
             }
-            turn.unusable() -> {
-                notAllowed(turn, "${player.name()} used $turnNamespace incorrectly.", "gameplay.info.wrong_usage")
+            turn.unusable(exec.player) -> {
+                notAllowed(exec, "${player.name()} used ${turn.name} incorrectly.", "gameplay.info.wrong_usage")
             }
             else -> allowed = true
         }
 
-        if (turn is TTimeLimit)
+        if (turn === TTimeLimit)
             allowed = true
 
         if (!allowed) return
 
-        if (turn.isDummy()) {
-            history += turn
+        if (turn.isCombo) {
+            history += exec
             return
         }
 
-        val skipped = preTurn(turn)
+        val skipped = preTurn(exec)
 
-        clearSlot(turn)
+        clearSlot(exec)
 
-        if (!skipped && executeTurn(turn)) {
-            turn.apply()
+        if (!skipped && executeTurn(exec)) {
+            turn.apply(exec)
 
-            if (turn !is TTimeLimit) {
-                if (turn.damage != 0.0)
-                    nextPlayer.damage(turn.damage, turn is WinConCategory)
+            if (turn !== TTimeLimit) {
+                if (turn.damage != null && turn.damage != 0.0)
+                    nextPlayer.damage(turn.damage!!, turn is WinConCategory)
 
-                effectManager.applyEffects(turn)
-                initialPlayers.forEach { it.sendMessage("gameplay.info.turn-used", player.name(), turn.name(it.locale()), color = Colors.EXTRA) }
+                effectManager.applyEffects(exec)
+                initialPlayers.forEach { it.sendMessage("gameplay.info.turn-used", player.name(), turn.translation(it.locale()), color = Colors.EXTRA) }
             }
         }
 
-        nextTurn(turn)
-        postTurn(turn, skipped)
+        nextTurn(exec)
+        postTurn(exec, skipped)
     }
 
-    private fun notAllowed(turn: Turn<*>, msg: String, key: String, vararg variables: String?) {
+    private fun notAllowed(exec: TurnExec<*>, msg: String, key: String, vararg variables: String?) {
         info(msg)
-        turn.player?.sendMessage(turn.player.locale().component(key, *variables, color = Colors.NEGATIVE))
-        turn.player?.opponents(false)?.forEach { it.sendMessage(it.locale().component("gameplay.info.wrong_usage.other", turn.player.name(), color = Colors.NEUTRAL)) }
-        turn.player?.playSound(Sound.ENTITY_VILLAGER_NO)
-        clearSlot(turn)
-        nextTurn(turn)
+        exec.player.sendMessage(exec.player.locale().component(key, *variables, color = Colors.NEGATIVE))
+        exec.player.opponents(false).forEach { it.sendMessage(it.locale().component("gameplay.info.wrong_usage.other", exec.player.name(), color = Colors.NEUTRAL)) }
+        exec.player.playSound(Sound.ENTITY_VILLAGER_NO)
+
+        clearSlot(exec)
+        nextTurn(exec)
     }
 
-    private fun clearSlot(turn: Turn<*>) {
-        if (turn !is TTimeLimit) {
+    private fun clearSlot(exec: TurnExec<*>) {
+        if (exec.turn !== TTimeLimit) {
             runCatching {
-                if (turn is StructureTurn) {
-                    turn.referenceStructure.materials.forEach { m, a -> turn.player?.inventory?.clearFirst { i, _ -> i.type == m && i.amount == a } }
+                if (exec.turn is StructureTurn) {
+                    exec.turn.referenceStructure.materials.forEach { m, a -> exec.player.inventory.clearFirst { i, _ -> i.type == m && i.amount == a } }
                 } else {
-                    turn.player?.inventory?.clearSlot(turn.player.player.inventory.heldItemSlot)
+                    exec.player.inventory.clearSlot(exec.player.player.inventory.heldItemSlot)
                 }
             }
         }
     }
 
-    fun warp(warp: WarpTurn) {
-        info("${warp.player?.name()} has warped from ${this.warp.name} to ${warp.name}.")
+    fun warp(player: NeoPlayer, warp: WarpTurn) {
+        info("${player.name()} has warped from the ${this.warp.name} to the ${warp.name}.")
 
         this.warp = warp
         if (playedWarps.all { it.name != warp.name })

@@ -3,6 +3,7 @@ package net.hectus.neobb.modes.turn.person_game
 import com.marcpg.libpg.storing.Cord
 import com.marcpg.libpg.util.component
 import net.hectus.neobb.modes.turn.Turn
+import net.hectus.neobb.modes.turn.TurnExec
 import net.hectus.neobb.modes.turn.default_game.attribute.AttackFunction
 import net.hectus.neobb.modes.turn.default_game.attribute.BuffFunction
 import net.hectus.neobb.player.NeoPlayer
@@ -12,7 +13,6 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.title.Title
 import org.bukkit.Material
-import kotlin.reflect.KClass
 
 interface Category {
     val categoryColor: TextColor
@@ -39,9 +39,7 @@ interface AttackCategory : Category, AttackFunction {
     override val categoryName: String get() = "attacked"
 
     // ========== CUSTOM CATEGORY LOGIC ==========
-    fun counteredBy(): List<KClass<out Turn<*>>> {
-        return emptyList() // Nothing counters it by default!
-    }
+    fun counteredBy(): List<Turn<*>> = emptyList() // Nothing counters it by default!
 }
 
 interface BuffCategory : Category, BuffFunction {
@@ -60,11 +58,11 @@ interface CounterCategory : Category {
     override val categoryName: String get() = "counter"
 
     // ========== CUSTOM CATEGORY LOGIC ==========
-    fun counterLogic(turn: Turn<*>): Boolean {
-        if (turn.player!!.game.history.isEmpty()) return true
-        val last: Turn<*> = turn.player.game.history.last()
+    fun counterLogic(turn: TurnExec<*>): Boolean {
+        if (turn.hist.isEmpty()) return true
+        val last: TurnExec<*> = turn.hist.last()
 
-        if (last is AttackCategory && (!turn.player.game.difficulty.completeRules || properlyPlaced(turn.cord!!, last.cord!!)) && last.counteredBy().contains(turn::class)) {
+        if (last.turn is AttackCategory && (!turn.game.difficulty.completeRules || properlyPlaced(turn.cord!!, last.cord!!)) && turn.turn in last.turn.counteredBy()) {
             counter(turn.player, last)
         } else {
             turn.player.showTitle(Title.title(turn.player.locale().component("gameplay.info.misplace", color = Colors.NEGATIVE), Component.empty()))
@@ -73,8 +71,8 @@ interface CounterCategory : Category {
         return false
     }
 
-    fun counter(source: NeoPlayer, countered: Turn<*>) {
-        source.heal(countered.damage)
+    fun counter(source: NeoPlayer, countered: TurnExec<*>) {
+        source.heal(countered.turn.damage ?: 0.0)
     }
 
     fun properlyPlaced(counter: Cord, attack: Cord): Boolean {
@@ -89,7 +87,7 @@ interface DefensiveCategory : Category {
     override val categoryName: String get() = "defensive"
 
     // ========== CUSTOM CATEGORY LOGIC ==========
-    fun applyDefense()
+    fun applyDefense(exec: TurnExec<*>)
 }
 
 interface DefensiveCounterCategory : CounterCategory {
@@ -102,9 +100,9 @@ interface DefensiveCounterCategory : CounterCategory {
         return attack.distance(counter) <= 2.25 // Small buffer, just in case.
     }
 
-    override fun counter(source: NeoPlayer, countered: Turn<*>) {
+    override fun counter(source: NeoPlayer, countered: TurnExec<*>) {
         super.counter(source, countered)
-        countered.player!!.damage(2.0)
+        countered.player.damage(2.0)
     }
 }
 

@@ -1,10 +1,8 @@
 package net.hectus.neobb.modes.turn.card_game
 
-import com.marcpg.libpg.storing.Cord
 import net.hectus.neobb.player.NeoPlayer
-import org.bukkit.block.Block
 
-abstract class InteractableCardTurn(data: Block?, cord: Cord?, player: NeoPlayer?) : CardTurn(data, cord, player) {
+abstract class InteractableCardTurn(namespace: String) : CardTurn(namespace) {
     var interactions: Int = 0
         private set
     var lastInteraction: Long = System.currentTimeMillis()
@@ -14,19 +12,19 @@ abstract class InteractableCardTurn(data: Block?, cord: Cord?, player: NeoPlayer
     open val interactionIntervalMs = 1000
 
     @Synchronized
-    fun interact() {
+    fun interact(player: NeoPlayer) {
         if (interactions <= maxInteractions && System.currentTimeMillis() - lastInteraction <= interactionIntervalMs) {
             lastInteraction = System.currentTimeMillis()
             interactions++
-            player?.nextPlayer()?.damage(damage)
+            player.nextPlayer().damage(damage!!)
         }
     }
 }
 
-class CTOakDoor(data: Block?, cord: Cord?, player: NeoPlayer?) : InteractableCardTurn(data, cord, player) {
-    override val damage: Double = 4.0
+object CTOakDoor : InteractableCardTurn("oak_door") {
+    override val damage: Double? = 4.0
 }
 
-class CTOakFenceGate(data: Block?, cord: Cord?, player: NeoPlayer?) : InteractableCardTurn(data, cord, player) {
-    override val damage: Double = 4.0
+object CTOakFenceGate : InteractableCardTurn("oak_fence_gate") {
+    override val damage: Double? = 4.0
 }

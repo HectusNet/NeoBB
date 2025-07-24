@@ -1,266 +1,323 @@
 package net.hectus.neobb.modes.turn.person_game
 
-import com.marcpg.libpg.storing.Cord
 import com.marcpg.libpg.util.MinecraftTime
 import com.marcpg.libpg.util.Randomizer
 import net.hectus.neobb.buff.Buff
 import net.hectus.neobb.buff.ExtraTurn
 import net.hectus.neobb.buff.Luck
 import net.hectus.neobb.modes.turn.Turn
+import net.hectus.neobb.modes.turn.TurnExec
 import net.hectus.neobb.modes.turn.default_game.BlockTurn
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Modifiers
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import kotlin.reflect.KClass
 
-class PTAmethystBlock(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterCategory
+object PTAmethystBlock : BlockTurn("amethyst_block"), CounterCategory {
+    override val mode: String = "person"
+}
 
-class PTBambooButton(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterCategory {
+object PTBambooButton : BlockTurn("bamboo_button"), CounterCategory {
+    override val mode: String = "person"
     override val damage: Double = 2.0
 }
 
-class PTBarrel(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterCategory
+object PTBarrel : BlockTurn("barrel"), CounterCategory {
+    override val mode: String = "person"
+}
 
-class PTBeeNest(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), AttackCategory {
+object PTBeeNest : BlockTurn("bee_nest"), AttackCategory {
+    override val mode: String = "person"
     override val damage: Double = 2.0
-    override fun apply() {
-        Luck(10).invoke(player!!)
-    }
-    override fun counteredBy(): List<KClass<out Turn<*>>> {
-        return listOf(PTHoneyBlock::class, PTAmethystBlock::class)
+
+    override val buffs: List<Buff<*>> = listOf(Luck(10))
+
+    override fun counteredBy(): List<Turn<*>> = listOf(PTHoneyBlock, PTAmethystBlock)
+}
+
+object PTBirchLog : BlockTurn("birch_log"), AttackCategory {
+    override val mode: String = "person"
+
+    override fun counteredBy(): List<Turn<*>> = listOf(PTPinkCarpet, PTGreenCarpet)
+
+    override fun apply(exec: TurnExec<Block>) {
+        exec.player.nextPlayer().damage(2.0, true)
     }
 }
 
-class PTBirchLog(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), AttackCategory {
-    override fun apply() {
-        player!!.nextPlayer().damage(2.0, true)
-    }
-    override fun counteredBy(): List<KClass<out Turn<*>>> {
-        return listOf(PTPinkCarpet::class, PTGreenCarpet::class)
-    }
-}
+object PTBlackCarpet : BlockTurn("black_carpet"), CounterCategory {
+    override val mode: String = "person"
 
-class PTBlackCarpet(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterCategory {
-    override fun counter(source: NeoPlayer, countered: Turn<*>) {
+    override fun counter(source: NeoPlayer, countered: TurnExec<*>) {
         super.counter(source, countered)
-        countered.player!!.damage(countered.damage + 2.0)
+        countered.player.damage((countered.turn.damage ?: 0.0) + 2.0)
     }
 }
 
-class PTBlueConcrete(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), AttackCategory {
-    override val damage: Double
-        get() = if (player!!.game.warp is PTIceWarp) 2.0 else 4.0
-    override fun apply() {
-        Luck(10).invoke(player!!)
-    }
-    override fun counteredBy(): List<KClass<out Turn<*>>> {
-        return listOf(PTHoneyBlock::class, PTBlueIce::class)
+object PTBlueConcrete : BlockTurn("blue_concrete"), AttackCategory {
+    override val mode: String = "person"
+    override val damage: Double = 2.0
+
+    override val buffs: List<Buff<*>> = listOf(Luck(10))
+
+    override fun counteredBy(): List<Turn<*>> = listOf(PTHoneyBlock, PTBlueIce)
+
+    override fun apply(exec: TurnExec<Block>) {
+        if (exec.game.warp is PTIceWarp)
+            exec.player.nextPlayer().damage(2.0)
     }
 }
 
-class PTBlueIce(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterCategory
+object PTBlueIce : BlockTurn("blue_ice"), CounterCategory {
+    override val mode: String = "person"
+}
 
-class PTBlueStainedGlass(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), DefensiveCategory {
-    override fun apply() {
-        player!!.heal(if (player.game.warp is PTIceWarp) 2.0 else 5.0)
+object PTBlueStainedGlass : BlockTurn("blue_stained_glass"), DefensiveCategory {
+    override val mode: String = "person"
+
+    override fun unusable(player: NeoPlayer): Boolean = player.game.time == MinecraftTime.MIDNIGHT
+
+    override fun applyDefense(exec: TurnExec<*>) {
+        exec.player.addModifier(Modifiers.Player.Default.DEFENDED)
     }
-    override fun applyDefense() {
-        player!!.addModifier(Modifiers.Player.Default.DEFENDED)
-    }
-    override fun unusable(): Boolean {
-        return player!!.game.time == MinecraftTime.MIDNIGHT
+
+    override fun apply(exec: TurnExec<Block>) {
+        exec.player.heal(if (exec.game.warp is PTIceWarp) 2.0 else 5.0)
     }
 }
 
-class PTBrainCoral(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), WinConCategory {
+object PTBrainCoral : BlockTurn("brain_coral"), WinConCategory {
+    override val mode: String = "person"
     override val damage: Double = 4.0
-    override fun counteredBy(): List<KClass<out Turn<*>>> {
-        return listOf(PTIronTrapdoor::class)
+
+    override fun counteredBy(): List<Turn<*>> = listOf(PTIronTrapdoor)
+
+    override fun unusable(player: NeoPlayer): Boolean = player.nextPlayer().health > 4.0
+}
+
+object PTBrownStainedGlass : BlockTurn("brown_stained_glass"), DefensiveCategory {
+    override val mode: String = "person"
+
+    override fun unusable(player: NeoPlayer): Boolean = player.game.time == MinecraftTime.MIDNIGHT
+
+    override fun applyDefense(exec: TurnExec<*>) {
+        exec.player.addModifier(Modifiers.Player.Default.DEFENDED)
     }
-    override fun unusable(): Boolean {
-        return player!!.nextPlayer().health > 4.0
+
+    override fun apply(exec: TurnExec<Block>) {
+        exec.player.heal(if (exec.game.warp is PTVillagerWarp) 2.0 else 5.0)
     }
 }
 
-class PTBrownStainedGlass(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), DefensiveCategory {
-    override fun apply() {
-        player!!.heal(if (player.game.warp is PTVillagerWarp) 2.0 else 5.0)
-    }
-    override fun applyDefense() {
-        player!!.addModifier(Modifiers.Player.Default.DEFENDED)
-    }
-    override fun unusable(): Boolean {
-        return player!!.game.time == MinecraftTime.MIDNIGHT
-    }
+object PTCake : BlockTurn("cake"), BuffCategory {
+    override val mode: String = "person"
+
+    override val buffs: List<Buff<*>> = listOf(Luck(20))
 }
 
-class PTCake(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), BuffCategory {
-    override fun buffs(): List<Buff<*>> {
-        return listOf(Luck(20))
-    }
-}
-
-class PTCherryButton(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterCategory {
+object PTCherryButton : BlockTurn("cherry_button"), CounterCategory {
+    override val mode: String = "person"
     override val damage: Double = 2.0
 }
 
-class PTCherryPressurePlate(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterCategory {
-    override fun apply() {
-        player!!.addArmor(1.0)
+object PTCherryPressurePlate : BlockTurn("cherry_pressure_plate"), CounterCategory {
+    override val mode: String = "person"
+
+    override fun apply(exec: TurnExec<Block>) {
+        exec.player.addArmor(1.0)
     }
 }
 
-class PTDaylightDetector(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterCategory {
-    override fun apply() {
-        player!!.game.time = MinecraftTime.NOON
+object PTDaylightDetector : BlockTurn("daylight_detector"), CounterCategory {
+    override val mode: String = "person"
+
+    override fun apply(exec: TurnExec<Block>) {
+        exec.game.time = MinecraftTime.NOON
     }
 }
 
-class PTDiamondBlock(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), AttackCategory {
-    override val damage: Double
-        get() = if (player!!.game.warp is PTVillagerWarp) 2.0 else 4.0
-    override fun counteredBy(): List<KClass<out Turn<*>>> {
-        return listOf(PTLightBlueCarpet::class, PTNoteBlock::class)
+object PTDiamondBlock : BlockTurn("diamond_block"), AttackCategory {
+    override val mode: String = "person"
+    override val damage: Double = 2.0
+
+    override fun counteredBy(): List<Turn<*>> = listOf(PTLightBlueCarpet, PTNoteBlock)
+
+    override fun apply(exec: TurnExec<Block>) {
+        if (exec.game.warp is PTVillagerWarp)
+            exec.player.nextPlayer().damage(2.0)
     }
 }
 
-class PTDripstone(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterCategory {
-    override fun item(): ItemStack = ItemStack(Material.POINTED_DRIPSTONE)
+object PTDripstone : BlockTurn("dripstone"), CounterCategory {
+    override val mode: String = "person"
+
+    override val mainItem: ItemStack = ItemStack.of(Material.POINTED_DRIPSTONE)
 }
 
-class PTFenceGate(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterCategory {
-    override fun item(): ItemStack = ItemStack(Material.OAK_FENCE_GATE)
-    override fun counter(source: NeoPlayer, countered: Turn<*>) {
+object PTFenceGate : BlockTurn("fence_gate"), CounterCategory {
+    override val mode: String = "person"
+
+    override val mainItem: ItemStack = ItemStack.of(Material.OAK_FENCE_GATE)
+
+    override fun counter(source: NeoPlayer, countered: TurnExec<*>) {
         super.counter(source, countered)
-        countered.player!!.damage(countered.damage + 2.0)
+        countered.player.damage((countered.turn.damage ?: 0.0) + 2.0)
     }
 }
 
-class PTFletchingTable(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), AttackCategory {
+object PTFletchingTable : BlockTurn("fletching_table"), AttackCategory {
+    override val mode: String = "person"
     override val damage: Double = 2.0
-    override fun apply() {
-        Luck(10).invoke(player!!)
-    }
-    override fun counteredBy(): List<KClass<out Turn<*>>> {
-        return listOf(PTDripstone::class, PTAmethystBlock::class)
-    }
+
+    override val buffs: List<Buff<*>> = listOf(Luck(10))
+
+    override fun counteredBy(): List<Turn<*>> = listOf(PTDripstone, PTAmethystBlock)
 }
 
-class PTGlowstone(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), UtilityCategory {
+object PTGlowstone : BlockTurn("glowstone"), UtilityCategory {
+    override val mode: String = "person"
     override val damage: Double = 2.0
-    override fun apply() {
-        ExtraTurn(if (Randomizer.boolByChance(25.0)) 2 else 1).invoke(player!!)
+
+    override fun apply(exec: TurnExec<Block>) {
+        ExtraTurn(if (Randomizer.boolByChance(25.0)) 2 else 1).invoke(exec.player)
     }
 }
 
-class PTGoldBlock(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterCategory
+object PTGoldBlock : BlockTurn("gold_block"), CounterCategory {
+    override val mode: String = "person"
+}
 
-class PTGrayWool(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), AttackCategory {
-    override fun apply() {
-        player!!.nextPlayer().damage(2.0, true)
-    }
-    override fun counteredBy(): List<KClass<out Turn<*>>> {
-        return listOf(PTNoteBlock::class, PTGoldBlock::class)
+object PTGrayWool : BlockTurn("gray_wool"), AttackCategory {
+    override val mode: String = "person"
+
+    override fun counteredBy(): List<Turn<*>> = listOf(PTNoteBlock, PTGoldBlock)
+
+    override fun apply(exec: TurnExec<Block>) {
+        exec.player.nextPlayer().damage(2.0, true)
     }
 }
 
-class PTGreenCarpet(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterCategory
+object PTGreenCarpet : BlockTurn("green_carpet"), CounterCategory {
+    override val mode: String = "person"
+}
 
-class PTHoneyBlock(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterCategory
+object PTHoneyBlock : BlockTurn("honey_block"), CounterCategory {
+    override val mode: String = "person"
+}
 
-class PTIronTrapdoor(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterCategory {
-    override fun counter(source: NeoPlayer, countered: Turn<*>) {
+object PTIronTrapdoor : BlockTurn("iron_trapdoor"), CounterCategory {
+    override val mode: String = "person"
+
+    override fun counter(source: NeoPlayer, countered: TurnExec<*>) {
         super.counter(source, countered)
-        countered.player!!.damage(countered.damage + 2.0)
+        countered.player.damage((countered.turn.damage ?: 0.0) + 2.0)
     }
 }
 
-class PTLever(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), DefensiveCounterCategory
+object PTLever : BlockTurn("lever"), DefensiveCounterCategory {
+    override val mode: String = "person"
+}
 
-class PTLightBlueCarpet(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterCategory
+object PTLightBlueCarpet : BlockTurn("light_blue_carpet"), CounterCategory {
+    override val mode: String = "person"
+}
 
-class PTNoteBlock(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterCategory
+object PTNoteBlock : BlockTurn("note_block"), CounterCategory {
+    override val mode: String = "person"
+}
 
-class PTOrangeWool(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), AttackCategory {
+object PTOrangeWool : BlockTurn("orange_wool"), AttackCategory {
+    override val mode: String = "person"
     override val damage: Double = 2.0
-    override fun apply() {
-        Luck(10).invoke(player!!)
-    }
-    override fun counteredBy(): List<KClass<out Turn<*>>> {
-        return listOf(PTGreenCarpet::class, PTBarrel::class)
-    }
+
+    override val buffs: List<Buff<*>> = listOf(Luck(10))
+
+    override fun counteredBy(): List<Turn<*>> = listOf(PTGreenCarpet, PTBarrel)
 }
 
-class PTPickCarpet(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterCategory
+object PTPinkCarpet : BlockTurn("pink_carpet"), CounterCategory {
+    override val mode: String = "person"
+}
 
-class PTPinkCarpet(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), CounterCategory
-
-class PTPurpleWool(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), WinConCategory {
+object PTPurpleWool : BlockTurn("purple_wool"), WinConCategory {
+    override val mode: String = "person"
     override val damage: Double = 4.0
-    override fun counteredBy(): List<KClass<out Turn<*>>> {
-        return listOf(PTBlackCarpet::class)
+
+    override fun counteredBy(): List<Turn<*>> = listOf(PTBlackCarpet)
+
+    override fun unusable(player: NeoPlayer): Boolean = player.nextPlayer().health > 4.0
+}
+
+object PTRedStainedGlass : BlockTurn("red_stained_glass"), DefensiveCategory {
+    override val mode: String = "person"
+
+    override fun unusable(player: NeoPlayer): Boolean = player.game.time == MinecraftTime.MIDNIGHT
+
+    override fun applyDefense(exec: TurnExec<*>) {
+        exec.player.addModifier(Modifiers.Player.Default.DEFENDED)
     }
-    override fun unusable(): Boolean {
-        return player!!.nextPlayer().health > 4.0
+
+    override fun apply(exec: TurnExec<Block>) {
+        exec.player.heal(if (exec.game.warp is PTFireWarp) 2.0 else 5.0)
     }
 }
 
-class PTRedStainedGlass(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), DefensiveCategory {
-    override fun apply() {
-        player!!.heal(if (player.game.warp is PTFireWarp) 2.0 else 5.0)
-    }
-    override fun applyDefense() {
-        player!!.addModifier(Modifiers.Player.Default.DEFENDED)
-    }
-    override fun unusable(): Boolean {
-        return player!!.game.time == MinecraftTime.MIDNIGHT
+object PTRedWool : BlockTurn("red_wool"), AttackCategory {
+    override val mode: String = "person"
+    override val damage: Double = 2.0
+
+    override fun counteredBy(): List<Turn<*>> = listOf(PTBarrel, PTPinkCarpet)
+
+    override fun apply(exec: TurnExec<Block>) {
+        if (exec.game.warp is PTFireWarp)
+            exec.player.nextPlayer().damage(2.0)
     }
 }
 
-class PTRedWool(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), AttackCategory {
-    override val damage: Double
-        get() = if (player!!.game.warp is PTFireWarp) 2.0 else 4.0
-    override fun counteredBy(): List<KClass<out Turn<*>>> {
-        return listOf(PTBarrel::class, PTPinkCarpet::class)
+object PTSeaLantern : BlockTurn("sea_lantern"), UtilityCategory {
+    override val mode: String = "person"
+
+    override fun apply(exec: TurnExec<Block>) {
+        exec.player.addArmor(1.0)
     }
 }
 
-class PTSeaLantern(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), UtilityCategory {
-    override fun apply() {
-        player!!.addArmor(1.0)
-    }
+object PTStonecutter : BlockTurn("stonecutter"), DefensiveCounterCategory {
+    override val mode: String = "person"
 }
 
-class PTStonecutter(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), DefensiveCounterCategory
-
-class PTVerdantFroglight(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), WinConCategory {
+object PTVerdantFroglight : BlockTurn("verdant_froglight"), WinConCategory {
+    override val mode: String = "person"
     override val damage: Double = 4.0
-    override fun counteredBy(): List<KClass<out Turn<*>>> {
-        return listOf(PTFenceGate::class)
+
+    override fun counteredBy(): List<Turn<*>> = listOf(PTFenceGate)
+
+    override fun unusable(player: NeoPlayer): Boolean = player.nextPlayer().health > 4.0
+}
+
+object PTWhiteStainedGlass : BlockTurn("white_stained_glass"), DefensiveCategory {
+    override val mode: String = "person"
+
+    override fun unusable(player: NeoPlayer): Boolean  = player.game.time == MinecraftTime.MIDNIGHT
+
+    override fun applyDefense(exec: TurnExec<*>) {
+        exec.player.addModifier(Modifiers.Player.Default.DEFENDED)
     }
-    override fun unusable(): Boolean {
-        return player!!.nextPlayer().health > 4.0
+
+    override fun apply(exec: TurnExec<Block>) {
+        exec.player.heal(if (exec.game.warp is PTSnowWarp) 2.0 else 5.0)
     }
 }
 
-class PTWhiteStainedGlass(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), DefensiveCategory {
-    override fun apply() {
-        player!!.heal(if (player.game.warp is PTSnowWarp) 2.0 else 5.0)
-    }
-    override fun applyDefense() {
-        player!!.addModifier(Modifiers.Player.Default.DEFENDED)
-    }
-    override fun unusable(): Boolean {
-        return player!!.game.time == MinecraftTime.MIDNIGHT
-    }
-}
+object PTWhiteWool : BlockTurn("white_wool"), AttackCategory {
+    override val mode: String = "person"
+    override val damage: Double = 2.0
 
-class PTWhiteWool(data: Block?, cord: Cord?, player: NeoPlayer?) : BlockTurn(data, cord, player), AttackCategory {
-    override val damage: Double
-        get() = if (player!!.game.warp is PTSnowWarp) 2.0 else 4.0
-    override fun counteredBy(): List<KClass<out Turn<*>>> {
-        return listOf(PTGoldBlock::class, PTDripstone::class)
+    override fun counteredBy(): List<Turn<*>> = listOf(PTGoldBlock, PTDripstone)
+
+    override fun apply(exec: TurnExec<Block>) {
+        if (exec.game.warp is PTSnowWarp)
+            exec.player.nextPlayer().damage(2.0)
     }
 }
