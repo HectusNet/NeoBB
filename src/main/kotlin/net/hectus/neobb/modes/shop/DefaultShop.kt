@@ -1,7 +1,8 @@
 package net.hectus.neobb.modes.shop
 
+import com.marcpg.libpg.display.closeInventory
+import com.marcpg.libpg.display.playSound
 import com.marcpg.libpg.item.ItemBuilder
-import com.marcpg.libpg.util.asString
 import com.marcpg.libpg.util.bukkitRun
 import com.marcpg.libpg.util.component
 import net.hectus.neobb.NeoBB
@@ -12,7 +13,6 @@ import net.hectus.neobb.modes.turn.default_game.*
 import net.hectus.neobb.modes.turn.default_game.attribute.*
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.bukkit.Sound
@@ -23,23 +23,8 @@ import xyz.xenondevs.invui.gui.ScrollGui
 import xyz.xenondevs.invui.gui.structure.Markers
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.window.Window
-import java.util.stream.Collectors
-import kotlin.reflect.KClass
 
 class DefaultShop(player: NeoPlayer) : Shop(player) {
-    private val buyConsumer: (Map<ItemStack, Turn<*>>, ItemStack) -> Boolean = fun(m, i): Boolean {
-        val turn = turn(m, i.type)
-        if (player.inventory.removeCoins(turn.cost)) {
-            if (player.inventory.allows(turn, i.type)) {
-                player.inventory.add(i, turn)
-                return true
-            }
-            player.inventory.addCoins(turn.cost)
-        }
-        player.playSound(Sound.ENTITY_VILLAGER_NO)
-        return false
-    }
-
     private val filter: MutableMap<String, Pair<FilterState, (Turn<*>) -> Boolean>> = hashMapOf()
     private val gui: ScrollGui<Item>
 
@@ -58,38 +43,38 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
 
             .addIngredient('1', Items.ClickItem(filter(Material.EGG, "usage")) { _, _ ->
                 filterUsageMenu(mapOf(
-                    "block" to Pair(Material.GRASS_BLOCK, BlockTurn::class),
-                    "flower" to Pair(Material.POPPY, FlowerTurn::class),
-                    "item" to Pair(Material.STICK, ItemTurn::class),
-                    "mob" to Pair(Material.CREEPER_SPAWN_EGG, MobTurn::class),
-                    "throwable" to Pair(Material.EGG, ThrowableTurn::class),
-                    "structures" to Pair(Material.BAMBOO_BLOCK, StructureTurn::class),
-                    "glass-wall" to Pair(Material.PURPLE_STAINED_GLASS, GlassWallTurn::class),
-                    "other" to Pair(Material.STRUCTURE_BLOCK, OtherTurn::class)
+                    "block" to Pair(Material.GRASS_BLOCK) { it is BlockTurn },
+                    "flower" to Pair(Material.POPPY) { it is FlowerTurn },
+                    "item" to Pair(Material.STICK) { it is ItemTurn },
+                    "mob" to Pair(Material.CREEPER_SPAWN_EGG) { it is MobTurn },
+                    "throwable" to Pair(Material.EGG) { it is ThrowableTurn },
+                    "structures" to Pair(Material.BAMBOO_BLOCK) { it is StructureTurn },
+                    "glass-wall" to Pair(Material.PURPLE_STAINED_GLASS) { it is GlassWallTurn },
+                    "other" to Pair(Material.STRUCTURE_BLOCK) { it is OtherTurn },
                 ), "usage")
             })
             .addIngredient('2', Items.ClickItem(filter(Material.LAVA_BUCKET, "class")) { _, _ ->
                 filterUsageMenu(mapOf(
-                    "neutral" to Pair(Material.DIRT, NeutralClazz::class),
-                    "hot" to Pair(Material.MAGMA_BLOCK, HotClazz::class),
-                    "cold" to Pair(Material.BLUE_ICE, ColdClazz::class),
-                    "water" to Pair(Material.WATER_BUCKET, WaterClazz::class),
-                    "nature" to Pair(Material.AZALEA_LEAVES, NatureClazz::class),
-                    "redstone" to Pair(Material.REDSTONE_BLOCK, RedstoneClazz::class),
-                    "supernatural" to Pair(Material.REPEATING_COMMAND_BLOCK, SupernaturalClazz::class)
-                ), "clazz")
+                    "neutral" to Pair(Material.DIRT) { it.clazz == TurnClazz.NEUTRAL },
+                    "hot" to Pair(Material.MAGMA_BLOCK) { it.clazz == TurnClazz.HOT },
+                    "cold" to Pair(Material.BLUE_ICE) { it.clazz == TurnClazz.COLD },
+                    "water" to Pair(Material.WATER_BUCKET) { it.clazz == TurnClazz.WATER },
+                    "nature" to Pair(Material.AZALEA_LEAVES) { it.clazz == TurnClazz.NATURE },
+                    "redstone" to Pair(Material.REDSTONE_BLOCK) { it.clazz == TurnClazz.REDSTONE },
+                    "supernatural" to Pair(Material.REPEATING_COMMAND_BLOCK) { it.clazz == TurnClazz.SUPERNATURAL },
+                ), "class")
             })
             .addIngredient('3', Items.ClickItem(filter(Material.IRON_AXE, "function")) { _, _ ->
                 filterUsageMenu(mapOf(
-                    "attack" to Pair(Material.DIAMOND_SWORD, AttackFunction::class),
-                    "buff" to Pair(Material.SPLASH_POTION, BuffFunction::class),
-                    "counterattack" to Pair(Material.DIAMOND_CHESTPLATE, CounterattackFunction::class),
-                    "counterbuff" to Pair(Material.WITHER_ROSE, CounterbuffFunction::class),
-                    "counter" to Pair(Material.TOTEM_OF_UNDYING, CounterFunction::class),
-                    "defense" to Pair(Material.SHIELD, DefenseFunction::class),
-                    "event" to Pair(Material.FIREWORK_ROCKET, EventFunction::class),
-                    "warp" to Pair(Material.END_PORTAL_FRAME, WarpFunction::class)
-                ), "class")
+                    "attack" to Pair(Material.DIAMOND_SWORD) { it is AttackFunction },
+                    "buff" to Pair(Material.SPLASH_POTION) { it is BuffFunction },
+                    "counterattack" to Pair(Material.DIAMOND_CHESTPLATE) { it is CounterattackFunction },
+                    "counterbuff" to Pair(Material.WITHER_ROSE) { it is CounterbuffFunction },
+                    "counter" to Pair(Material.TOTEM_OF_UNDYING) { it is CounterFunction },
+                    "defense" to Pair(Material.SHIELD) { it is DefenseFunction },
+                    "event" to Pair(Material.FIREWORK_ROCKET) { it is EventFunction },
+                    "warp" to Pair(Material.END_PORTAL_FRAME) { it is WarpFunction },
+                ), "function")
             })
 
             .addIngredient('D', Items.ClickItem(
@@ -117,16 +102,18 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
         }.setGui(gui).open(player.player)
     }
 
-    private fun syncContent() {
-        gui.setContent(content(dummyTurns.stream()
-            .filter { t -> filter.values.all { it.second.invoke(t) } }
-            .flatMap { t -> t.items().stream().map { i -> Pair(ItemBuilder(i).lore(loreBuilder.turn(t).buildWithTooltips(player.locale())).build(), t) } }
-            .sorted(Comparator.comparing { it.first.displayName().asString() })
-            .collect(Collectors.toMap({ it.first }, { it.second }, { e, _ -> e }, { linkedMapOf() }))
-        ))
+    override fun give(turn: Turn<*>): Boolean {
+        if (player.inventory.removeCoins(turn.cost ?: 0)) {
+            player.inventory.add(turn)
+            return true
+        }
+        player.playSound(Sound.ENTITY_VILLAGER_NO)
+        return false
     }
 
-    private fun filterUsageMenu(filters: Map<String, Pair<Material, KClass<*>>>, category: String) {
+    private fun syncContent() = gui.setContent(content { turn -> filter.values.all { it.second.invoke(turn) } })
+
+    private fun filterUsageMenu(filters: Map<String, Pair<Material, (Turn<*>) -> Boolean>>, category: String) {
         val locale = player.locale()
 
         val gui = Gui.normal().setStructure(
@@ -135,7 +122,6 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
             "# # # # D # # # #") // D = Done Button
             .setBackground(Items.GRAY_BACKGROUND)
             .addIngredient('#', Items.GRAY_BACKGROUND)
-
             .addIngredient(
                 'D', Items.ClickItem(ItemBuilder(Material.LIME_DYE)
                     .name(locale.component("shop.done.name", color = Colors.ACCENT, decoration = TextDecoration.BOLD))
@@ -145,7 +131,7 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
                     open()
                 })
 
-        val filterList: List<Map.Entry<String, Pair<Material, KClass<*>>>> = ArrayList(filters.entries)
+        val filterList: List<Map.Entry<String, Pair<Material, (Turn<*>) -> Boolean>>> = filters.entries.toList()
         val offset = (9 - filterList.size) / 2
         for (i in filterList.indices) {
             try {
@@ -163,17 +149,17 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
         }.setGui(gui.build()).open(player.player)
     }
 
-    private fun state(name: String, superClass: KClass<*>, f: Map<String, Pair<Material, KClass<*>>>): Items.ClickItem {
+    private fun state(name: String, check: (Turn<*>) -> Boolean, f: Map<String, Pair<Material, (Turn<*>) -> Boolean>>): Items.ClickItem {
         val state = (if (filter.containsKey(name)) filter[name]?.first else FilterState.UNSET) ?: FilterState.UNSET
         return Items.ClickItem(ItemBuilder(state.item)
-                .name(player.locale().component("shop.filter." + state.name.lowercase(), color = state.color))
-                .addLore(player.locale().component("shop.filter.lore-" + state.name.lowercase()))
+                .name(player.locale().component("shop.filter.${state.name.lowercase()}", color = state.color))
+                .addLore(player.locale().component("shop.filter.lore-${state.name.lowercase()}"))
                 .build()
         ) { _, e ->
             if (e.isLeftClick && state !== FilterState.YES) {
-                filter[name] = Pair(FilterState.YES) { superClass.isInstance(it) }
+                filter[name] = Pair(FilterState.YES, check)
             } else if (e.isRightClick && state !== FilterState.NO) {
-                filter[name] = Pair(FilterState.NO) { !superClass.isInstance(it) }
+                filter[name] = Pair(FilterState.NO) { !check(it) }
             } else {
                 filter.remove(name)
             }
@@ -182,20 +168,11 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
         }
     }
 
-    private fun content(items: LinkedHashMap<ItemStack, Turn<*>>): List<Item> = content(items, buyConsumer)
-
     private fun filter(item: Material, name: String): ItemStack {
         return ItemBuilder(item)
             .name(player.locale().component("shop.filter", color = Colors.ACCENT)
-                .append(Component.text(" - ", Colors.EXTRA))
+                .append(component(" - ", Colors.EXTRA))
                 .append(player.locale().component("info.$name.$name", color = Colors.SECONDARY)))
             .build()
-    }
-
-    private fun turn(map: Map<ItemStack, Turn<*>>, material: Material): Turn<*> {
-        for ((key, value) in map) {
-            if (key.type == material) return value
-        }
-        return Turn.DUMMY
     }
 }

@@ -1,6 +1,7 @@
 package net.hectus.neobb.player
 
 import com.marcpg.libpg.item.ItemBuilder
+import com.marcpg.libpg.util.asString
 import com.marcpg.libpg.util.component
 import net.hectus.neobb.modes.shop.util.Items
 import net.hectus.neobb.modes.turn.Turn
@@ -14,7 +15,7 @@ class NeoInventory(private var player: NeoPlayer) {
     var shopDone: Boolean = false
 
     val deck: Array<ItemStack?> = arrayOfNulls(player.game.info.deckSize)
-    val dummyTurns: Array<Turn<*>?> = arrayOfNulls(player.game.info.deckSize)
+    val turns: Array<Turn<*>?> = arrayOfNulls(player.game.info.deckSize)
 
     init {
         sync()
@@ -27,26 +28,31 @@ class NeoInventory(private var player: NeoPlayer) {
     fun clear() {
         for (i in deck.indices) {
             deck[i] = null
-            dummyTurns[i] = null
+            turns[i] = null
         }
         sync()
     }
 
     fun isEmpty(): Boolean = deck.all { it == null }
     fun isFull(): Boolean = deck.all { it != null }
+    fun slotsLeft(): Int = deck.count { it == null }
 
     fun setSlot(slot: Int, item: ItemStack?, turn: Turn<*>?) {
         deck[slot] = item
-        dummyTurns[slot] = turn
+        turns[slot] = turn
         sync()
     }
 
-    fun sellOne(item: ItemStack) {
-        val index = deck.indexOfLast { item.isSimilar(it) }
+    fun removeOne(item: ItemStack) {
+        val index = deck.indexOfLast { item.type == it?.type && item.displayName().asString() == it.displayName().asString() }
         if (index == -1) return
+        deck[index] = null
+        turns[index] = null
+    }
 
-        addCoins(dummyTurns[index]?.cost ?: 0)
-        clearSlot(index)
+    fun sell(turn: Turn<*>) {
+        turn.items.forEach { removeOne(it) }
+        addCoins(turn.cost ?: 0)
     }
 
     fun clearSlot(slot: Int) {
@@ -55,7 +61,7 @@ class NeoInventory(private var player: NeoPlayer) {
 
     fun clearFirst(predicate: (ItemStack, Turn<*>) -> Boolean) {
         for (i in deck.indices) {
-            if (deck[i] != null && predicate(deck[i]!!, dummyTurns[i]!!)) {
+            if (deck[i] != null && predicate(deck[i]!!, turns[i]!!)) {
                 clearSlot(i)
                 return
             }
@@ -63,10 +69,7 @@ class NeoInventory(private var player: NeoPlayer) {
     }
 
     fun add(turn: Turn<*>) {
-        turn.items().forEach { i -> add(ItemBuilder(i)
-            .lore(player.shop.loreBuilder.turn(turn).buildWithTooltips(player.locale()))
-            .build(), turn)
-        }
+        turn.items.forEach { i -> add(player.shop.makeItem(turn, i, false), turn) }
     }
 
     fun add(item: ItemStack, turn: Turn<*>) {
@@ -83,7 +86,7 @@ class NeoInventory(private var player: NeoPlayer) {
         if (isFull()) return
 
         runCatching {
-            add(player.shop.dummyTurns.random())
+            add(player.game.info.turns.random())
         }
     }
 
@@ -102,13 +105,19 @@ class NeoInventory(private var player: NeoPlayer) {
         }
     }
 
-    fun allows(turn: Turn<*>, material: Material): Boolean {
+    fun allows(turn: Turn<*>): Boolean {
         var count = 0
         for (item in deck) {
-            if (item != null && item.type == material)
+            if (item != null && item.type == turn.mainItem.type)
                 count++
         }
         return count < (if (turn is Category) turn.categoryMaxPerDeck else turn.maxAmount)
+    }
+
+    @Synchronized
+    fun addCoins(coins: Int) {
+        this.coins += coins
+        sync()
     }
 
     @Synchronized
@@ -119,28 +128,22 @@ class NeoInventory(private var player: NeoPlayer) {
         return true
     }
 
-    @Synchronized
-    fun addCoins(coins: Int) {
-        this.coins += coins
-        sync()
-    }
-
     fun sync() {
         val inv = player.player.inventory
         inv.clear()
 
         for (i in deck.indices) {
             val item = if (deck[i] == null) Items.BLACK_BACKGROUND else deck[i]!!.clone()
-            val dummyTurn = if (dummyTurns[i] == null) Turn.DUMMY else dummyTurns[i]!!
+            val turn = turns[i]
 
-            if (player.game.difficulty.suggestions && dummyTurn.goodChoice(player))
+            if (player.game.difficulty.suggestions && turn?.goodChoice(player) ?: false)
                 item.editMeta { it.setEnchantmentGlintOverride(true) }
 
             inv.setItem(i, item)
         }
 
         inv.setItem(13, ItemBuilder((if (coins == 0) Material.RESIN_BRICK else Material.GOLD_INGOT)).apply {
-            amount(coins.coerceIn(1, 64))
+            amount(coins.coerceAtLeast(1))
             name(player.locale().component("item-lore.cost.value", coins.toString()))
         }.build())
     }

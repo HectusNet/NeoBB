@@ -1,6 +1,8 @@
 package net.hectus.neobb.event
 
 import com.destroystokyo.paper.event.server.ServerTickEndEvent
+import com.marcpg.libpg.display.playSound
+import com.marcpg.libpg.util.asString
 import com.marcpg.libpg.util.bukkitRun
 import com.marcpg.libpg.util.bukkitRunLater
 import net.hectus.neobb.NeoBB
@@ -11,6 +13,7 @@ import net.hectus.neobb.util.Ticking
 import net.hectus.neobb.util.playerEventAction
 import org.bukkit.GameMode
 import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -44,8 +47,16 @@ class GameEvents : Listener {
         playerEventAction(event.player, false) { p ->
             if (event.player.openInventory.topInventory.type == InventoryType.CHEST) {
                 event.isCancelled = true
-                p.inventory.sellOne(event.itemDrop.itemStack)
-                bukkitRun { p.inventory.sync() }
+
+                val itemName = event.itemDrop.itemStack.displayName().asString().removePrefix("[").removeSuffix("]")
+                val turn = p.game.info.turns.firstOrNull { it.name == itemName }
+
+                if (turn != null) {
+                    p.inventory.sell(turn)
+                    bukkitRun { p.inventory.sync() }
+                } else {
+                    p.playSound(Sound.ENTITY_VILLAGER_NO)
+                }
             }
         }
     }
@@ -60,7 +71,7 @@ class GameEvents : Listener {
 
             if (p.game is HectusGame && event.to.clone().subtract(0.0, 0.1, 0.0).block.type == Material.MAGMA_BLOCK) {
                 p.game.eliminate(p)
-            } else if (event.hasChangedPosition() && p.game.outOfBounds(p.location(), event)) {
+            } else if (event.hasChangedPosition() && p.game.outOfBounds(p.cord(), event)) {
                 p.game.onOutOfBounds(p)
             }
         }
