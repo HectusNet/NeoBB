@@ -133,14 +133,11 @@ abstract class GlassWallTurn(namespace: String) : StructureTurn(namespace), Defe
 
     override val buffs: List<Buff<*>> = listOf(Luck(5))
 
-    // TODO: Convert to TurnExec metadata:
-    private var stay: Boolean = false
-
     override fun applyDefense(exec: TurnExec<*>) {
         exec.meta["stay"] = true
         exec.player.addModifier(Modifiers.Player.Default.DEFENDED)
 
-        exec.game.turnScheduler.runTaskTimer(ScheduleID.GLASS_WALL_DEFENSE, 1, { stay }) {
+        exec.game.turnScheduler.runTaskTimer(ScheduleID.GLASS_WALL_DEFENSE, 1, { exec.meta["stay"] as Boolean }) {
             exec.meta["stay"] = Randomizer.boolByChance(if (exec.game is DefaultGame) 40.0 else 60.0)
             if (exec.meta["stay"] as Boolean)
                 exec.player.addModifier(Modifiers.Player.Default.DEFENDED)
