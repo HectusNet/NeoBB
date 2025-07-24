@@ -49,7 +49,15 @@ object Utilities {
     }
 }
 
-    fun clazz(clazz: KClass<out Turn<*>>): String = clazz.allSuperclasses.firstOrNull { it.simpleName!!.endsWith("Clazz") && it.simpleName!!.length > 5 }?.simpleName?.removeSuffix("Clazz")?.lowercase() ?: "other"
+data class Bounds(
+    val dimensions: Cord,
+    val low: Cord,
+    val high: Cord = low + dimensions,
+    val center3D: Cord = low + (dimensions / Cord(2.0, 2.0, 2.0)),
+    val center2D: Cord = Cord(center3D.x, low.y, center3D.z),
+) {
+    operator fun contains(cord: Cord): Boolean = cord.inBounds(low, high)
+    operator fun contains(loc: Location): Boolean = contains(loc.toCord())
 }
 
 fun cancelEvent(event: Cancellable, eventPlayer: Player, requireStarted: Boolean, additionalPredicate: (NeoPlayer) -> Boolean) {

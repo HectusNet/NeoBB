@@ -91,8 +91,10 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         for (i in 0..<playerCount) {
             val angle = 2 * Math.PI * i / playerCount
             players[i].teleport(
-                Cord(warp.center.x + Constants.SPAWN_POINT_RADIUS * cos(angle), warp.center.y, warp.center.z + Constants.SPAWN_POINT_RADIUS * sin(angle)), world,
-                Math.toDegrees(angle + Math.PI / 2).toFloat(), 0f // No, I am not a math guy...
+                cord = warp.bounds.center2D + Cord(Constants.SPAWN_POINT_RADIUS * cos(angle), 0.0, Constants.SPAWN_POINT_RADIUS * sin(angle)),
+                world = world,
+                yaw = Math.toDegrees(angle + Math.PI / 2).toFloat(), // No, I am not a math guy...
+                pitch = 0f,
             )
         }
 
@@ -162,8 +164,8 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
      * Verifies if the turn can be used and will return `true` if it is canceled and the turn method can exit safely, due to being outside the arena, for example.
      * @return `false` if the turn method should abort, `true` if it can continue.
      */
-    fun outOfBounds(location: Location, event: Cancellable? = null): Boolean {
-        if (!location.toCord().inBounds(warp.lowCorner, warp.highCorner)) {
+    fun outOfBounds(cord: Cord, event: Cancellable? = null): Boolean {
+        if (cord !in warp.bounds) {
             if (event != null)
                 event.isCancelled = true
             return true
@@ -281,7 +283,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
             if (players.size == 1) {
                 win(players.first())
             }
-            target.teleport(warp.center)
+            target.teleport(warp.bounds.center2D)
             target.eachBukkitPlayer { it.gameMode = GameMode.SPECTATOR }
         }
 
