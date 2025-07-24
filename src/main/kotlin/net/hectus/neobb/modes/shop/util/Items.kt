@@ -1,6 +1,7 @@
 package net.hectus.neobb.modes.shop.util
 
 import com.marcpg.libpg.item.ItemBuilder
+import com.marcpg.libpg.util.component
 import net.hectus.neobb.NeoBB
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -35,8 +36,8 @@ object Items {
         override fun getItemProvider(gui: ScrollGui<*>): ItemProvider {
             try {
                 return ItemWrapper(ItemBuilder(Material.FEATHER)
-                    .name(Component.text("Scroll " + (if (up) "Up" else "Down")))
-                    .lore(listOf(Component.text("+ [SHIFT] Scroll Down x5", NamedTextColor.GRAY)))
+                    .name(component("Scroll " + (if (up) "Up" else "Down")))
+                    .lore(listOf(component("+ [SHIFT] Scroll Down x5", NamedTextColor.GRAY)))
                     .build())
             } catch (e: Exception) {
                 NeoBB.LOG.warn("Could not create skull for scroll item.", e)
@@ -49,7 +50,7 @@ object Items {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
             try {
                 return ItemWrapper(ItemBuilder(Material.FEATHER)
-                    .name(Component.text((if (forward) "Next" else "Last") + " Page"))
+                    .name(component((if (forward) "Next" else "Last") + " Page"))
                     .build())
             } catch (e: Exception) {
                 NeoBB.LOG.warn("Could not create skull for page item.", e)

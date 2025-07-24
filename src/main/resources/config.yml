@@ -92,9 +92,9 @@ warps:
   void: [ -138, 22, 302 ]
   wood: [ -225, 22, 469 ]
 
-  person-amethyst: [ -345, 62, 320 ] # TODO: Build this!
-  person-fire: [ -203, 19, 142 ] # TODO: Build this!
-  person-ice: [ -358, 13, 245 ] # TODO: Build this!
-  person-snow: [ -358, 13, 245 ] # TODO: Build this!
-  person-villager: [ 0, 0, 0 ] # TODO: Build this!
-  person-void: [ -138, 22, 302 ] # TODO: Build this!
+  person_amethyst: [ -345, 62, 320 ] # TODO: Build this!
+  person_fire: [ -203, 19, 142 ] # TODO: Build this!
+  person_ice: [ -358, 13, 245 ] # TODO: Build this!
+  person_snow: [ -358, 13, 245 ] # TODO: Build this!
+  person_villager: [ 0, 0, 0 ] # TODO: Build this!
+  person_void: [ -138, 22, 302 ] # TODO: Build this!

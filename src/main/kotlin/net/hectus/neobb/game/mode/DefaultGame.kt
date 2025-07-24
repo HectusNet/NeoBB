@@ -34,15 +34,15 @@ class DefaultGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDif
     )
 
     override val scoreboard: ((NeoPlayer) -> SimpleScoreboard)? = { p -> SimpleScoreboard(p, 5, MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"),
-        ValueScoreboardEntry(p.locale().component("scoreboard.turning", color = Colors.ACCENT)) { Component.text(if (currentPlayer() === p) p.locale().string("scoreboard.turning.you") else currentPlayer().name()) },
-        ValueScoreboardEntry(p.locale().component("scoreboard.time", color = Colors.ACCENT)) { Component.text(p.game.timeLeft.preciselyFormatted) },
+        ValueScoreboardEntry(p.locale().component("scoreboard.turning", color = Colors.ACCENT)) { component(if (currentPlayer() === p) p.locale().string("scoreboard.turning.you") else currentPlayer().name()) },
+        ValueScoreboardEntry(p.locale().component("scoreboard.time", color = Colors.ACCENT)) { component(p.game.timeLeft.preciselyFormatted) },
         ValueScoreboardEntry(p.locale().component("scoreboard.luck", color = Colors.ACCENT)) { Component.text(p.luck) },
         BlankScoreboardEntry(),
         ValueScoreboardEntry(p.locale().component("scoreboard.rank", color = Colors.ACCENT)) { Rank.ofElo(p.databaseInfo.elo).toRankTranslations(p.locale()) },
         ValueScoreboardEntry(p.locale().component("scoreboard.elo", color = Colors.ACCENT)) { Component.text(p.databaseInfo.elo.toInt()) },
         BlankScoreboardEntry(),
-        SimpleScoreboardEntry() { Component.text("NeoBB-" + NeoBB.VERSION + " (d" + Integer.toHexString(LocalDateTime.now().dayOfYear) + "h" + LocalDateTime.now().hour + ")", Colors.EXTRA) },
-        StaticScoreboardEntry(Component.text("mc.hectus.net", Colors.LINK)),
+        SimpleScoreboardEntry { component("NeoBB-${NeoBB.VERSION} (d${Integer.toHexString(LocalDateTime.now().dayOfYear)}h${LocalDateTime.now().hour})", Colors.EXTRA) },
+        StaticScoreboardEntry(component("mc.hectus.net", Colors.LINK)),
     ) }
 
     override val actionBar: ((NeoPlayer) -> SimpleActionBar)? = { p -> SimpleActionBar(p, 1) { if (currentPlayer() === p) {

@@ -1,11 +1,12 @@
 package net.hectus.neobb.buff
 
+import com.marcpg.libpg.display.eachBukkitPlayer
+import com.marcpg.libpg.display.teleport
 import com.marcpg.libpg.lang.string
 import com.marcpg.libpg.storing.Cord
 import com.marcpg.libpg.util.asString
 import net.hectus.neobb.game.util.ScheduleID
 import net.hectus.neobb.modes.turn.Turn
-import net.hectus.neobb.modes.turn.default_game.attribute.BuffFunction
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Constants
@@ -18,7 +19,7 @@ import java.util.*
 
 class ExtraTurn(data: Int = 1, target: BuffTarget = BuffTarget.YOU): Buff<Int>(data, target) {
     override fun invoke(source: NeoPlayer) {
-        if (source.game.history.size >= Constants.MAX_EXTRA_TURNS && source.game.history.takeLast(Constants.MAX_EXTRA_TURNS).all { turn -> turn is BuffFunction && turn.buffs().any { it is ExtraTurn } }) {
+        if (source.game.history.size >= Constants.MAX_EXTRA_TURNS && source.game.history.takeLast(Constants.MAX_EXTRA_TURNS).all { exec -> exec.turn.buffs.any { it is ExtraTurn } }) {
             source.sendMessage("gameplay.info.extra-turn.enough", color = Colors.NEUTRAL)
             return
         }
@@ -102,7 +103,7 @@ class Give(data: Turn<*>, target: BuffTarget = BuffTarget.YOU): Buff<Turn<*>>(da
         source.game.initialPlayers.forEach { it.sendMessage("gameplay.info.give", target(source).name(), data.translation(it.locale()), color = Colors.NEUTRAL) }
     }
 
-    override fun text(locale: Locale): String = locale.string("item-lore.buff.give", data.items().stream().mapToInt { it.amount }.sum().toString(), data.items().first().displayName().asString())
+    override fun text(locale: Locale): String = locale.string("item-lore.buff.give", data.items.sumOf { it.amount }.toString(), data.mainItem.displayName().asString())
 
     override fun color(): TextColor = when (target) {
         BuffTarget.YOU -> Colors.POSITIVE

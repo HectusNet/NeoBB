@@ -42,11 +42,11 @@ class PersonGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDiff
     override val scoreboard: ((NeoPlayer) -> SimpleScoreboard)? = { p -> SimpleScoreboard(p, 5, MiniMessage.miniMessage().deserialize("<bold><#328825>Block <#37BF1F>Battles <reset><#9D9D9D>Alpha " + NeoBB.VERSION),
         BlankScoreboardEntry(),
         StaticScoreboardEntry(p.locale().component("scoreboard.stats", color = Colors.PERSON_2, decoration = TextDecoration.BOLD)),
-        ValueScoreboardEntry(Component.text("💎", Colors.PERSON_4).append(p.locale().component("scoreboard.rank", color = Colors.PERSON_0))) { Rank.ofElo(p.databaseInfo.elo).toRankTranslations(p.locale()) },
-        ValueScoreboardEntry(Component.text("⚔", Colors.PERSON_4).append(p.locale().component("scoreboard.elo", color = Colors.PERSON_0))) { Component.text(p.databaseInfo.elo.toInt()) },
+        ValueScoreboardEntry(component("💎", Colors.PERSON_4).append(p.locale().component("scoreboard.rank", color = Colors.PERSON_0))) { Rank.ofElo(p.databaseInfo.elo).toRankTranslations(p.locale()) },
+        ValueScoreboardEntry(component("⚔", Colors.PERSON_4).append(p.locale().component("scoreboard.elo", color = Colors.PERSON_0))) { Component.text(p.databaseInfo.elo.toInt()) },
         BlankScoreboardEntry(),
         BlankScoreboardEntry(),
-        StaticScoreboardEntry(Component.text("mc", Colors.PERSON_1).append(Component.text(".hectus", Colors.PERSON_2)).append(Component.text(".net", Colors.PERSON_3))),
+        StaticScoreboardEntry(component("mc", Colors.PERSON_1).append(component(".hectus", Colors.PERSON_2)).append(component(".net", Colors.PERSON_3))),
     ) }
 
     override fun preTurn(exec: TurnExec<*>): Boolean {

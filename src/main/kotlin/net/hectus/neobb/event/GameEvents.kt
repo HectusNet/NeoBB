@@ -122,7 +122,7 @@ class GameEvents : Listener {
 
     @EventHandler(ignoreCancelled = true)
     fun onEntityDamage(event: EntityDamageEvent) {
-        if (DISABLED_DAMAGE.contains(event.cause))
+        if (event.cause in DISABLED_DAMAGE)
             event.isCancelled = true
     }
 }

@@ -19,7 +19,7 @@ import xyz.xenondevs.invui.InvUI
 import java.net.URI
 import java.util.*
 
-class NeoBB : KotlinPlugin(NeoBB.Companion) {
+class NeoBB : KotlinPlugin(Companion) {
     companion object : KotlinPluginCompanion() {
         lateinit var PLUGIN: NeoBB
         lateinit var DATABASE: AutoCatchingSQLConnection<UUID>

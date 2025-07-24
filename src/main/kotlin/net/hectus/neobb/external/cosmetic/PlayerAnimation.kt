@@ -39,7 +39,5 @@ enum class PlayerAnimation(private val action: (Player, Cord) -> Unit) {
         play(player.player, player.game.warp.lowCorner)
     }
 
-    fun play(player: Player, cord: Cord) {
-        action.invoke(player, cord)
-    }
+    fun play(player: Player, cord: Cord) = action(player, cord)
 }

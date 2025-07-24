@@ -4,6 +4,7 @@ import net.hectus.neobb.player.DatabaseInfo
 import net.hectus.neobb.util.Constants
 import kotlin.math.*
 
+@Suppress("LocalVariableName")
 class Rating(private val mu: Double, private val phi: Double, private var sigma: Double) {
     companion object {
         private const val SCALE_MULTIPLIER = 173.7178
@@ -127,7 +128,7 @@ class Rating(private val mu: Double, private val phi: Double, private var sigma:
     private fun f(x: Double, delta: Double, v: Double, a: Double): Double {
         val expX = exp(x)
         val num = expX * (delta * delta - phi * phi - v - expX)
-        val denom = 2.0 * (phi * phi + v + expX) * (phi * phi + v + expX)
-        return num / denom - (x - a) / (TAU * TAU)
+        val denominator = 2.0 * (phi * phi + v + expX) * (phi * phi + v + expX)
+        return num / denominator - (x - a) / (TAU * TAU)
     }
 }

@@ -8,7 +8,7 @@ class CardItemLoreBuilder: ItemLoreBuilder() {
         val lore = mutableListOf<Component>()
 
         lore += SEPARATOR
-        lore += key(locale, "item-lore.damage", "❖").append(Component.text(turn?.damage ?: 0.0))
+        lore += key(locale, "item-lore.damage", "❖").append(Component.text(turn!!.damage ?: 0.0))
         if (locale.translationExists("usage")) {
             lore += SEPARATOR
             lore += key(locale, "item-lore.usage", "➽")

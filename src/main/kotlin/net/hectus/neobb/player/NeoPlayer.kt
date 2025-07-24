@@ -1,8 +1,6 @@
 package net.hectus.neobb.player
 
-import com.marcpg.libpg.display.PlayerMinecraftReceiver
-import com.marcpg.libpg.display.SimpleActionBar
-import com.marcpg.libpg.display.SimpleScoreboard
+import com.marcpg.libpg.display.*
 import com.marcpg.libpg.util.MinecraftTime
 import com.marcpg.libpg.util.following
 import net.hectus.neobb.game.Game

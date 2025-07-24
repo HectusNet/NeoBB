@@ -1,29 +1,26 @@
 package net.hectus.neobb.util
 
 import com.marcpg.libpg.display.MinecraftReceiver
-import com.marcpg.libpg.util.enumValueNoCase
+import com.marcpg.libpg.display.playSound
+import com.marcpg.libpg.storing.Cord
+import com.marcpg.libpg.util.toCord
 import net.hectus.neobb.game.GameManager
-import net.hectus.neobb.modes.turn.Turn
 import net.hectus.neobb.player.NeoPlayer
-import org.bukkit.Material
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.TextDecoration
+import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.EntityType.*
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 import java.time.*
-import kotlin.reflect.KClass
-import kotlin.reflect.full.allSuperclasses
 
 object Utilities {
-    val ENTITY_TYPES: List<EntityType> = listOf(
-        ALLAY, AXOLOTL, BAT, BEE, BLAZE, CAMEL, CAT, CAVE_SPIDER, CHICKEN, COW, CREEPER, DONKEY, DROWNED, ENDERMAN,
-        ENDERMITE, EVOKER, FOX, FROG, GHAST, GLOW_SQUID, GOAT, GUARDIAN, HOGLIN, HORSE, HUSK, IRON_GOLEM, LLAMA,
-        MAGMA_CUBE, MOOSHROOM, MULE, OCELOT, PANDA, PARROT, PHANTOM, PIG, PIGLIN, PILLAGER, POLAR_BEAR, RABBIT,
-        RAVAGER, SHEEP, SHULKER, SILVERFISH, SKELETON, SKELETON_HORSE, SLIME, SNIFFER, SNOW_GOLEM, SPIDER, SQUID,
-        STRAY, STRIDER, TRADER_LLAMA, TURTLE, VEX, VILLAGER, VINDICATOR, WANDERING_TRADER, WITCH, WITHER_SKELETON,
-        WOLF, ZOGLIN, ZOMBIE, ZOMBIE_HORSE, ZOMBIE_VILLAGER, ZOMBIFIED_PIGLIN
-    )
+    val REMOVED_ENTITY_TYPES = listOf(ENDER_DRAGON, ELDER_GUARDIAN, GIANT, ILLUSIONER, RAVAGER, WITHER)
+
+    val ENTITY_TYPES: List<EntityType> = EntityType.entries.filter { it.entityClass != null && it !in REMOVED_ENTITY_TYPES && LivingEntity::class.java.isAssignableFrom(it.entityClass!!) }
 
     private val EARLIEST_TIMEZONE: ZoneId = ZoneId.of("Pacific/Honolulu") // UTC−10
     private val LATEST_TIMEZONE: ZoneId = ZoneId.of("Pacific/Auckland") // UTC+12
@@ -50,6 +47,7 @@ object Utilities {
         val time = ZonedDateTime.now(ZoneOffset.UTC).toLocalTime()
         return time.isAfter(LocalTime.of(8, 0)) && time.isBefore(LocalTime.of(20, 0))
     }
+}
 
     fun clazz(clazz: KClass<out Turn<*>>): String = clazz.allSuperclasses.firstOrNull { it.simpleName!!.endsWith("Clazz") && it.simpleName!!.length > 5 }?.simpleName?.removeSuffix("Clazz")?.lowercase() ?: "other"
 }
@@ -67,16 +65,9 @@ fun playerEventAction(eventPlayer: Player, requireStarted: Boolean, additionalPr
         action.invoke(player)
 }
 
-fun KClass<out Turn<*>>.material(): Material = enumValueNoCase(simpleName!!.counterFilterName().camelToSnake())
-
-private val COUNTER_FILTER_REGEX = Regex("^.?T(?!.*(Function|Usage|Clazz)$)|Function$|Usage$|Clazz$")
-private val CAMEL_CASE_REGEX = Regex("([a-z])([A-Z]+)")
-
-fun String.camelToSnake(): String = replace(CAMEL_CASE_REGEX, "$1_$2").lowercase()
-fun String.camelToTitle(): String = replace(CAMEL_CASE_REGEX, "$1 $2")
-fun String.counterFilterName(): String = replaceFirst(COUNTER_FILTER_REGEX, "")
-
 fun MinecraftReceiver.eachNeoPlayer(action: (NeoPlayer) -> Unit) = eachReceiver {
     if (it is NeoPlayer)
         action(it)
 }
+
+fun Component.noItalic(): Component = decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)

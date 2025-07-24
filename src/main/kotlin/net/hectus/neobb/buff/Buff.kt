@@ -8,6 +8,7 @@ import com.marcpg.libpg.util.component
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Constants
+import net.hectus.neobb.util.noItalic
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import java.util.*
@@ -26,7 +27,7 @@ abstract class Buff<T>(protected val data: T, protected val target: BuffTarget) 
     abstract fun text(locale: Locale): String
     abstract fun color(): TextColor
 
-    fun line(locale: Locale): Component = component("${Constants.MINECRAFT_TAB_CHAR}| ${text(locale)}${target(locale)}", color())
+    fun line(locale: Locale): Component = component("${Constants.MINECRAFT_TAB_CHAR}| ${text(locale)}${target(locale)}", color()).noItalic()
 
     fun target(locale: Locale): String = if (target == BuffTarget.YOU) "" else " " + locale.string("item-lore.buff.${target.name.lowercase()}")
 }

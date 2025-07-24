@@ -75,7 +75,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
     // =================== INIT BLOCK ===================
     // ==================================================
 
-    fun init() {
+    open fun init() {
         Bukkit.getScoreboardManager().mainScoreboard.teams.forEach { it.unregister() }
 
         initialPlayers = bukkitPlayers.map { NeoPlayer(it, this) }.shuffled()
@@ -227,9 +227,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         return players[turningIndex]
     }
 
-    fun nextPlayer(): NeoPlayer {
-        return players[(turningIndex + 1) % players.size]
-    }
+    fun nextPlayer(): NeoPlayer = players[(turningIndex + 1) % players.size]
 
     fun player(bukkitPlayer: Player, onlyAlive: Boolean = true): NeoPlayer? {
         for (player in (if (onlyAlive) players else initialPlayers)) {
@@ -445,7 +443,11 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         info("Stopped the game gracefully.")
 
         // Save replay if gracefully stopping the game.
-        saveReplay()
+        runCatching {
+            saveReplay()
+        }.onFailure {
+            warn("Unable to save replay due to internal error: ${it.message}")
+        }
     }
 
     fun win(player: NeoPlayer) {

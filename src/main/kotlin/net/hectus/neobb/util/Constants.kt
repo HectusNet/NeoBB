@@ -11,7 +11,7 @@ object Constants {
     const val MAX_PLAYER_RD = 350.0
 
     const val MINECRAFT_TAB_CHAR = "   "
-    const val MAX_LORE_WIDTH = 50
+    const val MAX_LORE_WIDTH = 32
 
     const val GAME_ID_LENGTH = 16
     const val GAME_ID_CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789"
@@ -21,7 +21,7 @@ object Constants {
     val DEFAULT_DIFFICULTY = GameDifficulty.NORMAL
     const val MAX_EXTRA_TURNS = 3
 
-    const val HIGHLIGHT_SCALE = 0.95f
+    const val HIGHLIGHT_SCALE = 0.98f
     const val SPAWN_POINT_RADIUS = 3.0
 
     const val CHECK_WARP_CLASSES = true

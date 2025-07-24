@@ -6,13 +6,13 @@ import com.marcpg.libpg.util.lineWrap
 import net.hectus.neobb.modes.turn.Turn
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Constants
+import net.hectus.neobb.util.noItalic
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.TextDecoration
 import java.util.*
 
 abstract class ItemLoreBuilder {
     companion object {
-        val SEPARATOR = Component.text("                    ", Colors.EXTRA)
+        val SEPARATOR = component("                    ", Colors.EXTRA)
     }
 
     protected var turn: Turn<*>? = null
@@ -22,11 +22,11 @@ abstract class ItemLoreBuilder {
     fun buildWithTooltips(locale: Locale): List<Component> {
         val lore = build(locale).toMutableList()
         lore += SEPARATOR
-        lore += keybindPrefix("key.mouse.left").append(locale.component("item-lore.tooltip.buy"))
-        lore += keybindPrefix("key.mouse.right").append(locale.component("item-lore.tooltip.buy_3"))
-        lore += keybindPrefix("key.mouse.left").append(Component.text("+ ")).append(keybindPrefix("key.sneak")).append(locale.component("item-lore.tooltip.buy_max"))
+        lore += keybindPrefix("key.mouse.left").append(locale.component("item-lore.tooltip.buy")).color(Colors.EXTRA).noItalic()
+        lore += keybindPrefix("key.mouse.right").append(locale.component("item-lore.tooltip.buy_3")).color(Colors.EXTRA).noItalic()
+        lore += keybindPrefix("key.mouse.left").append(component("+ ")).append(keybindPrefix("key.sneak")).append(locale.component("item-lore.tooltip.buy_max")).color(Colors.EXTRA).noItalic()
         lore += Component.space()
-        lore += keybindPrefix("key.drop").append(locale.component("item-lore.tooltip.sell"))
+        lore += keybindPrefix("key.drop").append(locale.component("item-lore.tooltip.sell")).color(Colors.EXTRA).noItalic()
         return lore
     }
 
@@ -36,21 +36,20 @@ abstract class ItemLoreBuilder {
     }
 
     protected fun key(locale: Locale, key: String, icon: String): Component {
-        return Component.text("$icon ").append(locale.component(key)).append(Component.text(": "))
-            .color(Colors.NEUTRAL).decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+        return component("$icon ").append(locale.component(key)).append(component(": ")).color(Colors.NEUTRAL).noItalic()
     }
 
     protected fun longText(l: Locale, type: String): List<Component> {
-        val text = l.string("$type." + turn?.namespace())
-        return text.lineWrap(Constants.MAX_LORE_WIDTH).map { Component.text("${Constants.MINECRAFT_TAB_CHAR}| $it", Colors.BLUE).decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE) }
+        val text = l.string("$type.${turn!!.namespace}")
+        return text.lineWrap(Constants.MAX_LORE_WIDTH).map { component("${Constants.MINECRAFT_TAB_CHAR}| $it", Colors.BLUE).noItalic() }
     }
 
-    protected fun keybindPrefix(key: String): Component = Component.text("[")
+    protected fun keybindPrefix(key: String): Component = component("[")
         .append(Component.keybind(key))
-        .append(Component.text("] "))
+        .append(component("] "))
 
     protected fun Locale.translationExists(prefix: String): Boolean {
-        val key = prefix + "." + turn?.namespace()
+        val key = "$prefix.${turn!!.namespace}"
         return string(key) != key
     }
 }

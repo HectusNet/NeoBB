@@ -2,7 +2,6 @@ package net.hectus.neobb.external.rating
 
 import com.marcpg.libpg.util.component
 import com.marcpg.libpg.util.toTitleCase
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Material
 import java.util.*
@@ -48,7 +47,7 @@ enum class Rank(val minElo: Double, val levels: Int, val league: Int, val materi
                     return rank to 1
                 }
             }
-            return Rank.DIRT to 1
+            return DIRT to 1
         }
 
         fun Pair<Rank, Int>.toRankString() = first.name.toTitleCase() + " " + second
@@ -56,18 +55,16 @@ enum class Rank(val minElo: Double, val levels: Int, val league: Int, val materi
         fun Pair<Rank, Int>.toRankTranslations(locale: Locale) = locale
             .component("rating.rank.${first.name.lowercase()}")
             .appendSpace()
-            .append(Component.text(second.toRomanNumeral()))
+            .append(component(second.toRomanNumeral()))
             .color(first.color)
 
-        private fun Int.toRomanNumeral(): String {
-            return when (this) {
-                1 -> "I"
-                2 -> "II"
-                3 -> "III"
-                4 -> "IV"
-                5 -> "V"
-                else -> "V+"
-            }
+        private fun Int.toRomanNumeral(): String = when (this) {
+            1 -> "I"
+            2 -> "II"
+            3 -> "III"
+            4 -> "IV"
+            5 -> "V"
+            else -> "V+"
         }
     }
 }

@@ -1,6 +1,7 @@
 package net.hectus.neobb.external.cosmetic
 
-import net.hectus.neobb.modes.turn.Turn
+import net.hectus.neobb.matrix.structure.PlacedStructure
+import net.hectus.neobb.modes.turn.TurnExec
 import net.hectus.neobb.modes.turn.default_game.BlockTurn
 import net.hectus.neobb.modes.turn.default_game.MobTurn
 import net.hectus.neobb.modes.turn.default_game.StructureTurn
@@ -11,6 +12,7 @@ import org.bukkit.block.Block
 import org.bukkit.entity.BlockDisplay
 import org.bukkit.entity.Display
 import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
 import org.bukkit.util.Transformation
 import org.joml.AxisAngle4f
 import org.joml.Vector3f
@@ -18,16 +20,14 @@ import org.joml.Vector3f
 class EffectManager {
     private var highlight: Entity? = null
 
-    fun applyEffects(turn: Turn<*>) {
-        val player = turn.player ?: return
+    fun applyEffects(exec: TurnExec<*>) {
+        exec.game.world.playSound(exec.location!!, exec.player.databaseInfo.placeSound, 1.0f, 1.0f)
+        spawnParticle(exec.location, exec.player)
 
-        player.game.world.playSound(turn.location(), player.databaseInfo.placeSound, 1.0f, 1.0f)
-        spawnParticle(turn.location(), turn.player)
-
-        when (turn) {
-            is BlockTurn -> highlightBlock(turn.data!!, turn.player)
-            is StructureTurn -> highlightBlock(turn.data!!.lastBlock, turn.player)
-            is MobTurn<*> -> applyHighlight(turn.data!!, turn.player)
+        when (exec.turn) {
+            is BlockTurn -> highlightBlock(exec.data!! as Block, exec.player)
+            is StructureTurn -> highlightBlock((exec.data!! as PlacedStructure).lastBlock, exec.player)
+            is MobTurn<*> -> applyHighlight(exec.data!! as LivingEntity, exec.player)
         }
     }
 

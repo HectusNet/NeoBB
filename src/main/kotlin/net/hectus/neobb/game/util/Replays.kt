@@ -3,6 +3,7 @@ package net.hectus.neobb.game.util
 import kotlinx.serialization.Serializable
 import net.hectus.neobb.NeoBB
 import net.hectus.neobb.game.Game
+import net.hectus.neobb.modes.turn.default_game.attribute.TurnClazz
 import net.hectus.neobb.util.Constants
 import kotlin.io.path.createDirectories
 import kotlin.io.path.writeText
@@ -25,6 +26,8 @@ private data class TurnData(
     val turn: String,
     val location: Triple<Int, Int, Int>?,
     val damage: Double,
+    val clazz: TurnClazz?,
+    val meta: Map<String, String>,
 ) : java.io.Serializable
 
 fun Game.saveReplay() {
@@ -34,12 +37,14 @@ fun Game.saveReplay() {
         startingHealth = info.startingHealth,
         difficulty = difficulty.name,
         players = initialPlayers.map { it.name() },
-        turns = history.map { turn ->
+        turns = history.map { exec ->
             TurnData(
-                player = turn.player?.name() ?: "System",
-                turn = turn.namespace(),
-                location = Triple(turn.cord?.x?.toInt() ?: 0, turn.cord?.y?.toInt() ?: 0, turn.cord?.z?.toInt() ?: 0),
-                damage = turn.damage,
+                player = exec.player.name(),
+                turn = exec.turn.namespace,
+                location = Triple(exec.cord?.x?.toInt() ?: 0, exec.cord?.y?.toInt() ?: 0, exec.cord?.z?.toInt() ?: 0),
+                damage = exec.turn.damage ?: 0.0,
+                clazz = exec.turn.clazz,
+                meta = exec.meta.mapValues { it.toString() },
             )
         },
         duration = info.totalTime.get() - timeLeft.get(),
