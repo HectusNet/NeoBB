@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "net.hectus.neobb"
-version = "0.1.0"
+version = "0.2.0"
 description = "A better version of Block Battles, where multiple players compete in a turn-based game, similar to chess or card games."
 
 kotlin {
