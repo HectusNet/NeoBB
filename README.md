@@ -4,6 +4,10 @@ If you wanna use this plugin and are not here to help with development, please r
 
 ## How to Compile & Use
 
+> [!WARNING]
+> The KtLibPG dependency is currently not available via any online repository.
+> This makes building the plugin impossible. Please instead use the pre-compiled versions on [our Modrinth page](https://modrinth.com/plugin/neobb/versions).
+
 This guide will get you to running the plugin on your own. You'll need to manually compile and then set up your own server with the compiled plugin.
 
 ### Downloading the Code
