@@ -17,6 +17,8 @@ object Configuration {
 
     var CONFIG: FileConfiguration private set
 
+    var OFFLINE: Boolean private set
+
     var SPAWN_CORD: Cord private set
 
     var STRUCTURE_MODE: StructureMode private set
@@ -28,6 +30,8 @@ object Configuration {
     init {
         NeoBB.PLUGIN.saveDefaultConfig()
         CONFIG = NeoBB.PLUGIN.config
+
+        OFFLINE = CONFIG.getBoolean("offline")
 
         SPAWN_CORD = Cord.ofList(CONFIG.getIntegerList("warps.default")) + Cord(4.5, 0.0, 4.5)
 

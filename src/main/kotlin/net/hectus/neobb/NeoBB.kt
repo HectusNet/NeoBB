@@ -31,7 +31,7 @@ class NeoBB : KotlinPlugin(NeoBB.Companion) {
 
         InvUI.getInstance().setPlugin(this)
 
-        loadTranslations(URI("https://marcpg.com/neobb/lang/all"))
+        loadTranslations(URI(if (Configuration.OFFLINE) "offline://mode.is/enabled" else "https://marcpg.com/neobb/lang/all"))
         connectDatabase()
 
         StructureManager.load()
@@ -52,7 +52,7 @@ class NeoBB : KotlinPlugin(NeoBB.Companion) {
     }
 
     private fun connectDatabase() {
-        if (Configuration.DATABASE_ENABLED) {
+        if (!Configuration.OFFLINE && Configuration.DATABASE_ENABLED) {
             try {
                 DATABASE = AutoCatchingSQLConnection(
                     DatabaseInfo(

@@ -13,6 +13,12 @@
 #################################################################################
 
 
+## If all online features should be disabled. ##
+# This primarily includes translations and the database.
+# Default: false
+offline: true
+
+
 ## The method of storing and loading structures. ##
 #   Available Methods:
 #     | -> local   : in the plugin folder
@@ -49,7 +55,7 @@ database:
   # If all userdata should be stored in a PostgreSQL database.
   enabled: false
 
-  # The address/ip of the database. Can be localhost.
+  # The address/ip of the database. Can be `localhost`.
   address: localhost
 
   # The port of the database. If set to 0, it will use the database's default port.
