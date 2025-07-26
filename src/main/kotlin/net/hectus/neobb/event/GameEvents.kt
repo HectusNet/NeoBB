@@ -1,9 +1,6 @@
 package net.hectus.neobb.event
 
 import com.destroystokyo.paper.event.server.ServerTickEndEvent
-import com.marcpg.libpg.display.playSound
-import com.marcpg.libpg.util.asString
-import com.marcpg.libpg.util.bukkitRun
 import com.marcpg.libpg.util.bukkitRunLater
 import net.hectus.neobb.NeoBB
 import net.hectus.neobb.game.GameManager
@@ -13,7 +10,6 @@ import net.hectus.neobb.util.Ticking
 import net.hectus.neobb.util.playerEventAction
 import org.bukkit.GameMode
 import org.bukkit.Material
-import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -25,7 +21,6 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent
 import org.bukkit.event.entity.PlayerDeathEvent
-import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
@@ -44,21 +39,22 @@ class GameEvents : Listener {
 
     @EventHandler(ignoreCancelled = true)
     fun onPlayerDropItem(event: PlayerDropItemEvent) {
-        playerEventAction(event.player, false) { p ->
-            if (event.player.openInventory.topInventory.type == InventoryType.CHEST) {
-                event.isCancelled = true
-
-                val itemName = event.itemDrop.itemStack.displayName().asString().removePrefix("[").removeSuffix("]")
-                val turn = p.game.info.turns.firstOrNull { it.name == itemName }
-
-                if (turn != null) {
-                    p.inventory.sell(turn)
-                    bukkitRun { p.inventory.sync() }
-                } else {
-                    p.playSound(Sound.ENTITY_VILLAGER_NO)
-                }
-            }
-        }
+        if (event.player.gameMode != GameMode.CREATIVE)
+            event.isCancelled = true
+//        playerEventAction(event.player, false) { p ->
+//            if (event.player.openInventory.topInventory.type == InventoryType.CHEST) {
+//
+//                val itemName = event.itemDrop.itemStack.displayName().asString().removePrefix("[").removeSuffix("]")
+//                val turn = p.game.info.turns.firstOrNull { it.name == itemName }
+//
+//                if (turn != null) {
+//                    p.inventory.sell(turn)
+//                    bukkitRun { p.inventory.sync() }
+//                } else {
+//                    p.playSound(Sound.ENTITY_VILLAGER_NO)
+//                }
+//            }
+//        }
     }
 
     @EventHandler(ignoreCancelled = true)
