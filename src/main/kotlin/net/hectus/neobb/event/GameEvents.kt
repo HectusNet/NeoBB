@@ -5,6 +5,7 @@ import com.marcpg.libpg.util.bukkitRunLater
 import net.hectus.neobb.NeoBB
 import net.hectus.neobb.game.GameManager
 import net.hectus.neobb.game.mode.HectusGame
+import net.hectus.neobb.modes.turn.default_game.TMagmaBlock
 import net.hectus.neobb.util.Modifiers
 import net.hectus.neobb.util.Ticking
 import net.hectus.neobb.util.playerEventAction
@@ -65,7 +66,7 @@ class GameEvents : Listener {
                 return@playerEventAction
             }
 
-            if (p.game is HectusGame && event.to.clone().subtract(0.0, 0.1, 0.0).block.type == Material.MAGMA_BLOCK) {
+            if (p.game is HectusGame && event.to.clone().subtract(0.0, 0.1, 0.0).block.type == Material.MAGMA_BLOCK && p.game.history.last().turn != TMagmaBlock && !p.player.isInsideVehicle) {
                 p.game.eliminate(p)
             } else if (event.hasChangedPosition() && p.game.outOfBounds(p.cord(), event)) {
                 p.game.onOutOfBounds(p)
