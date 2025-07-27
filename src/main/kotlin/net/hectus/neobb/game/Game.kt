@@ -156,6 +156,8 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         return turn.clazz == null || !difficulty.completeRules || turn is WarpTurn || turn.clazz in allowed
     }
 
+    open fun targetPlayer(player: NeoPlayer, beam: Boolean = false): NeoPlayer? = players.following(player)
+
     // ==================================================
     // ============= CLOSED UTILITY METHODS =============
     // ==================================================
@@ -292,7 +294,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
 
     fun <T> turn(exec: TurnExec<T>, event: Cancellable? = null) {
         val player = exec.player
-        val nextPlayer = player.nextPlayer()
+        val nextPlayer = player.targetPlayer()
         val turn = exec.turn
 
         var allowed = false

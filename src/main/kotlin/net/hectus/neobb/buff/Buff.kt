@@ -16,7 +16,7 @@ import java.util.*
 abstract class Buff<T>(protected val data: T, protected val target: BuffTarget) {
     enum class BuffTarget(private val getter: (NeoPlayer) -> MinecraftReceiver) {
         YOU({ it }),
-        NEXT({ it.nextPlayer() }),
+        NEXT({ it.targetPlayer() }),
         OPPONENTS({ it.opponents().receiver() }),
         ALL({ it.game.target() });
 

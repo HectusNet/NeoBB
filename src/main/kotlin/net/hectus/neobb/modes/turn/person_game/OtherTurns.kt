@@ -47,7 +47,7 @@ object PTPainting : OtherTurn<Painting>("painting"), BuffCategory {
             Art.SEA, Art.BUST -> exec.game.eliminate(exec.player)
             Art.CREEBET -> {
                 val gui = Gui.normal().setStructure("0 1 2 3 4 5 6 7 8 9")
-                val deck = exec.player.nextPlayer().inventory.deck
+                val deck = exec.player.targetPlayer().inventory.deck
                 for (i in deck.indices)
                     gui.addIngredient(('0'.code + i).toChar(), deck[i] ?: ItemStack.empty())
                 Window.single().setTitle("Opponent Deck").setGui(gui.build()).open(exec.player.player)
@@ -73,7 +73,7 @@ object PTPainting : OtherTurn<Painting>("painting"), BuffCategory {
                 ExtraTurn().invoke(exec.player)
                 exec.player.addArmor(1.0)
             }
-            Art.WITHER -> exec.game.eliminate(if (Randomizer.boolByChance(20.0)) exec.player.nextPlayer() else exec.player)
+            Art.WITHER -> exec.game.eliminate(if (Randomizer.boolByChance(20.0)) exec.player.targetPlayer() else exec.player)
         }
     }
 }

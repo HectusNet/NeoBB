@@ -18,7 +18,7 @@ object TTimeLimit : OtherTurn<Time>("time_limit") {
     override fun apply(exec: TurnExec<Time>) {
         exec.player.sendMessage(exec.player.locale().component("gameplay.info.too-slow.player", exec.data.toString(), color = Colors.NEGATIVE))
         exec.player.opponents(false).forEach { p ->
-            p.sendMessage(p.locale().component("gameplay.info.too-slow." + (if (p == exec.player.nextPlayer()) "next" else "others"), exec.player.nextPlayer().name(), color = Colors.NEUTRAL))
+            p.sendMessage(p.locale().component("gameplay.info.too-slow." + (if (p == exec.player.targetPlayer()) "next" else "others"), exec.player.targetPlayer().name(), color = Colors.NEUTRAL))
         }
     }
 }

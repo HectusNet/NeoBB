@@ -131,8 +131,8 @@ object TPufferfish : MobTurn<PufferFish>("pufferfish"), BuffFunction {
 
     override fun apply(exec: TurnExec<PufferFish>) {
         exec.player.game.turnScheduler.runTaskLater(ScheduleID.POISON, 2) {
-            if (exec.player.nextPlayer().player.hasPotionEffect(PotionEffectType.POISON))
-                exec.player.game.eliminate(exec.player.nextPlayer())
+            if (exec.player.targetPlayer().player.hasPotionEffect(PotionEffectType.POISON))
+                exec.player.game.eliminate(exec.player.targetPlayer())
         }
     }
 }

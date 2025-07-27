@@ -16,7 +16,7 @@ import org.bukkit.entity.Player
 abstract class HectusGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDifficulty = GameDifficulty.NORMAL) : BossBarGame(world, bukkitPlayers, difficulty) {
     override fun executeTurn(exec: TurnExec<*>): Boolean {
         val player = exec.player
-        val nextPlayer = player.nextPlayer()
+        val nextPlayer = player.targetPlayer()
 
         if (exec.turn is CounterFunction) {
             if (exec.turn.counterLogic(exec)) {

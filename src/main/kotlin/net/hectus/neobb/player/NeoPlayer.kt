@@ -2,7 +2,6 @@ package net.hectus.neobb.player
 
 import com.marcpg.libpg.display.*
 import com.marcpg.libpg.util.MinecraftTime
-import com.marcpg.libpg.util.following
 import net.hectus.neobb.game.Game
 import net.hectus.neobb.game.mode.PersonGame
 import net.hectus.neobb.modes.shop.Shop
@@ -58,7 +57,8 @@ class NeoPlayer(player: Player, val game: Game): PlayerMinecraftReceiver(player)
         simpleActionBar?.start()
     }
 
-    fun nextPlayer(): NeoPlayer = game.players.following(this) ?: this
+    fun targetPlayer(beam: Boolean = false): NeoPlayer = game.targetPlayer(this, beam) ?: this
+    fun targetPlayerOrNull(beam: Boolean = false): NeoPlayer? = game.targetPlayer(this, beam)
 
     fun opponents(onlyAlive: Boolean = true): MutableList<NeoPlayer> {
         return (if (onlyAlive) game.players else game.initialPlayers).filter { it != this }.toMutableList()

@@ -16,7 +16,7 @@ abstract class InteractableCardTurn(namespace: String) : CardTurn(namespace) {
         if (interactions <= maxInteractions && System.currentTimeMillis() - lastInteraction <= interactionIntervalMs) {
             lastInteraction = System.currentTimeMillis()
             interactions++
-            player.nextPlayer().damage(damage!!)
+            player.targetPlayer().damage(damage!!)
         }
     }
 }

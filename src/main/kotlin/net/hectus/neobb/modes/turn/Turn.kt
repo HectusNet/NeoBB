@@ -70,7 +70,7 @@ abstract class Turn<T>(
             }
         }
 
-        return this !is AttackFunction || !player.nextPlayer().hasModifier(Modifiers.Player.Default.DEFENDED)
+        return this !is AttackFunction || !player.targetPlayer().hasModifier(Modifiers.Player.Default.DEFENDED)
     }
 
     fun translation(locale: Locale): String = translationOrNull(locale) ?: name

@@ -29,10 +29,10 @@ object TBoat : OtherTurn<Boat>("boat"), EventFunction {
     override val mainItem: ItemStack = ItemStack.of(Material.OAK_BOAT)
 
     override fun triggerEvent(exec: TurnExec<*>) {
-        exec.player.nextPlayer().addModifier(Modifiers.Player.Default.BOAT_DAMAGE)
+        exec.player.targetPlayer().addModifier(Modifiers.Player.Default.BOAT_DAMAGE)
         bukkitRunTimer(0, 20) { r ->
-            if (exec.player.nextPlayer().hasModifier(Modifiers.Player.Default.BOAT_DAMAGE)) {
-                exec.player.nextPlayer().damage(1.0)
+            if (exec.player.targetPlayer().hasModifier(Modifiers.Player.Default.BOAT_DAMAGE)) {
+                exec.player.targetPlayer().damage(1.0)
             } else {
                 r.cancel()
             }

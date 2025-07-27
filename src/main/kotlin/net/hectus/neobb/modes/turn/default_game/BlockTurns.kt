@@ -242,9 +242,9 @@ object TLava : BlockTurn("lava"), BuffFunction {
     override val mainItem: ItemStack = ItemStack.of(Material.LAVA_BUCKET)
 
     override fun apply(exec: TurnExec<Block>) {
-        exec.player.nextPlayer().player.fireTicks = 6000
+        exec.player.targetPlayer().player.fireTicks = 6000
         exec.game.turnScheduler.runTaskLater(ScheduleID.BURN, 3) {
-            exec.game.eliminate(exec.player.nextPlayer())
+            exec.game.eliminate(exec.player.targetPlayer())
         }
     }
 }
@@ -361,9 +361,9 @@ object TPowderSnow : BlockTurn("powder_snow"), BuffFunction {
     override val mainItem: ItemStack = ItemStack.of(Material.POWDER_SNOW_BUCKET)
 
     override fun apply(exec: TurnExec<Block>) {
-        exec.player.nextPlayer().player.freezeTicks = 6000
+        exec.player.targetPlayer().player.freezeTicks = 6000
         exec.game.turnScheduler.runTaskLater(ScheduleID.FREEZE, 3) {
-            exec.game.eliminate(exec.player.nextPlayer())
+            exec.game.eliminate(exec.player.targetPlayer())
         }
     }
 }

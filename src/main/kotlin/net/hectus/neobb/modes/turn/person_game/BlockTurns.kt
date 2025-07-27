@@ -42,7 +42,7 @@ object PTBirchLog : BlockTurn("birch_log"), AttackCategory {
     override fun counteredBy(): List<Turn<*>> = listOf(PTPinkCarpet, PTGreenCarpet)
 
     override fun apply(exec: TurnExec<Block>) {
-        exec.player.nextPlayer().damage(2.0, true)
+        exec.player.targetPlayer().damage(2.0, true)
     }
 }
 
@@ -65,7 +65,7 @@ object PTBlueConcrete : BlockTurn("blue_concrete"), AttackCategory {
 
     override fun apply(exec: TurnExec<Block>) {
         if (exec.game.warp is PTIceWarp)
-            exec.player.nextPlayer().damage(2.0)
+            exec.player.targetPlayer().damage(2.0)
     }
 }
 
@@ -93,7 +93,7 @@ object PTBrainCoral : BlockTurn("brain_coral"), WinConCategory {
 
     override fun counteredBy(): List<Turn<*>> = listOf(PTIronTrapdoor)
 
-    override fun unusable(player: NeoPlayer): Boolean = player.nextPlayer().health > 4.0
+    override fun unusable(player: NeoPlayer): Boolean = player.targetPlayer().health > 4.0
 }
 
 object PTBrownStainedGlass : BlockTurn("brown_stained_glass"), DefensiveCategory {
@@ -145,7 +145,7 @@ object PTDiamondBlock : BlockTurn("diamond_block"), AttackCategory {
 
     override fun apply(exec: TurnExec<Block>) {
         if (exec.game.warp is PTVillagerWarp)
-            exec.player.nextPlayer().damage(2.0)
+            exec.player.targetPlayer().damage(2.0)
     }
 }
 
@@ -194,7 +194,7 @@ object PTGrayWool : BlockTurn("gray_wool"), AttackCategory {
     override fun counteredBy(): List<Turn<*>> = listOf(PTNoteBlock, PTGoldBlock)
 
     override fun apply(exec: TurnExec<Block>) {
-        exec.player.nextPlayer().damage(2.0, true)
+        exec.player.targetPlayer().damage(2.0, true)
     }
 }
 
@@ -246,7 +246,7 @@ object PTPurpleWool : BlockTurn("purple_wool"), WinConCategory {
 
     override fun counteredBy(): List<Turn<*>> = listOf(PTBlackCarpet)
 
-    override fun unusable(player: NeoPlayer): Boolean = player.nextPlayer().health > 4.0
+    override fun unusable(player: NeoPlayer): Boolean = player.targetPlayer().health > 4.0
 }
 
 object PTRedStainedGlass : BlockTurn("red_stained_glass"), DefensiveCategory {
@@ -271,7 +271,7 @@ object PTRedWool : BlockTurn("red_wool"), AttackCategory {
 
     override fun apply(exec: TurnExec<Block>) {
         if (exec.game.warp is PTFireWarp)
-            exec.player.nextPlayer().damage(2.0)
+            exec.player.targetPlayer().damage(2.0)
     }
 }
 
@@ -293,7 +293,7 @@ object PTVerdantFroglight : BlockTurn("verdant_froglight"), WinConCategory {
 
     override fun counteredBy(): List<Turn<*>> = listOf(PTFenceGate)
 
-    override fun unusable(player: NeoPlayer): Boolean = player.nextPlayer().health > 4.0
+    override fun unusable(player: NeoPlayer): Boolean = player.targetPlayer().health > 4.0
 }
 
 object PTWhiteStainedGlass : BlockTurn("white_stained_glass"), DefensiveCategory {
@@ -318,6 +318,6 @@ object PTWhiteWool : BlockTurn("white_wool"), AttackCategory {
 
     override fun apply(exec: TurnExec<Block>) {
         if (exec.game.warp is PTSnowWarp)
-            exec.player.nextPlayer().damage(2.0)
+            exec.player.targetPlayer().damage(2.0)
     }
 }
