@@ -64,11 +64,14 @@ class NeoPlayer(player: Player, val game: Game): PlayerMinecraftReceiver(player)
         return (if (onlyAlive) game.players else game.initialPlayers).filter { it != this }.toMutableList()
     }
 
-    fun clean() {
-        simpleScoreboard?.stop()
-        simpleActionBar?.stop()
+    fun clean(display: Boolean = false) {
+        if (display) {
+            simpleScoreboard?.stop()
+            simpleActionBar?.stop()
 
-        player.scoreboard = Bukkit.getScoreboardManager().mainScoreboard
+            player.scoreboard = Bukkit.getScoreboardManager().mainScoreboard
+        }
+
         player.closeInventory()
         player.inventory.clear()
         player.clearActivePotionEffects()

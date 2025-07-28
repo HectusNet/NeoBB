@@ -9,6 +9,7 @@ import net.hectus.neobb.NeoBB
 import net.hectus.neobb.external.rating.Rank
 import net.hectus.neobb.external.rating.Rank.Companion.toRankTranslations
 import net.hectus.neobb.game.Game
+import net.hectus.neobb.game.GameCompanion
 import net.hectus.neobb.game.util.GameDifficulty
 import net.hectus.neobb.game.util.GameInfo
 import net.hectus.neobb.modes.lore.PersonItemLoreBuilder
@@ -31,13 +32,20 @@ import org.bukkit.entity.Player
  * Source: [Semi-Official Google Document](https://docs.google.com/document/d/1SOp-fDTZqx2l3XJoT0zqf4CDuTNCffU2pTejKrzEGO4)
  */
 class PersonGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDifficulty = GameDifficulty.NORMAL) : Game(world, bukkitPlayers, difficulty) {
-    override val info: GameInfo = GameInfo(
-        namespace = "person",
-        startingHealth = 10.0,
-        turnTimer = 10,
-        shop = PersonShop::class,
-        loreBuilder = PersonItemLoreBuilder::class,
-    )
+    companion object : GameCompanion<PersonGame> {
+        override val gameConstructor: (World, List<Player>, GameDifficulty) -> PersonGame =
+            { w, p, d -> PersonGame(w, p, d) }
+
+        override val gameInfo: GameInfo = GameInfo(
+            namespace = "person",
+            startingHealth = 10.0,
+            turnTimer = 10,
+            shop = PersonShop::class,
+            loreBuilder = PersonItemLoreBuilder::class,
+        )
+    }
+
+    override val info: GameInfo = gameInfo
 
     override val scoreboard: ((NeoPlayer) -> SimpleScoreboard)? = { p -> SimpleScoreboard(p, 5, MiniMessage.miniMessage().deserialize("<bold><#328825>Block <#37BF1F>Battles <reset><#9D9D9D>Alpha " + NeoBB.VERSION),
         BlankScoreboardEntry(),

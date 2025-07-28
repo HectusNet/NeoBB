@@ -1,11 +1,18 @@
-package net.hectus.neobb.modes.turn
+package net.hectus.neobb
 
+import net.hectus.neobb.game.mode.CardGame
+import net.hectus.neobb.game.mode.DefaultGame
+import net.hectus.neobb.game.mode.PersonGame
+import net.hectus.neobb.game.mode.PvpGame
+import net.hectus.neobb.matrix.structure.StructureManager
 import net.hectus.neobb.modes.turn.card_game.*
 import net.hectus.neobb.modes.turn.default_game.*
 import net.hectus.neobb.modes.turn.person_game.*
+import net.hectus.neobb.util.Colors
+import net.hectus.neobb.util.Modifiers
 
-object TurnRegistry {
-    val turns = listOf<Turn<*>>(
+object Registry {
+    val turns = listOf(
         TTimeLimit, TDefaultWarp,
 
         // CardTurns.kt
@@ -94,4 +101,37 @@ object TurnRegistry {
         PTAmethystWarp,     PTFireWarp,         PTIceWarp,          PTSnowWarp,
         PTVillagerWarp,     PTVoidWarp,
     ).sortedBy { it.namespace }
+
+    val modes = listOf(
+        CardGame,
+        DefaultGame,
+        PersonGame,
+        PvpGame,
+    ).associateBy { it.gameInfo.namespace }
+
+    val colors = listOf(
+        Colors.ACCENT, Colors.SECONDARY,
+        Colors.GREEN, Colors.YELLOW, Colors.RED, Colors.BLUE,
+        Colors.PERSON_0, Colors.PERSON_1, Colors.PERSON_2, Colors.PERSON_3, Colors.PERSON_4,
+        Colors.POSITIVE, Colors.NEUTRAL, Colors.NEGATIVE, Colors.LINK,
+        Colors.EXTRA, Colors.RESET,
+    )
+
+    val modifiers = Modifiers.Player.entries + Modifiers.Player.Default.entries + Modifiers.Game.entries + Modifiers.Game.Person.entries
+
+    /**
+     * Doesn't do any loading logic, but still forces this singleton object to initialize itself.
+     *
+     * Also shows some information about the loaded registry elements.
+     */
+    fun load() {
+        NeoBB.LOG.info("[Registry] Loaded ${turns.size} turns as list.")
+        NeoBB.LOG.info("[Registry] Loaded ${turns.count { it is WarpTurn }} warps as part of turn list.")
+
+        NeoBB.LOG.info("[Registry] Loaded ${modes.size} modes as map.")
+        NeoBB.LOG.info("[Registry] Loaded ${colors.size} colors as list.")
+        NeoBB.LOG.info("[Registry] Loaded ${modifiers.size} modifiers as list.")
+
+        NeoBB.LOG.info("[Registry] Loaded ${StructureManager.LOADED.size} structures externally.")
+    }
 }

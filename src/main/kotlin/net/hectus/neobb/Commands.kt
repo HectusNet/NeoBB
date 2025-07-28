@@ -10,9 +10,6 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import net.hectus.neobb.external.cosmetic.PlaceParticle
 import net.hectus.neobb.external.cosmetic.PlayerAnimation
 import net.hectus.neobb.game.GameManager
-import net.hectus.neobb.game.mode.CardGame
-import net.hectus.neobb.game.mode.DefaultGame
-import net.hectus.neobb.game.mode.PersonGame
 import net.hectus.neobb.game.util.GameDifficulty
 import net.hectus.neobb.matrix.structure.Structure
 import net.hectus.neobb.matrix.structure.StructureManager
@@ -21,12 +18,10 @@ import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 
 object Commands {
-    val MODES = listOf("default", "card", "person98")
-
     val game = command("game") {
         require("neobb.games")
         subcommand("start") {
-            argument("mode", ExtendedArgumentTypes.valued { MODES }.paper()) {
+            argument("mode", ExtendedArgumentTypes.valued { Registry.modes.keys }.paper()) {
                 argument("difficulty", ExtendedArgumentTypes.enum(GameDifficulty::class.java).paper()) {
                     argument("players", ArgumentTypes.players()) {
                         action { context ->
@@ -39,11 +34,11 @@ object Commands {
                                 return@action source.locale().component("command.games.start.not_enough_players", color = Colors.NEGATIVE)
 
                             runCatching {
-                                when (context.arg("mode", StringArgumentType.word())) {
-                                    "default" -> DefaultGame(players.last().world, players, difficulty).init()
-                                    "card" -> CardGame(players.last().world, players, difficulty).init()
-                                    "person98" -> PersonGame(players.last().world, players, difficulty).init()
-                                    else -> return@action source.locale().component("command.games.start.unknown_mode", color = Colors.NEGATIVE)
+                                val mode = Registry.modes[context.arg("mode", StringArgumentType.word())]
+                                if (mode != null) {
+                                    mode.gameConstructor(players.last().world, players, difficulty).init()
+                                } else {
+                                    return@action source.locale().component("command.games.start.unknown_mode", color = Colors.NEGATIVE)
                                 }
                             }.onFailure {
                                 NeoBB.LOG.error("Could not start match!", it)

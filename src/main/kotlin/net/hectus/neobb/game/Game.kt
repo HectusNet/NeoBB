@@ -153,7 +153,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
     open fun onOutOfBounds(player: NeoPlayer) = eliminate(player)
 
     open fun allows(turn: Turn<*>): Boolean {
-        return turn.clazz == null || !difficulty.completeRules || turn is WarpTurn || turn.clazz in allowed
+        return turn.clazz == null || turn.clazz == TurnClazz.NEUTRAL || !difficulty.completeRules || turn is WarpTurn || turn.clazz in allowed
     }
 
     open fun targetPlayer(player: NeoPlayer, beam: Boolean = false): NeoPlayer? = players.following(player)
@@ -182,7 +182,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
     }
 
     fun turnCountdownTick() {
-        if (--turnCountdown <= 0) {
+        if (--turnCountdown == 0) {
             if (history.size >= players.size && history.subList(history.size - players.size, history.size).all { it.turn === TTimeLimit }) {
                 players.forEach { it.sendMessage(it.locale().component("gameplay.info.ending.too-slow", color = Colors.NEUTRAL)) }
                 draw(false)
@@ -301,9 +301,9 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
 
         when {
             Constants.CHECK_WARP_CLASSES && !allows(turn) -> {
-                notAllowed(exec, "${player.name()} can't use ${turn.name} in the current warp.", "gameplay.info.not_allowed.class", turn.clazz?.name?.lowercase() ?: "unknown", warp.name)
+                notAllowed(exec, "${player.name()} can't use ${turn.name} in the current warp.", "gameplay.info.not_allowed.class", turn.clazz?.name?.toTitleCase() ?: "Unknown", warp.name)
             }
-            turn is WarpTurn && !hasModifier(Modifiers.Game.NO_WARP.name + "_" + turn.namespace) -> {
+            turn is WarpTurn && hasModifier(Modifiers.Game.NO_WARP.name + "_" + turn.namespace) -> {
                 notAllowed(exec, "${player.name()} can't use ${turn.name} right now.", "gameplay.info.not_allowed.warp_filter", turn.name)
             }
             outOfBounds(exec.cord ?: warp.bounds.center3D, event) -> {
@@ -421,7 +421,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
 
     fun end(force: Boolean = false) {
         initialPlayers.forEach {
-            it.clean()
+            it.clean(display = true)
             it.team.unregister()
         }
         GameManager.remove(this)

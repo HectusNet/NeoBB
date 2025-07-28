@@ -11,7 +11,7 @@ object Constants {
     const val MAX_PLAYER_RD = 350.0
 
     const val MINECRAFT_TAB_CHAR = "   "
-    const val MAX_LORE_WIDTH = 32
+    const val MAX_LORE_WIDTH = 48
 
     const val GAME_ID_LENGTH = 16
     const val GAME_ID_CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789"

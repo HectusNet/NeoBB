@@ -12,7 +12,6 @@ import net.hectus.neobb.event.PlayerEvents
 import net.hectus.neobb.event.TurnEvents
 import net.hectus.neobb.game.GameManager
 import net.hectus.neobb.matrix.structure.StructureManager
-import net.hectus.neobb.modes.turn.TurnRegistry
 import net.hectus.neobb.util.Configuration
 import org.bukkit.Bukkit
 import xyz.xenondevs.invui.InvUI
@@ -45,7 +44,7 @@ class NeoBB : KotlinPlugin(Companion) {
             ServerUtils.Cmd(Commands.structure, "Manage the NeoBB structures.", "neobb-structure"),
         )
 
-        /* Force call of `init {}` block: */ TurnRegistry
+        Registry.load()
     }
 
     override fun disable() {

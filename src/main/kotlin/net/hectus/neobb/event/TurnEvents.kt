@@ -52,6 +52,9 @@ class TurnEvents: Listener {
 
         val block = event.block
 
+        if (block.type == Material.NOTE_BLOCK)
+            return
+
         player!!.game.resetTurnCountdown()
         if (player.game.info.hasStructures && StructureManager.MATERIALS.contains(block.type)) {
             if (player.game.arena.placedBlocks == 0) {

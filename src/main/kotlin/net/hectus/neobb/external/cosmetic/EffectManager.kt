@@ -36,7 +36,10 @@ class EffectManager {
     }
 
     fun highlightBlock(block: Block, player: NeoPlayer) {
-        val display = block.world.spawn(block.location, BlockDisplay::class.java)
+        val offset = (1.0 - Constants.HIGHLIGHT_SCALE) / 2
+        val location = block.location.clone().add(offset, offset, offset)
+
+        val display = block.world.spawn(location, BlockDisplay::class.java)
         display.block = block.blockData.clone()
         display.transformation = Transformation(
             Vector3f(0.0f),

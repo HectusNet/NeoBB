@@ -48,7 +48,7 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
                     "item" to Pair(Material.STICK) { it is ItemTurn },
                     "mob" to Pair(Material.CREEPER_SPAWN_EGG) { it is MobTurn },
                     "throwable" to Pair(Material.EGG) { it is ThrowableTurn },
-                    "structures" to Pair(Material.BAMBOO_BLOCK) { it is StructureTurn },
+                    "structure" to Pair(Material.BAMBOO_BLOCK) { it is StructureTurn },
                     "glass-wall" to Pair(Material.PURPLE_STAINED_GLASS) { it is GlassWallTurn },
                     "other" to Pair(Material.STRUCTURE_BLOCK) { it is OtherTurn },
                 ), "usage")

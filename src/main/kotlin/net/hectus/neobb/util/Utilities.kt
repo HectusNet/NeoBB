@@ -7,6 +7,7 @@ import com.marcpg.libpg.util.toCord
 import net.hectus.neobb.game.GameManager
 import net.hectus.neobb.player.NeoPlayer
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Location
 import org.bukkit.Sound
@@ -47,6 +48,8 @@ object Utilities {
         val time = ZonedDateTime.now(ZoneOffset.UTC).toLocalTime()
         return time.isAfter(LocalTime.of(8, 0)) && time.isBefore(LocalTime.of(20, 0))
     }
+
+    fun colorTransition(color1: TextColor, color2: TextColor, progress: Number): TextColor = TextColor.lerp(progress.toFloat(), color1, color2)
 }
 
 data class Bounds(

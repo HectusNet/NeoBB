@@ -1,12 +1,12 @@
 package net.hectus.neobb.game.util
 
 import com.marcpg.libpg.data.time.Time
+import net.hectus.neobb.Registry
 import net.hectus.neobb.event.TurnEvent
 import net.hectus.neobb.modes.lore.DummyItemLoreBuilder
 import net.hectus.neobb.modes.lore.ItemLoreBuilder
 import net.hectus.neobb.modes.shop.Shop
 import net.hectus.neobb.modes.turn.Turn
-import net.hectus.neobb.modes.turn.TurnRegistry
 import net.hectus.neobb.modes.turn.default_game.StructureTurn
 import org.bukkit.block.Block
 import org.bukkit.entity.Projectile
@@ -23,7 +23,7 @@ data class GameInfo(
     val turnTimer: Int = -1,
     val shop: KClass<out Shop>,
     val loreBuilder: KClass<out ItemLoreBuilder> = DummyItemLoreBuilder::class,
-    val turns: List<Turn<*>> = TurnRegistry.turns.filter { it.mode == "any" || it.mode == namespace },
+    val turns: List<Turn<*>> = Registry.turns.filter { it.mode == "any" || it.mode == namespace },
 ) {
     val customEvents = mutableListOf<Turn<*>>()
     val blockEvents = mutableListOf<Turn<Block>>()
@@ -37,7 +37,10 @@ data class GameInfo(
             when (turn.event) {
                 TurnEvent.CUSTOM -> customEvents.add(turn)
                 TurnEvent.BLOCK -> blockEvents.add(turn as Turn<Block>)
-                TurnEvent.FLOWER -> flowerEvents.add(turn as Turn<Block>)
+                TurnEvent.FLOWER -> {
+                    flowerEvents.add(turn as Turn<Block>)
+                    blockEvents.add(turn)
+                }
                 TurnEvent.STRUCTURE -> structureEvents.add(turn as StructureTurn)
                 TurnEvent.THROW -> throwEvents.add(turn as Turn<Projectile>)
                 else -> {}
