@@ -130,8 +130,7 @@ object Commands {
                 action { context ->
                     val name = context.arg("name", String::class.java)
                     val structure = StructureManager[name]
-                    if (structure == null)
-                        return@action component("Could not find structure with name: $name", Colors.NEGATIVE)
+                        ?: return@action component("Could not find structure with name: $name", Colors.NEGATIVE)
 
                     StructureManager.remove(structure)
                     return@action component("Successfully removed structure with name: ${structure.name}", Colors.NEUTRAL)
@@ -155,8 +154,7 @@ object Commands {
                         val location = context.arg("location", ArgumentTypes.blockPosition()).resolve(context.source).toLocation(context.source.location.world)
 
                         val structure = StructureManager[name]
-                        if (structure == null)
-                            return@action component("Could not find structure with name: $name", Colors.NEGATIVE)
+                            ?: return@action component("Could not find structure with name: $name", Colors.NEGATIVE)
 
                         val obstructed = structure.place(location, false)
                         return@action when {

@@ -42,7 +42,7 @@ object Configuration {
         MAX_ARENA_HEIGHT = CONFIG.getInt("max-arena-height", 9)
 
         try {
-            Files.createDirectories(STRUCTURE_MODE.pathSupplier.invoke())
+            Files.createDirectories(STRUCTURE_MODE.pathSupplier())
         } catch (e: IOException) {
             NeoBB.LOG.error("Could not access and create structure directory.", e)
         }

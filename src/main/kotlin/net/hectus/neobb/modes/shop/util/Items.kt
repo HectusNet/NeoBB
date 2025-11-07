@@ -25,7 +25,7 @@ object Items {
         override fun getItemProvider(): ItemProvider = ItemWrapper(item)
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            clickConsumer.invoke(player, event)
+            clickConsumer(player, event)
         }
     }
 

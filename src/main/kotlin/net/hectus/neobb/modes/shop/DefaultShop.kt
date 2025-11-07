@@ -111,7 +111,7 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
         return false
     }
 
-    private fun syncContent() = gui.setContent(content { turn -> filter.values.all { it.second.invoke(turn) } })
+    fun syncContent() = gui.setContent(content { turn -> filter.values.all { it.second(turn) } })
 
     private fun filterUsageMenu(filters: Map<String, Pair<Material, (Turn<*>) -> Boolean>>, category: String) {
         val locale = player.locale()

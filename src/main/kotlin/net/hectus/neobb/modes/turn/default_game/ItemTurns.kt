@@ -21,7 +21,7 @@ abstract class ItemTurn(namespace: String) : Turn<ItemStack>(namespace) {
 
 object TChorusFruit : ItemTurn("chorus_fruit"), EventFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.NEUTRAL
+    override val clazz: TurnClazz = TurnClazz.NEUTRAL
     override val cost: Int = 2
 
     override fun triggerEvent(exec: TurnExec<*>) {
@@ -34,7 +34,7 @@ object TChorusFruit : ItemTurn("chorus_fruit"), EventFunction {
 
 object TIronShovel : ItemTurn("iron_shovel"), CounterbuffFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.NEUTRAL
+    override val clazz: TurnClazz = TurnClazz.NEUTRAL
     override val cost: Int = 5
 
     override val counters: List<CounterFilter> = listOf(

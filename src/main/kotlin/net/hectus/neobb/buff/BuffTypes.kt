@@ -28,7 +28,7 @@ class ExtraTurn(data: Int = 1, target: BuffTarget = BuffTarget.YOU): Buff<Int>(d
         target.addModifier(Modifiers.Player.EXTRA_TURN)
 
         if (data > 1) { // Not nice, but works. Too lazy to create a proper way.
-            for (i in 1..<data) source.game.turnScheduler.runTaskLater(ScheduleID.EXTRA_TURN, i) {
+            for (i in 1 until data) source.game.turnScheduler.runTaskLater(ScheduleID.EXTRA_TURN, i) {
                 target.addModifier(Modifiers.Player.EXTRA_TURN)
             }
         }

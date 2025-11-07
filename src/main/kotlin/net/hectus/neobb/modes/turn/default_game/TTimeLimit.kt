@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack
 object TTimeLimit : OtherTurn<Time>("time_limit") {
     override val mode: String = "any"
     override val event: TurnEvent = TurnEvent.NONE
-    override val clazz: TurnClazz? = TurnClazz.NEUTRAL
+    override val clazz: TurnClazz = TurnClazz.NEUTRAL
     override val mainItem: ItemStack = ItemStack.of(Material.CLOCK)
 
     override fun apply(exec: TurnExec<Time>) {

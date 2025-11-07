@@ -55,7 +55,7 @@ object PTPainting : OtherTurn<Painting>("painting"), BuffCategory {
             Art.SUNSET -> {
                 val players = exec.game.players
                 val temp = players.first().health
-                for (i in 0..<players.size - 1) {
+                for (i in 0 until players.size - 1) {
                     players[i].health = players[i + 1].health
                 }
                 players.last().health = temp

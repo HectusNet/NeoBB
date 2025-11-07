@@ -60,7 +60,7 @@ object TCornflower : FlowerTurn("cornflower") {
 
 object TDirt : BlockTurn("dirt") {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.NATURE
+    override val clazz: TurnClazz = TurnClazz.NATURE
     override val cost: Int = 2
 
     override val isCombo: Boolean = true
@@ -68,7 +68,7 @@ object TDirt : BlockTurn("dirt") {
 
 object TFlowerPot : BlockTurn("flower_pot") {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.NATURE
+    override val clazz: TurnClazz = TurnClazz.NATURE
     override val cost: Int = 2
 
     override val isCombo: Boolean = true
@@ -106,7 +106,7 @@ object TPoppy : FlowerTurn("poppy") {
     override fun apply(exec: TurnExec<Block>) {
         val players = exec.game.players
         val temp: NeoInventory = players.first().inventory
-        for (i in 0..<players.size - 1) {
+        for (i in 0 until players.size - 1) {
             players[i].inventory = players[i + 1].inventory
         }
         players.last().inventory = temp

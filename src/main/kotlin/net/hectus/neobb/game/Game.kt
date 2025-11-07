@@ -88,7 +88,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         resetTurnCountdown()
 
         val playerCount = players.size
-        for (i in 0..<playerCount) {
+        for (i in 0 until playerCount) {
             val angle = 2 * Math.PI * i / playerCount
             players[i].teleport(
                 cord = warp.bounds.center2D + Cord(Constants.SPAWN_POINT_RADIUS * cos(angle), 0.0, Constants.SPAWN_POINT_RADIUS * sin(angle)),
@@ -359,7 +359,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         if (exec.turn !== TTimeLimit) {
             runCatching {
                 if (exec.turn is StructureTurn) {
-                    exec.turn.referenceStructure.materials.forEach { m, a -> exec.player.inventory.clearFirst { i, _ -> i.type == m && i.amount == a } }
+                    exec.turn.referenceStructure.materials.forEach { (m, a) -> exec.player.inventory.clearFirst { i, _ -> i.type == m && i.amount == a } }
                 } else {
                     exec.player.inventory.clearSlot(exec.player.player.inventory.heldItemSlot)
                 }

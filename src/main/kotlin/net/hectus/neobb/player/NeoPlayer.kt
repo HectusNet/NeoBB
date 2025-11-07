@@ -92,7 +92,7 @@ class NeoPlayer(player: Player, val game: Game): PlayerMinecraftReceiver(player)
             playSound(Sound.ENCHANT_THORNS_HIT)
         }
 
-        this.health = this.health - finalDamage
+        this.health -= finalDamage
         if (finalDamage > 0.0)
             playSound(Sound.ENTITY_PLAYER_HURT, 0.5f)
     }
@@ -100,12 +100,12 @@ class NeoPlayer(player: Player, val game: Game): PlayerMinecraftReceiver(player)
     fun heal(health: Double) {
         if (game is PersonGame && game.time == MinecraftTime.MIDNIGHT) return
 
-        this.health = this.health - health
+        this.health -= health
         if (health > 0.0)
             playSound(Sound.BLOCK_BEACON_ACTIVATE, 0.5f)
     }
 
     fun addArmor(armor: Double) {
-        this.armor = this.armor + armor
+        this.armor += armor
     }
 }

@@ -34,7 +34,7 @@ abstract class StructureTurn(namespace: String) : Turn<PlacedStructure>(namespac
 
 object TDaylightSensorLine : StructureTurn("daylight_sensor_line"), CounterbuffFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.REDSTONE
+    override val clazz: TurnClazz = TurnClazz.REDSTONE
     override val cost: Int = 6
 
     override val staticStructure: StaticStructure = StaticStructures.Default.DAYLIGHT_SENSOR_LINE
@@ -48,7 +48,7 @@ object TDaylightSensorLine : StructureTurn("daylight_sensor_line"), CounterbuffF
 
 object TIronBarJail : StructureTurn("iron_bar_jail"), BuffFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.NEUTRAL
+    override val clazz: TurnClazz = TurnClazz.NEUTRAL
     override val cost: Int = 7
 
     override val staticStructure: StaticStructure = StaticStructures.Default.IRON_BAR_JAIL
@@ -75,7 +75,7 @@ object TIronBarJail : StructureTurn("iron_bar_jail"), BuffFunction {
 
 object TOakDoorTurtling : StructureTurn("oak_door_turtling"), DefenseFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.NEUTRAL
+    override val clazz: TurnClazz = TurnClazz.NEUTRAL
     override val maxAmount: Int = 1
     override val cost: Int = 4
 
@@ -99,7 +99,7 @@ object TOakDoorTurtling : StructureTurn("oak_door_turtling"), DefenseFunction {
 
 object TPumpkinWall : StructureTurn("pumpkin_wall"), BuffFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.NATURE
+    override val clazz: TurnClazz = TurnClazz.NATURE
     override val cost: Int = 5
 
     override val staticStructure: StaticStructure = StaticStructures.Default.PUMPKIN_WALL
@@ -113,7 +113,7 @@ object TPumpkinWall : StructureTurn("pumpkin_wall"), BuffFunction {
 
 object TRedstoneWall : StructureTurn("redstone_wall"), EventFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.REDSTONE
+    override val clazz: TurnClazz = TurnClazz.REDSTONE
     override val cost: Int = 4
 
     override val staticStructure: StaticStructure = StaticStructures.Default.REDSTONE_WALL
@@ -146,43 +146,43 @@ abstract class GlassWallTurn(namespace: String) : StructureTurn(namespace), Defe
 }
 
 object TBlueGlassWall : GlassWallTurn("blue_glass_wall") {
-    override val clazz: TurnClazz? = TurnClazz.WATER
+    override val clazz: TurnClazz = TurnClazz.WATER
 
     override val staticStructure: StaticStructure = StaticStructures.Default.GlassWall.BLUE
 }
 
 object TGlassWall : GlassWallTurn("glass_wall") {
-    override val clazz: TurnClazz? = TurnClazz.NEUTRAL
+    override val clazz: TurnClazz = TurnClazz.NEUTRAL
 
     override val staticStructure: StaticStructure = StaticStructures.Default.GlassWall.DEFAULT
 }
 
 object TGreenGlassWall : GlassWallTurn("green_glass_wall") {
-    override val clazz: TurnClazz? = TurnClazz.NATURE
+    override val clazz: TurnClazz = TurnClazz.NATURE
 
     override val staticStructure: StaticStructure = StaticStructures.Default.GlassWall.GREEN
 }
 
 object TOrangeGlassWall : GlassWallTurn("orange_glass_wall") {
-    override val clazz: TurnClazz? = TurnClazz.HOT
+    override val clazz: TurnClazz = TurnClazz.HOT
 
     override val staticStructure: StaticStructure = StaticStructures.Default.GlassWall.ORANGE
 }
 
 object TPinkGlassWall : GlassWallTurn("pink_glass_wall") {
-    override val clazz: TurnClazz? = TurnClazz.SUPERNATURAL
+    override val clazz: TurnClazz = TurnClazz.SUPERNATURAL
 
     override val staticStructure: StaticStructure = StaticStructures.Default.GlassWall.PINK
 }
 
 object TRedGlassWall : GlassWallTurn("red_glass_wall") {
-    override val clazz: TurnClazz? = TurnClazz.REDSTONE
+    override val clazz: TurnClazz = TurnClazz.REDSTONE
 
     override val staticStructure: StaticStructure = StaticStructures.Default.GlassWall.RED
 }
 
 object TWhiteGlassWall : GlassWallTurn("white_glass_wall") {
-    override val clazz: TurnClazz? = TurnClazz.COLD
+    override val clazz: TurnClazz = TurnClazz.COLD
 
     override val staticStructure: StaticStructure = StaticStructures.Default.GlassWall.WHITE
 }

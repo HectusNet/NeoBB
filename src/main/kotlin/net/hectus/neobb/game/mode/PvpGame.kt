@@ -53,7 +53,7 @@ class PvpGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDifficu
 
     override val info: GameInfo = gameInfo
 
-    override val scoreboard: ((NeoPlayer) -> SimpleScoreboard)? = { p -> SimpleScoreboard(
+    override val scoreboard: (NeoPlayer) -> SimpleScoreboard = { p -> SimpleScoreboard(
         p,
         3,
         MiniMessage.miniMessage()
@@ -82,7 +82,7 @@ class PvpGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDifficu
         StaticScoreboardEntry(component("mc.hectus.net", Colors.LINK)),
     ) }
 
-    override val actionBar: ((NeoPlayer) -> SimpleActionBar)? = { p -> SimpleActionBar(p, 1) {
+    override val actionBar: (NeoPlayer) -> SimpleActionBar = { p -> SimpleActionBar(p, 1) {
         val focus = p.targetPlayerOrNull()
         if (focus == null) {
             it.component("actionbar.focus.none", color = Colors.EXTRA)

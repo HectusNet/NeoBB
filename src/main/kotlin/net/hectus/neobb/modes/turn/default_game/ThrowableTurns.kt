@@ -28,7 +28,7 @@ abstract class ThrowableTurn(namespace: String) : Turn<Projectile>(namespace) {
 
 object TEnderPearl : ThrowableTurn("ender_pearl"), CounterFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.NEUTRAL
+    override val clazz: TurnClazz = TurnClazz.NEUTRAL
     override val cost: Int = 3
 
     override val counters: List<CounterFilter> = listOf(
@@ -44,7 +44,7 @@ object TEnderPearl : ThrowableTurn("ender_pearl"), CounterFunction {
 
 object TSnowball : ThrowableTurn("snowball"), CounterbuffFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.COLD
+    override val clazz: TurnClazz = TurnClazz.COLD
     override val cost: Int = 6
 
     override val counters: List<CounterFilter> = listOf(TurnClazz.HOT)
@@ -58,7 +58,7 @@ object TSnowball : ThrowableTurn("snowball"), CounterbuffFunction {
 
 object TSplashJumpBoostPotion : ThrowableTurn("splash_jump_boost_potion"), BuffFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.SUPERNATURAL
+    override val clazz: TurnClazz = TurnClazz.SUPERNATURAL
     override val cost: Int = 3
 
     override val mainItem: ItemStack = ItemBuilder(Material.SPLASH_POTION)
@@ -82,7 +82,7 @@ object TSplashJumpBoostPotion : ThrowableTurn("splash_jump_boost_potion"), BuffF
 
 object TSplashLevitationPotion : ThrowableTurn("splash_levitation_potion"), BuffFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.SUPERNATURAL
+    override val clazz: TurnClazz = TurnClazz.SUPERNATURAL
     override val cost: Int = 4
 
     override val mainItem: ItemStack = ItemBuilder(Material.SPLASH_POTION)
@@ -104,7 +104,7 @@ object TSplashLevitationPotion : ThrowableTurn("splash_levitation_potion"), Buff
 
 object TSplashWaterBottle : ThrowableTurn("splash_water_bottle"), CounterbuffFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.WATER
+    override val clazz: TurnClazz = TurnClazz.WATER
     override val cost: Int = 7
 
     override val mainItem: ItemStack = ItemBuilder(Material.SPLASH_POTION)

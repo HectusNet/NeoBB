@@ -91,7 +91,7 @@ object StructureManager {
             val response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString()).body()
             return Gson().fromJson(response, object : com.google.gson.reflect.TypeToken<List<Structure>>() {})
         } else {
-            val structureDir = Configuration.STRUCTURE_MODE.pathSupplier.invoke().toFile()
+            val structureDir = Configuration.STRUCTURE_MODE.pathSupplier().toFile()
             saveFromResources(structureDir.toPath())
 
             val structures = mutableListOf<Structure>()

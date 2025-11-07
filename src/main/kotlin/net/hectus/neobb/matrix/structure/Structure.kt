@@ -59,7 +59,7 @@ open class Structure(
         if (Configuration.STRUCTURE_MODE == Configuration.StructureMode.SERVER) {
             NeoBB.LOG.warn("Saving structures to the server is not yet supported yet.")
         } else {
-            val file: Path = Configuration.STRUCTURE_MODE.pathSupplier.invoke().resolve("$name.json")
+            val file: Path = Configuration.STRUCTURE_MODE.pathSupplier().resolve("$name.json")
             runCatching {
                 JsonUtils.save(this, file.toFile())
                 NeoBB.LOG.info("Saved structure $name to $file.")
@@ -73,7 +73,7 @@ open class Structure(
         if (Configuration.STRUCTURE_MODE == Configuration.StructureMode.SERVER) {
             NeoBB.LOG.warn("Removing structures from the server is not yet supported yet.")
         } else {
-            val file: Path = Configuration.STRUCTURE_MODE.pathSupplier.invoke().resolve("$name.json")
+            val file: Path = Configuration.STRUCTURE_MODE.pathSupplier().resolve("$name.json")
             runCatching {
                 Files.delete(file)
                 NeoBB.LOG.info("Deleted structure $name from $file.")
@@ -129,9 +129,9 @@ open class Structure(
     fun items(): List<ItemStack> = materials.entries.map { ItemStack(it.key, it.value) }
 
     private fun matchesAtPosition(space: BlockSpace, offsetX: Int, offsetY: Int, offsetZ: Int): Boolean {
-        for (x in 0..<blocks.x) {
-            for (y in 0..<blocks.y) {
-                for (z in 0..<blocks.z) {
+        for (x in 0 until blocks.x) {
+            for (y in 0 until blocks.y) {
+                for (z in 0 until blocks.z) {
                     val structureBlock = blocks[x, y, z] ?: continue
 
                     val spaceBlock = space[offsetX + x, offsetY + y, offsetZ + z]

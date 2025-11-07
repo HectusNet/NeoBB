@@ -27,7 +27,7 @@ abstract class MobTurn<T : LivingEntity>(namespace: String) : Turn<T>(namespace)
 
 object TAxolotl : MobTurn<Axolotl>("axolotl"), BuffFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.WATER
+    override val clazz: TurnClazz = TurnClazz.WATER
     override val cost: Int = 4
 
     override val buffs: List<Buff<*>> = listOf(
@@ -51,7 +51,7 @@ object TAxolotl : MobTurn<Axolotl>("axolotl"), BuffFunction {
 
 object TBee : MobTurn<Bee>("bee"), BuffFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.NATURE
+    override val clazz: TurnClazz = TurnClazz.NATURE
     override val cost: Int = 3
 
     override val buffs: List<Buff<*>> = listOf(Effect(PotionEffectType.SLOWNESS, target = Buff.BuffTarget.OPPONENTS))
@@ -64,7 +64,7 @@ object TBee : MobTurn<Bee>("bee"), BuffFunction {
 
 object TBlaze : MobTurn<Blaze>("blaze"), AttackFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.HOT
+    override val clazz: TurnClazz = TurnClazz.HOT
     override val cost: Int = 5
 
     override fun apply(exec: TurnExec<Blaze>) {
@@ -75,7 +75,7 @@ object TBlaze : MobTurn<Blaze>("blaze"), AttackFunction {
 
 object TEvoker : MobTurn<Evoker>("evoker"), CounterbuffFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.SUPERNATURAL
+    override val clazz: TurnClazz = TurnClazz.SUPERNATURAL
     override val cost: Int = 4
 
     override val buffs: List<Buff<*>> = listOf(
@@ -88,13 +88,13 @@ object TEvoker : MobTurn<Evoker>("evoker"), CounterbuffFunction {
 
 object TPhantom : MobTurn<Phantom>("phantom"), AttackFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.SUPERNATURAL
+    override val clazz: TurnClazz = TurnClazz.SUPERNATURAL
     override val cost: Int = 5
 }
 
 object TPiglin : MobTurn<Piglin>("piglin"), EventFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.HOT
+    override val clazz: TurnClazz = TurnClazz.HOT
     override val cost: Int = 3
 
     override val event: TurnEvent = TurnEvent.CUSTOM
@@ -112,7 +112,7 @@ object TPiglin : MobTurn<Piglin>("piglin"), EventFunction {
 
 object TPolarBear : MobTurn<PolarBear>("polar_bear"), BuffFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.COLD
+    override val clazz: TurnClazz = TurnClazz.COLD
     override val cost: Int = 4
 
     override val buffs: List<Buff<*>> = listOf(Effect(PotionEffectType.SPEED, 3, Buff.BuffTarget.ALL))
@@ -124,7 +124,7 @@ object TPolarBear : MobTurn<PolarBear>("polar_bear"), BuffFunction {
 
 object TPufferfish : MobTurn<PufferFish>("pufferfish"), BuffFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.WATER
+    override val clazz: TurnClazz = TurnClazz.WATER
     override val cost: Int = 6
 
     override val buffs: List<Buff<*>> = listOf(Effect(PotionEffectType.POISON, target = Buff.BuffTarget.NEXT))
@@ -139,7 +139,7 @@ object TPufferfish : MobTurn<PufferFish>("pufferfish"), BuffFunction {
 
 object TSheep : MobTurn<Sheep>("sheep"), BuffFunction {
     override val mode: String = "default"
-    override val clazz: TurnClazz? = TurnClazz.SUPERNATURAL
+    override val clazz: TurnClazz = TurnClazz.SUPERNATURAL
     override val cost: Int = 4
 
     override val buffs: List<Buff<*>> = listOf(Luck(5))

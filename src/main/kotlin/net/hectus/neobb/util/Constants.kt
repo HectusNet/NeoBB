@@ -33,7 +33,7 @@ object Constants {
         prettyPrint = true
         useAlternativeNames = false
         prettyPrintIndent = "  "
-        namingStrategy = JsonNamingStrategy.Builtins.KebabCase
+        namingStrategy = JsonNamingStrategy.KebabCase
         decodeEnumsCaseInsensitive = true
         allowComments = true
     })

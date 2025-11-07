@@ -23,7 +23,7 @@ data class BlockSpace(val x: Int = 9, val y: Int = 9, val z: Int = 9) {
             for (j in 0 until y) {
                 for (k in 0 until z) {
                     val block = blocks[i][j][k] ?: if (!allowNull) continue else null
-                    action.invoke(block)
+                    action(block)
                 }
             }
         }
@@ -34,7 +34,7 @@ data class BlockSpace(val x: Int = 9, val y: Int = 9, val z: Int = 9) {
             for (j in 0 until y) {
                 for (k in 0 until z) {
                     val block = blocks[i][j][k] ?: if (!allowNull) continue else null
-                    action.invoke(block, x, y, z)
+                    action(block, x, y, z)
                 }
             }
         }

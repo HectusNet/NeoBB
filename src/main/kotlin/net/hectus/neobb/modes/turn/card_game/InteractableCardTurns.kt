@@ -22,9 +22,9 @@ abstract class InteractableCardTurn(namespace: String) : CardTurn(namespace) {
 }
 
 object CTOakDoor : InteractableCardTurn("oak_door") {
-    override val damage: Double? = 4.0
+    override val damage: Double = 4.0
 }
 
 object CTOakFenceGate : InteractableCardTurn("oak_fence_gate") {
-    override val damage: Double? = 4.0
+    override val damage: Double = 4.0
 }

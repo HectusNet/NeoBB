@@ -85,8 +85,8 @@ fun cancelEvent(event: Cancellable, eventPlayer: Player, requireStarted: Boolean
 
 fun playerEventAction(eventPlayer: Player, requireStarted: Boolean, additionalPredicate: (NeoPlayer) -> Boolean = { true }, action: (NeoPlayer) -> Unit) {
     val player = GameManager.player(eventPlayer)
-    if (player != null && (!requireStarted || player.game.started) && additionalPredicate.invoke(player))
-        action.invoke(player)
+    if (player != null && (!requireStarted || player.game.started) && additionalPredicate(player))
+        action(player)
 }
 
 fun MinecraftReceiver.eachNeoPlayer(action: (NeoPlayer) -> Unit) = eachReceiver {

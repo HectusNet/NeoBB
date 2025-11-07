@@ -11,7 +11,7 @@ import java.util.*
 interface CounterFilter {
     companion object {
         fun of(name: String, doCounter: (TurnExec<*>) -> Boolean) = object : CounterFilter {
-            override fun doCounter(last: TurnExec<*>): Boolean = doCounter.invoke(last)
+            override fun doCounter(last: TurnExec<*>): Boolean = doCounter(last)
             override fun text(locale: Locale): String = locale.string("item-lore.counter.$name")
         }
     }

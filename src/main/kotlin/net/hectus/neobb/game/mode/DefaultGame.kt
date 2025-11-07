@@ -47,7 +47,7 @@ class DefaultGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDif
 
     override val info: GameInfo = gameInfo
 
-    override val scoreboard: ((NeoPlayer) -> SimpleScoreboard)? = { p -> SimpleScoreboard(p, 5, MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"),
+    override val scoreboard: (NeoPlayer) -> SimpleScoreboard = { p -> SimpleScoreboard(p, 5, MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"),
         ValueScoreboardEntry(p.locale().component("scoreboard.turning", color = Colors.ACCENT)) { component(if (currentPlayer() === p) p.locale().string("scoreboard.turning.you") else currentPlayer().name()) },
         ValueScoreboardEntry(p.locale().component("scoreboard.time", color = Colors.ACCENT)) { component(p.game.timeLeft.preciselyFormatted) },
         ValueScoreboardEntry(p.locale().component("scoreboard.luck", color = Colors.ACCENT)) { Component.text(p.luck) },
@@ -59,7 +59,7 @@ class DefaultGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDif
         StaticScoreboardEntry(component("mc.hectus.net", Colors.LINK)),
     ) }
 
-    override val actionBar: ((NeoPlayer) -> SimpleActionBar)? = { p -> GradientActionBar(p, 1, difficulty.gradientSpeed) { if (currentPlayer() === p) {
+    override val actionBar: (NeoPlayer) -> SimpleActionBar = { p -> GradientActionBar(p, 1, difficulty.gradientSpeed) { if (currentPlayer() === p) {
         if (p.hasModifier(Modifiers.Player.Default.ATTACKED)) {
             if (p.hasModifier(Modifiers.Player.Default.DEFENDED)) {
                 it.component("actionbar.defended_attack").decorate(TextDecoration.BOLD) to NEUTRAL_GRADIENT

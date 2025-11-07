@@ -44,7 +44,7 @@ class CardGame(world: World, bukkitPlayers: List<Player>, difficulty: GameDiffic
 
     override val info: GameInfo = gameInfo
 
-    override val scoreboard: ((NeoPlayer) -> SimpleScoreboard)? = { p -> SimpleScoreboard(p, 5, MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"),
+    override val scoreboard: (NeoPlayer) -> SimpleScoreboard = { p -> SimpleScoreboard(p, 5, MiniMessage.miniMessage().deserialize("<gradient:#D068FF:#EC1A3D>BlockBattles<reset><#BF646B>-<#9D9D9D>Alpha"),
         ValueScoreboardEntry(p.locale().component("scoreboard.turning", color = Colors.BLUE)) { component(if (currentPlayer() === p) p.locale().string("scoreboard.turning.you") else currentPlayer().name()) },
         ValueScoreboardEntry(p.locale().component("scoreboard.time", color = Colors.BLUE)) { component(p.game.timeLeft.preciselyFormatted) },
         ValueScoreboardEntry(p.locale().component("scoreboard.health", color = Colors.BLUE)) { Component.text(p.health) },

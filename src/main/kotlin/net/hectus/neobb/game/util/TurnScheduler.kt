@@ -6,7 +6,7 @@ class TurnScheduler {
     fun tick() {
         for (task in tasks.toList()) {
             if (--task.countdown <= 0) {
-                task.action.invoke()
+                task.action()
                 tasks.remove(task)
             }
         }
@@ -26,8 +26,8 @@ class TurnScheduler {
 
     fun runTaskTimer(id: ScheduleID, interval: Int, predicate: () -> Boolean = { true }, action: () -> Unit) {
         tasks.add(Task(id, {
-            action.invoke()
-            if (predicate.invoke())
+            action()
+            if (predicate())
                 runTaskTimer(id, interval, predicate, action)
         }, interval))
     }
