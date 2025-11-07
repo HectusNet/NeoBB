@@ -421,7 +421,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
 
     fun end(force: Boolean = false) {
         initialPlayers.forEach {
-            it.clean(display = true)
+            it.clear(display = true)
             it.team.unregister()
         }
         GameManager.remove(this)

@@ -23,7 +23,7 @@ class NeoBB : KotlinPlugin(Companion) {
         lateinit var PLUGIN: NeoBB
         lateinit var DATABASE: AutoCatchingSQLConnection<UUID>
 
-        override val VERSION: String = "0.1.0"
+        override val VERSION: String = "0.2.1"
     }
 
     override fun enable() {
@@ -36,7 +36,7 @@ class NeoBB : KotlinPlugin(Companion) {
 
         StructureManager.load()
 
-        addListeners(GameEvents(), PlayerEvents(), TurnEvents())
+        addListeners(GameEvents, PlayerEvents, TurnEvents)
         addCommands(
             ServerUtils.Cmd(Commands.debug, "Test/debug some NeoBB features."),
             ServerUtils.Cmd(Commands.game, "Manage the currently running games.", "block-battle", "neobb"),

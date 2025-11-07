@@ -38,7 +38,7 @@ class NeoPlayer(player: Player, val game: Game): PlayerMinecraftReceiver(player)
     val simpleActionBar: SimpleActionBar? = game.actionBar?.invoke(this)
 
     init {
-        clean()
+        clear()
 
         team.color(databaseInfo.outline)
         team.addEntity(player)
@@ -64,7 +64,7 @@ class NeoPlayer(player: Player, val game: Game): PlayerMinecraftReceiver(player)
         return (if (onlyAlive) game.players else game.initialPlayers).filter { it != this }.toMutableList()
     }
 
-    fun clean(display: Boolean = false) {
+    fun clear(display: Boolean = false) {
         if (display) {
             simpleScoreboard?.stop()
             simpleActionBar?.stop()

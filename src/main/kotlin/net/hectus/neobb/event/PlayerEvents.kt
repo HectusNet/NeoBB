@@ -23,7 +23,7 @@ import org.bukkit.event.player.PlayerAttemptPickupItemEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 
-class PlayerEvents : Listener {
+object PlayerEvents : Listener {
     // ========== INVENTORY EVENTS ==========
     @EventHandler(ignoreCancelled = true)
     fun onInventoryInteract(event: InventoryInteractEvent) {

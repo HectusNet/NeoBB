@@ -41,7 +41,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.meta.PotionMeta
 
-class TurnEvents: Listener {
+object TurnEvents: Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     fun onBlockPlace(event: BlockPlaceEvent) {
         if (event.block.type == Material.BLACK_STAINED_GLASS_PANE)

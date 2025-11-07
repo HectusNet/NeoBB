@@ -67,7 +67,7 @@ object Commands {
                 if (GameManager.GAMES.isEmpty())
                     return@action component("There are no games running.", Colors.NEUTRAL)
 
-                source.sendMessage(component("Loaded Structures:"))
+                source.sendMessage(component("Running games:"))
                 for (game in GameManager.GAMES.values) {
                     source.sendMessage(component("==== ", Colors.EXTRA).append(component(game.id, Colors.ACCENT)).append(component(" ====", Colors.EXTRA)))
                     source.sendMessage(component("> Players: ", Colors.EXTRA).append(component("${game.players.size}/${game.initialPlayers.size}", Colors.SECONDARY)))

@@ -26,10 +26,8 @@ import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
 
-class GameEvents : Listener {
-    companion object {
-        private val DISABLED_DAMAGE = listOf(DamageCause.FIRE_TICK, DamageCause.FREEZE, DamageCause.POISON)
-    }
+object GameEvents : Listener {
+    private val DISABLED_DAMAGE = listOf(DamageCause.FIRE_TICK, DamageCause.FREEZE, DamageCause.POISON)
 
     @EventHandler
     fun onServerTickEnd(event: ServerTickEndEvent) {

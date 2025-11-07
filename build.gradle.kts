@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "net.hectus.neobb"
-version = "0.2.0"
+version = "0.2.1"
 description = "A better version of Block Battles, where multiple players compete in a turn-based game, similar to chess or card games."
 
 kotlin {
@@ -32,13 +32,11 @@ repositories {
 dependencies {
     paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
 
-    implementation("com.marcpg:ktlibpg-platform-adventure:2.0.0")
-    implementation("com.marcpg:ktlibpg-platform-brigadier:2.0.0")
     implementation("com.marcpg:ktlibpg-platform-paper:2.0.0")
     implementation("com.marcpg:ktlibpg-storage-database-sql:2.0.0")
     implementation("com.marcpg:ktlibpg-storage-json:2.0.0")
 
-    compileOnly("xyz.xenondevs.invui:invui:1.46")
+    compileOnly("xyz.xenondevs.invui:invui:1.47")
 
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))

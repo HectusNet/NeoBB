@@ -1,5 +1,6 @@
 package net.hectus.neobb.util
 
+import com.destroystokyo.paper.ParticleBuilder
 import com.marcpg.libpg.display.MinecraftReceiver
 import com.marcpg.libpg.display.playSound
 import com.marcpg.libpg.storing.Cord
@@ -16,6 +17,7 @@ import org.bukkit.entity.EntityType.*
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
+import org.bukkit.util.Vector
 import java.time.*
 
 object Utilities {
@@ -47,6 +49,17 @@ object Utilities {
     fun isDaytime(): Boolean {
         val time = ZonedDateTime.now(ZoneOffset.UTC).toLocalTime()
         return time.isAfter(LocalTime.of(8, 0)) && time.isBefore(LocalTime.of(20, 0))
+    }
+
+    fun generateBeam(start: Location, direction: Vector, length: Int, spacing: Double, particle: ParticleBuilder, forPoint: (Location) -> Unit = {}) {
+        val dir = direction.clone().normalize().multiply(spacing)
+        val current = start.clone()
+
+        for (i in 0 until length) {
+            current.add(dir)
+            particle.location(current).spawn()
+            forPoint(current)
+        }
     }
 
     fun colorTransition(color1: TextColor, color2: TextColor, progress: Number): TextColor = TextColor.lerp(progress.toFloat(), color1, color2)
