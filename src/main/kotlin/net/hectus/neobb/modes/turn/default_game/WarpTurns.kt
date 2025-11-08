@@ -2,7 +2,6 @@ package net.hectus.neobb.modes.turn.default_game
 
 import com.marcpg.libpg.display.teleport
 import com.marcpg.libpg.storing.Cord
-import com.marcpg.libpg.util.Randomizer
 import net.hectus.neobb.event.TurnEvent
 import net.hectus.neobb.matrix.structure.PlacedStructure
 import net.hectus.neobb.matrix.structure.StaticStructure
@@ -10,9 +9,7 @@ import net.hectus.neobb.matrix.structure.StaticStructures
 import net.hectus.neobb.modes.turn.TurnExec
 import net.hectus.neobb.modes.turn.default_game.attribute.TurnClazz
 import net.hectus.neobb.modes.turn.default_game.attribute.WarpFunction
-import net.hectus.neobb.util.Bounds
-import net.hectus.neobb.util.Configuration
-import net.hectus.neobb.util.Modifiers
+import net.hectus.neobb.util.*
 
 abstract class WarpTurn(namespace: String) : StructureTurn(namespace), WarpFunction {
     enum class Temperature { COLD, NORMAL, HOT }
@@ -31,7 +28,7 @@ abstract class WarpTurn(namespace: String) : StructureTurn(namespace), WarpFunct
     open fun canBePlayed(exec: TurnExec<PlacedStructure>): Boolean = true
 
     override fun apply(exec: TurnExec<PlacedStructure>) {
-        if (canBePlayed(exec) && (Randomizer.boolByChance(chance) || exec.player.hasModifier(Modifiers.Player.Default.ALWAYS_WARP))) {
+        if (canBePlayed(exec) && (chance.luckChance(exec.player.luck) || exec.player.hasModifier(Modifiers.Player.Default.ALWAYS_WARP))) {
             exec.player.removeModifier(Modifiers.Player.Default.ALWAYS_WARP)
             exec.game.players.forEach { it.teleport(it.cord() - exec.game.warp.bounds.low + bounds.low) }
             exec.game.warp(exec.player, this)

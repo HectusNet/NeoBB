@@ -1,7 +1,6 @@
 package net.hectus.neobb.modes.turn.default_game
 
 import com.marcpg.libpg.storing.Cord
-import com.marcpg.libpg.util.Randomizer
 import com.marcpg.libpg.util.component
 import net.hectus.neobb.buff.*
 import net.hectus.neobb.event.TurnEvent
@@ -12,6 +11,7 @@ import net.hectus.neobb.modes.turn.default_game.attribute.*
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Modifiers
+import net.hectus.neobb.util.luckChance
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.data.Waterlogged
@@ -29,7 +29,7 @@ object TBeeNest : BlockTurn("bee_nest"), AttackFunction {
     override val cost: Int = 4
 
     override fun apply(exec: TurnExec<Block>) {
-        if (Randomizer.boolByChance(20.0)) {
+        if (0.2.luckChance(exec.player.luck)) {
             val exec = TurnExec(TBee, exec.player, exec.cord, exec.game.world.spawn(exec.location!!, Bee::class.java))
             exec.turn.buffs.forEach { it(exec.player) }
             exec.turn.apply(exec)
@@ -337,7 +337,7 @@ object TPinkBed : BlockTurn("pink_bed"), BuffFunction {
     override val cost: Int = 4
 
     override fun apply(exec: TurnExec<Block>) {
-        if (Randomizer.boolByChance(70.0)) {
+        if (0.7.luckChance(exec.player.luck)) {
             exec.player.player.clearActivePotionEffects()
         }
     }

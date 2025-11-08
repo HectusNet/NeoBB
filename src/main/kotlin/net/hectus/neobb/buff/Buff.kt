@@ -3,11 +3,11 @@ package net.hectus.neobb.buff
 import com.marcpg.libpg.display.MinecraftReceiver
 import com.marcpg.libpg.display.receiver
 import com.marcpg.libpg.lang.string
-import com.marcpg.libpg.util.Randomizer
 import com.marcpg.libpg.util.component
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Constants
+import net.hectus.neobb.util.luckChance
 import net.hectus.neobb.util.noItalic
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
@@ -34,7 +34,7 @@ abstract class Buff<T>(protected val data: T, protected val target: BuffTarget) 
 
 class ChancedBuff(data: Double, val buff: Buff<*>, target: BuffTarget = BuffTarget.YOU): Buff<Double>(data, target) {
     override operator fun invoke(source: NeoPlayer) {
-        if (Randomizer.boolByChance(data))
+        if (data.luckChance(source.luck))
             buff(source)
 
         source.sendMessage("gameplay.info.chance.fail", buff.text(source.locale()), color = Colors.NEUTRAL)

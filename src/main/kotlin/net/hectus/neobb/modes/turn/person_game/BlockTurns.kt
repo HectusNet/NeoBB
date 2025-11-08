@@ -1,7 +1,6 @@
 package net.hectus.neobb.modes.turn.person_game
 
 import com.marcpg.libpg.util.MinecraftTime
-import com.marcpg.libpg.util.Randomizer
 import net.hectus.neobb.buff.Buff
 import net.hectus.neobb.buff.ExtraTurn
 import net.hectus.neobb.buff.Luck
@@ -10,6 +9,7 @@ import net.hectus.neobb.modes.turn.TurnExec
 import net.hectus.neobb.modes.turn.default_game.BlockTurn
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Modifiers
+import net.hectus.neobb.util.luckChance
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
@@ -180,7 +180,7 @@ object PTGlowstone : BlockTurn("glowstone"), UtilityCategory {
     override val damage: Double = 2.0
 
     override fun apply(exec: TurnExec<Block>) {
-        ExtraTurn(if (Randomizer.boolByChance(25.0)) 2 else 1).invoke(exec.player)
+        ExtraTurn(if (0.25.luckChance(exec.player.luck)) 2 else 1).invoke(exec.player)
     }
 }
 

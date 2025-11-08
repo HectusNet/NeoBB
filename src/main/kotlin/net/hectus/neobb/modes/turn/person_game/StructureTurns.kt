@@ -1,7 +1,6 @@
 package net.hectus.neobb.modes.turn.person_game
 
 import com.marcpg.libpg.util.MinecraftTime
-import com.marcpg.libpg.util.Randomizer
 import net.hectus.neobb.buff.ExtraTurn
 import net.hectus.neobb.matrix.structure.PlacedStructure
 import net.hectus.neobb.matrix.structure.StaticStructure
@@ -11,6 +10,7 @@ import net.hectus.neobb.modes.turn.TurnExec
 import net.hectus.neobb.modes.turn.default_game.StructureTurn
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Modifiers
+import net.hectus.neobb.util.luckChance
 
 object PTCandleCircle : StructureTurn("candle_circle"), ArmorCategory {
     override val mode: String = "person"
@@ -68,7 +68,7 @@ object PTWoodWall : StructureTurn("wood_wall"), DefensiveCategory {
 
     override fun apply(exec: TurnExec<PlacedStructure>) {
         exec.player.heal(1.0)
-        if (Randomizer.boolByChance(15.0))
+        if (0.15.luckChance(exec.player.luck))
             ExtraTurn().invoke(exec.player)
     }
 

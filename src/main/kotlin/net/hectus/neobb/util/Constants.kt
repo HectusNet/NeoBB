@@ -29,6 +29,8 @@ object Constants {
     const val TARGET_MAX_RANGE = 6.0
     const val TARGET_TOLERANCE = 1.2
 
+    const val BASE_LUCK = 20
+
     val JSON: Json = @OptIn(ExperimentalSerializationApi::class) (Json {
         prettyPrint = true
         useAlternativeNames = false

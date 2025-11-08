@@ -5,6 +5,7 @@ import com.marcpg.libpg.util.MinecraftTime
 import net.hectus.neobb.game.Game
 import net.hectus.neobb.game.mode.PersonGame
 import net.hectus.neobb.modes.shop.Shop
+import net.hectus.neobb.util.Constants
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Sound
@@ -16,7 +17,7 @@ class NeoPlayer(player: Player, val game: Game): PlayerMinecraftReceiver(player)
     var inventory: NeoInventory = NeoInventory(this)
     var databaseInfo: DatabaseInfo = DatabaseInfo(player.uniqueId)
 
-    var luck: Int = 20
+    var luck: Int = Constants.BASE_LUCK
 
     var health: Double = game.info.startingHealth
         set(value) {

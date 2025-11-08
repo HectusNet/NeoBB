@@ -2,13 +2,13 @@ package net.hectus.neobb.modes.turn.person_game
 
 import com.marcpg.libpg.display.location
 import com.marcpg.libpg.util.MinecraftTime
-import com.marcpg.libpg.util.Randomizer
 import net.hectus.neobb.buff.ExtraTurn
 import net.hectus.neobb.buff.Luck
 import net.hectus.neobb.event.TurnEvent
 import net.hectus.neobb.modes.turn.TurnExec
 import net.hectus.neobb.modes.turn.default_game.OtherTurn
 import net.hectus.neobb.util.Modifiers
+import net.hectus.neobb.util.luckChance
 import org.bukkit.Art
 import org.bukkit.Material
 import org.bukkit.entity.ArmorStand
@@ -37,7 +37,7 @@ object PTPainting : OtherTurn<Painting>("painting"), BuffCategory {
             }
             Art.BOMB -> exec.game.players.forEach { it.damage(5.0) }
             Art.KEBAB -> exec.player.inventory.removeRandom()
-            Art.PLANT -> ExtraTurn(if (Randomizer.boolByChance(25.0)) 2 else 1).invoke(exec.player)
+            Art.PLANT -> ExtraTurn(if (0.25.luckChance(exec.player.luck)) 2 else 1).invoke(exec.player)
             Art.WASTELAND -> exec.game.players.forEach { p ->
                 p.inventory.clear()
                 p.inventory.fillInRandomly()
@@ -66,14 +66,14 @@ object PTPainting : OtherTurn<Painting>("painting"), BuffCategory {
             Art.SKULL_AND_ROSES -> exec.game.arena.clear()
             Art.STAGE -> exec.player.opponents().forEach { p ->
                 p.location().block.type = Material.COBWEB
-                if (Randomizer.boolByChance(20.0))
+                if (0.2.luckChance(exec.player.luck))
                     p.game.eliminate(p)
             }
             Art.VOID -> {
                 ExtraTurn().invoke(exec.player)
                 exec.player.addArmor(1.0)
             }
-            Art.WITHER -> exec.game.eliminate(if (Randomizer.boolByChance(20.0)) exec.player.targetPlayer() else exec.player)
+            Art.WITHER -> exec.game.eliminate(if (0.2.luckChance(exec.player.luck)) exec.player.targetPlayer() else exec.player)
         }
     }
 }

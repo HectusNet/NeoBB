@@ -2,7 +2,6 @@ package net.hectus.neobb.modes.turn.default_game
 
 import com.marcpg.libpg.display.location
 import com.marcpg.libpg.util.MinecraftTime
-import com.marcpg.libpg.util.Randomizer
 import net.hectus.neobb.buff.Buff
 import net.hectus.neobb.buff.Luck
 import net.hectus.neobb.event.TurnEvent
@@ -17,6 +16,7 @@ import net.hectus.neobb.modes.turn.TurnExec
 import net.hectus.neobb.modes.turn.default_game.attribute.*
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Modifiers
+import net.hectus.neobb.util.luckChance
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
@@ -138,7 +138,7 @@ abstract class GlassWallTurn(namespace: String) : StructureTurn(namespace), Defe
         exec.player.addModifier(Modifiers.Player.Default.DEFENDED)
 
         exec.game.turnScheduler.runTaskTimer(ScheduleID.GLASS_WALL_DEFENSE, 1, { exec.meta["stay"] as Boolean }) {
-            exec.meta["stay"] = Randomizer.boolByChance(if (exec.game is DefaultGame) 40.0 else 60.0)
+            exec.meta["stay"] = (if (exec.game is DefaultGame) 40.0 else 60.0).luckChance(exec.player.luck)
             if (exec.meta["stay"] as Boolean)
                 exec.player.addModifier(Modifiers.Player.Default.DEFENDED)
         }

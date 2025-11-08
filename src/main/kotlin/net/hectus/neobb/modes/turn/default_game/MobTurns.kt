@@ -13,6 +13,7 @@ import net.hectus.neobb.modes.turn.default_game.attribute.*
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
 import net.hectus.neobb.util.Modifiers
+import net.hectus.neobb.util.luckChance
 import org.bukkit.DyeColor
 import org.bukkit.Material
 import org.bukkit.entity.*
@@ -35,8 +36,16 @@ object TAxolotl : MobTurn<Axolotl>("axolotl"), BuffFunction {
         Luck(-10, Buff.BuffTarget.OPPONENTS)
     )
 
-    override fun apply(exec: TurnExec<Axolotl>) {
-        when (exec.data.variant) {
+    val normal = listOf(Axolotl.Variant.LUCY, Axolotl.Variant.WILD, Axolotl.Variant.GOLD, Axolotl.Variant.CYAN)
+
+    override fun apply(exec: TurnExec<Axolotl> ) {
+        val color = if (0.00083.luckChance(exec.player.luck))
+            Axolotl.Variant.BLUE
+        else
+            normal.random()
+
+        exec.data.variant = color
+        when (color) {
             Axolotl.Variant.LUCY -> randomWarp(exec.player, TurnClazz.HOT)
             Axolotl.Variant.WILD -> randomWarp(exec.player, TurnClazz.NATURE)
             Axolotl.Variant.GOLD -> randomWarp(exec.player, TurnClazz.SUPERNATURAL)
@@ -144,8 +153,25 @@ object TSheep : MobTurn<Sheep>("sheep"), BuffFunction {
 
     override val buffs: List<Buff<*>> = listOf(Luck(5))
 
+    val chances = mapOf(
+        0.00164 to listOf(DyeColor.PINK),
+        0.03 to listOf(DyeColor.BROWN),
+        0.15 to listOf(DyeColor.LIGHT_GRAY, DyeColor.GRAY, DyeColor.BLACK),
+    )
+
     override fun apply(exec: TurnExec<Sheep>) {
-        when (exec.data.color) {
+        val luck = exec.player.luck
+
+        var color = DyeColor.WHITE
+        for (e in chances) {
+            if (e.key.luckChance(luck)) {
+                color = e.value.random()
+                break
+            }
+        }
+        exec.data.color = color
+
+        when (color) {
             DyeColor.PINK -> exec.player.game.win(exec.player)
             DyeColor.LIGHT_GRAY -> ExtraTurn().invoke(exec.player)
             DyeColor.GRAY -> Luck(25).invoke(exec.player)
