@@ -61,7 +61,7 @@ object TCornflower : FlowerTurn("cornflower") {
 object TDirt : BlockTurn("dirt") {
     override val mode: String = "default"
     override val clazz: TurnClazz = TurnClazz.NATURE
-    override val cost: Int = 2
+    override val cost: Int = 1
 
     override val isCombo: Boolean = true
 }
@@ -69,7 +69,7 @@ object TDirt : BlockTurn("dirt") {
 object TFlowerPot : BlockTurn("flower_pot") {
     override val mode: String = "default"
     override val clazz: TurnClazz = TurnClazz.NATURE
-    override val cost: Int = 2
+    override val cost: Int = 1
 
     override val isCombo: Boolean = true
 }

@@ -29,6 +29,14 @@ object Items {
         }
     }
 
+    class UpdatingClickItem(private val item: ItemProvider, private val clickConsumer: (Player, InventoryClickEvent) -> Unit) : AbstractItem() {
+        override fun getItemProvider(): ItemProvider = item
+
+        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+            clickConsumer(player, event)
+        }
+    }
+
     class ScrollItem(private val up: Boolean) : xyz.xenondevs.invui.item.impl.controlitem.ScrollItem(hashMapOf(
         ClickType.LEFT to if (up) -1 else 1,
         ClickType.SHIFT_LEFT to if (up) -5 else 5

@@ -32,12 +32,12 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
         val locale = player.locale()
 
         gui = ScrollGui.items().setStructure(
-            "1 # # # # # # # ^", // # = Border
-            "2 # * * * * * * #", // F = Filters
-            "3 # * * * * * * #", // * = Items
-            "4 # * * * * * * #", // D = Done Button
-            "5 # * * * * * * #", // ^ = Scroll Up
-            "6 # # # D # # # v") // v = Scroll Down
+            "$ # # # # # # # ^", // # = Border
+            "# # * * * * * * #", // F = Filters
+            "1 # * * * * * * #", // * = Items
+            "2 # * * * * * * #", // D = Done Button
+            "3 # * * * * * * #", // ^ = Scroll Up
+            "4 # # # D # # # v") // v = Scroll Down
             .setBackground(Items.BLACK_BACKGROUND)
             .addIngredient('#', Items.GRAY_BACKGROUND)
 
@@ -77,6 +77,16 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
                 ), "function")
             })
 
+            .addIngredient('$', Items.UpdatingClickItem({ ItemBuilder(if (onlyAffordable) Material.GOLD_INGOT else Material.COPPER_INGOT).apply {
+                name(locale.component("shop.affordable", color = if (onlyAffordable) Colors.ACCENT else Colors.SECONDARY))
+                addLore(locale.component("shop.affordable.status", color = Colors.EXTRA).appendSpace().append(locale.component("shop.affordable.status.${if (onlyAffordable) "" else "in"}active", color = if (onlyAffordable) Colors.POSITIVE else Colors.NEGATIVE)))
+                addLore(locale.component("shop.affordable.toggle", color = Colors.EXTRA))
+            }.build()
+            }) { _, _ ->
+                onlyAffordable = !onlyAffordable
+                syncContent()
+            })
+
             .addIngredient('D', Items.ClickItem(
                 ItemBuilder(Material.LIME_DYE).apply {
                     name(locale.component("shop.done.name", color = Colors.ACCENT, decoration = TextDecoration.BOLD))
@@ -105,6 +115,7 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
     override fun give(turn: Turn<*>): Boolean {
         if (player.inventory.removeCoins(turn.cost ?: 0)) {
             player.inventory.add(turn)
+            syncContent()
             return true
         }
         player.playSound(Sound.ENTITY_VILLAGER_NO)

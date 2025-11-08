@@ -16,6 +16,7 @@ import xyz.xenondevs.invui.item.Item
 
 abstract class Shop(val player: NeoPlayer) {
     val loreBuilder: ItemLoreBuilder = player.game.info.loreBuilder.java.getConstructor().newInstance()
+    protected var onlyAffordable: Boolean = true
 
     fun syncedOpen() {
         player.inventory.sync()
@@ -47,7 +48,7 @@ abstract class Shop(val player: NeoPlayer) {
     }
 
     protected fun content(filter: (Turn<*>) -> Boolean): List<Item> = player.game.info.turns
-        .filter { it.cost != null }
+        .filter { it.cost != null && (!onlyAffordable || it.cost!! <= player.inventory.coins) }
         .filter(filter)
         .map { makeShopItem(it) }
 

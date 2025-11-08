@@ -6,6 +6,7 @@ import com.marcpg.libpg.util.extractNumber
 import com.marcpg.libpg.util.toLocation
 import net.hectus.neobb.game.GameManager
 import net.hectus.neobb.game.mode.DefaultGame
+import net.hectus.neobb.modes.shop.DefaultShop
 import net.hectus.neobb.util.Configuration
 import net.hectus.neobb.util.Modifiers
 import net.hectus.neobb.util.cancelEvent
@@ -43,6 +44,7 @@ object PlayerEvents : Listener {
                     p.inventory.addCoins(line.asString().extractNumber())
                 }
                 p.inventory.clearSlot(event.slot)
+                (p.shop as? DefaultShop)?.syncContent()
             })
         }
     }
