@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component
 import java.util.*
 
 class CardItemLoreBuilder: ItemLoreBuilder() {
-    override fun build(locale: Locale): List<Component> {
+    override fun build(locale: Locale, itemClasses: Boolean): List<Component> {
         val lore = mutableListOf<Component>()
 
         lore += SEPARATOR

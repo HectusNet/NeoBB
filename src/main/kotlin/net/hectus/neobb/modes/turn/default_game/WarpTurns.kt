@@ -10,9 +10,14 @@ import net.hectus.neobb.modes.turn.TurnExec
 import net.hectus.neobb.modes.turn.default_game.attribute.TurnClazz
 import net.hectus.neobb.modes.turn.default_game.attribute.WarpFunction
 import net.hectus.neobb.util.*
+import net.kyori.adventure.text.format.TextColor
 
 abstract class WarpTurn(namespace: String) : StructureTurn(namespace), WarpFunction {
-    enum class Temperature { COLD, NORMAL, HOT }
+    enum class Temperature(val color: TextColor) {
+        COLD(Colors.BLUE),
+        NORMAL(Colors.EXTRA),
+        HOT(Colors.RED),
+    }
 
     override val maxAmount: Int = 1
 
@@ -32,6 +37,8 @@ abstract class WarpTurn(namespace: String) : StructureTurn(namespace), WarpFunct
             exec.player.removeModifier(Modifiers.Player.Default.ALWAYS_WARP)
             exec.game.players.forEach { it.teleport(it.cord() - exec.game.warp.bounds.low + bounds.low) }
             exec.game.warp(exec.player, this)
+        } else {
+            exec.game.players.forEach { p -> p.sendMessage("gameplay.info.warp.fail", exec.player.name(), color = Colors.NEUTRAL) }
         }
     }
 }

@@ -17,10 +17,10 @@ abstract class ItemLoreBuilder {
 
     protected var turn: Turn<*>? = null
 
-    abstract fun build(locale: Locale): List<Component>
+    abstract fun build(locale: Locale, itemClasses: Boolean): List<Component>
 
-    fun buildWithTooltips(locale: Locale): List<Component> {
-        val lore = build(locale).toMutableList()
+    fun buildWithTooltips(locale: Locale, itemClasses: Boolean): List<Component> {
+        val lore = build(locale, itemClasses).toMutableList()
         lore += SEPARATOR
         lore += keybindPrefix("key.mouse.left").append(locale.component("item-lore.tooltip.buy")).color(Colors.EXTRA).noItalic()
         lore += keybindPrefix("key.mouse.right").append(locale.component("item-lore.tooltip.buy_3")).color(Colors.EXTRA).noItalic()

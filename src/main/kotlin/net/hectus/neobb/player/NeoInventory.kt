@@ -6,6 +6,7 @@ import com.marcpg.libpg.util.component
 import net.hectus.neobb.modes.shop.util.Items
 import net.hectus.neobb.modes.turn.Turn
 import net.hectus.neobb.modes.turn.person_game.Category
+import net.hectus.neobb.util.Colors
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.util.stream.IntStream
@@ -136,8 +137,12 @@ class NeoInventory(private var player: NeoPlayer) {
             val item = if (deck[i] == null) Items.BLACK_BACKGROUND else deck[i]!!.clone()
             val turn = turns[i]
 
-            if (player.game.difficulty.suggestions && turn?.goodChoice(player) ?: false)
-                item.editMeta { it.setEnchantmentGlintOverride(true) }
+            if (!player.game.difficulty.suggestions || !(turn?.goodChoice(player) ?: false)) {
+                item.editMeta {
+                    it.setEnchantmentGlintOverride(true)
+                    it.displayName(it.displayName()?.color(Colors.RED))
+                }
+            }
 
             inv.setItem(i, item)
         }

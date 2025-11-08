@@ -9,7 +9,7 @@ import net.kyori.adventure.text.format.TextDecoration
 import java.util.*
 
 class PersonItemLoreBuilder: ItemLoreBuilder() {
-    override fun build(locale: Locale): List<Component> {
+    override fun build(locale: Locale, itemClasses: Boolean): List<Component> {
         val turn = this.turn
         if (turn !is Category) return emptyList()
 

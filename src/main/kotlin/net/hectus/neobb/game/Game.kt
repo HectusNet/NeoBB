@@ -370,6 +370,8 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
     fun warp(player: NeoPlayer, warp: WarpTurn) {
         info("${player.name()} has warped from the ${this.warp.name} to the ${warp.name}.")
 
+        players.forEach { p -> p.sendMessage("gameplay.info.warp.used", this.warp.translation(p.locale()), warp.translation(p.locale()), color = Colors.EXTRA) }
+
         this.warp = warp
         if (playedWarps.all { it.name != warp.name })
             this.playedWarps += warp
@@ -383,6 +385,11 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
             if (warp.temperature == WarpTurn.Temperature.COLD) {
                 p.player.fireTicks = 0
                 turnScheduler.remove(ScheduleID.BURN)
+            }
+
+            if (difficulty.completeRules) {
+                p.sendMessage("gameplay.info.warp.playable", this.warp.translation(p.locale()), warp.translation(p.locale()), color = Colors.NEUTRAL)
+                warp.allows.forEach { p.sendMessage(it.line(p.locale())) }
             }
         }
     }

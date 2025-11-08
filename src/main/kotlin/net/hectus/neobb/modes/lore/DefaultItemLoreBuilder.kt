@@ -1,14 +1,17 @@
 package net.hectus.neobb.modes.lore
 
 import com.marcpg.libpg.util.component
+import net.hectus.neobb.modes.turn.default_game.WarpTurn
 import net.hectus.neobb.modes.turn.default_game.attribute.CounterFunction
+import net.hectus.neobb.util.Colors
+import net.hectus.neobb.util.Utilities
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import java.util.*
 import kotlin.reflect.full.allSuperclasses
 
 class DefaultItemLoreBuilder: ItemLoreBuilder() {
-    override fun build(locale: Locale): List<Component> {
+    override fun build(locale: Locale, itemClasses: Boolean): List<Component> {
         val lore = mutableListOf<Component>()
 
         lore += SEPARATOR
@@ -39,6 +42,18 @@ class DefaultItemLoreBuilder: ItemLoreBuilder() {
             lore += SEPARATOR
             lore += key(locale, "item-lore.buffs", "↑")
             lore += turn!!.buffs.map { it.line(locale) }
+        }
+
+        if (turn is WarpTurn) {
+            lore += SEPARATOR
+            lore += key(locale, "item-lore.warp.temperature", "❄").append(locale.component("info.temperature.${(turn as WarpTurn).temperature.name.lowercase()}", color = (turn as WarpTurn).temperature.color))
+            lore += key(locale, "item-lore.warp.chance", "%").append(component("${(turn as WarpTurn).chance}%", color = Utilities.colorTransition(Colors.RED, Colors.GREEN, (turn as WarpTurn).chance / 100.0)))
+
+            if (itemClasses) {
+                lore += SEPARATOR
+                lore += key(locale, "item-lore.warp.allows", "✔")
+                lore += (turn as WarpTurn).allows.map { it.line(locale) }
+            }
         }
 
         return lore

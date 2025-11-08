@@ -68,9 +68,9 @@ abstract class Shop(val player: NeoPlayer) {
     fun makeItem(turn: Turn<*>, item: ItemStack, tooltips: Boolean) = item.clone().apply { editMeta {
         it.displayName(component(turn.translation(player.locale())).decorate(TextDecoration.BOLD).noItalic())
         if (tooltips) {
-            it.lore(loreBuilder.turn(turn).buildWithTooltips(player.locale()))
+            it.lore(loreBuilder.turn(turn).buildWithTooltips(player.locale(), player.game.difficulty.completeRules))
         } else {
-            it.lore(loreBuilder.turn(turn).build(player.locale()))
+            it.lore(loreBuilder.turn(turn).build(player.locale(), player.game.difficulty.completeRules))
         }
     } }
 }
