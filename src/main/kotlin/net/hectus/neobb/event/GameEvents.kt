@@ -64,6 +64,10 @@ object GameEvents : Listener {
                 return@playerEventAction
             }
 
+            @Suppress("DEPRECATION")
+            if (event.player.isOnGround)
+                p.standingHeight = event.to.y
+
             if (p.game is HectusGame && event.to.clone().subtract(0.0, 0.1, 0.0).block.type == Material.MAGMA_BLOCK && p.game.history.last().turn != TMagmaBlock && !p.player.isInsideVehicle) {
                 p.game.eliminate(p)
             } else if (event.hasChangedPosition() && p.game.outOfBounds(p.cord(), event)) {

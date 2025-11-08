@@ -30,6 +30,10 @@ object Constants {
     const val TARGET_TOLERANCE = 1.2
 
     const val BASE_LUCK = 20
+    const val ATTACK_SUCCESS_CHANCE = 0.8
+
+    val COUNTER_LUCK_LOSS = 3..8
+    val COUNTERATTACK_LUCK_LOSS = 5..12
 
     val JSON: Json = @OptIn(ExperimentalSerializationApi::class) (Json {
         prettyPrint = true

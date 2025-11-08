@@ -33,6 +33,8 @@ class NeoPlayer(player: Player, val game: Game): PlayerMinecraftReceiver(player)
             field = value.coerceAtLeast(0.0)
         }
 
+    var standingHeight: Double = 0.0
+
     val team: Team = Bukkit.getScoreboardManager().mainScoreboard.registerNewTeam("highlight-${player.uniqueId}")
 
     val simpleScoreboard: SimpleScoreboard? = game.scoreboard?.invoke(this)
