@@ -3,7 +3,6 @@ package net.hectus.neobb
 import net.hectus.neobb.game.mode.CardGame
 import net.hectus.neobb.game.mode.DefaultGame
 import net.hectus.neobb.game.mode.PersonGame
-import net.hectus.neobb.game.mode.PvpGame
 import net.hectus.neobb.matrix.structure.StructureManager
 import net.hectus.neobb.modes.turn.card_game.*
 import net.hectus.neobb.modes.turn.default_game.*
@@ -66,10 +65,10 @@ object Registry {
         TSplashLevitationPotion,                TSplashWaterBottle,
 
         // WarpTurns.kt
-        TAmethystWarp,      TCliffWarp,         TDesertWarp,        TFrozenWarp,
-        TMeadowWarp,        TMushroomWarp,      TNerdWarp,          TNetherWarp,
-        TOceanWarp,         TRedstoneWarp,      TSunWarp,           TVoidWarp,
-        TWoodWarp,
+        TAmethystWarp,      TCliffWarp,         TDesertWarp,        TEndWarp,
+        TFrozenWarp,        TMeadowWarp,        TMushroomWarp,      TNerdWarp,
+        TNetherWarp,        TOceanWarp,         TRedstoneWarp,      TSunWarp,
+        TVoidWarp,          TWoodWarp,
 
         // BlockTurns.kt
         PTAmethystBlock,    PTBambooButton,     PTBarrel,           PTBeeNest,
@@ -106,7 +105,7 @@ object Registry {
         CardGame,
         DefaultGame,
         PersonGame,
-        PvpGame,
+//        PvpGame,
     ).associateBy { it.gameInfo.namespace }
 
     val colors = listOf(
