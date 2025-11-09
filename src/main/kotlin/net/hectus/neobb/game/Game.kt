@@ -322,6 +322,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
 
         if (turn.isCombo) {
             history += exec
+            clearSlot(exec)
             return
         }
 

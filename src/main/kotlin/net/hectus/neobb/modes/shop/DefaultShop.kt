@@ -13,6 +13,7 @@ import net.hectus.neobb.modes.turn.default_game.*
 import net.hectus.neobb.modes.turn.default_game.attribute.*
 import net.hectus.neobb.player.NeoPlayer
 import net.hectus.neobb.util.Colors
+import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.bukkit.Sound
@@ -78,7 +79,7 @@ class DefaultShop(player: NeoPlayer) : Shop(player) {
             })
 
             .addIngredient('$', Items.UpdatingClickItem({ ItemBuilder(if (onlyAffordable) Material.GOLD_INGOT else Material.COPPER_INGOT).apply {
-                name(locale.component("shop.affordable", color = if (onlyAffordable) Colors.ACCENT else Colors.SECONDARY))
+                name(locale.component("shop.affordable", color = if (onlyAffordable) TextColor.color(0xDEB12D) else TextColor.color(0xB4684D)))
                 addLore(locale.component("shop.affordable.status", color = Colors.EXTRA).appendSpace().append(locale.component("shop.affordable.status.${if (onlyAffordable) "" else "in"}active", color = if (onlyAffordable) Colors.POSITIVE else Colors.NEGATIVE)))
                 addLore(locale.component("shop.affordable.toggle", color = Colors.EXTRA))
             }.build()

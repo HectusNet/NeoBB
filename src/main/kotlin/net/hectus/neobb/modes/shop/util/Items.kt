@@ -34,6 +34,7 @@ object Items {
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             clickConsumer(player, event)
+            notifyWindows()
         }
     }
 

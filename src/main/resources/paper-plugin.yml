@@ -5,7 +5,7 @@ name: NeoBB
 description: A better version of Block Battles, where multiple players compete in a turn-based game, similar to chess or card games.
 
 ### Build Version ###
-version: 0.2.0
+version: 0.2.1
 
 ### Main Class ###
 main: net.hectus.neobb.NeoBB
