@@ -51,7 +51,7 @@ object Commands {
             }
         }
         subcommand("stop") {
-            argument("id", ExtendedArgumentTypes.valued { GameManager.GAMES.keys }.paper()) {
+            argument("id", ExtendedArgumentTypes.valued { GameManager.games.keys }.paper()) {
                 action { context ->
                     val id = context.arg("id", StringArgumentType.word())
                     val game = GameManager[id] ?: return@action context.exec().locale().component("command.games.start.not_found", id, color = Colors.NEGATIVE)
@@ -64,11 +64,11 @@ object Commands {
         subcommand("list") {
             action { context ->
                 val source = context.exec()
-                if (GameManager.GAMES.isEmpty())
+                if (GameManager.games.isEmpty())
                     return@action component("There are no games running.", Colors.NEUTRAL)
 
                 source.sendMessage(component("Running games:"))
-                for (game in GameManager.GAMES.values) {
+                for (game in GameManager.games.values) {
                     source.sendMessage(component("==== ", Colors.EXTRA).append(component(game.id, Colors.ACCENT)).append(component(" ====", Colors.EXTRA)))
                     source.sendMessage(component("> Players: ", Colors.EXTRA).append(component("${game.players.size}/${game.initialPlayers.size}", Colors.SECONDARY)))
                     source.sendMessage(component("> Time: ", Colors.EXTRA).append(component(game.timeLeft.preciselyFormatted, Colors.SECONDARY)))

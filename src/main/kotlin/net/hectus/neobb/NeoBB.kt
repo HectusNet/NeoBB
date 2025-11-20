@@ -48,7 +48,7 @@ class NeoBB : KotlinPlugin(Companion) {
     }
 
     override fun disable() {
-        GameManager.GAMES.values.forEach { it.draw(true) }
+        GameManager.games.values.forEach { it.draw(true) }
         Bukkit.unloadWorld("world", false) // Prevent the saving of the worlds.
         DATABASE.closeConnection()
     }

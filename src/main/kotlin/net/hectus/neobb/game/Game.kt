@@ -418,7 +418,7 @@ abstract class Game(val world: World, private val bukkitPlayers: List<Player>, v
         extraStart()
 
         bukkitRunTimer(20, 20) {
-            if (id !in GameManager.GAMES) {
+            if (id !in GameManager.games) {
                 it.cancel()
             } else {
                 if (!players.contains(currentPlayer()))

@@ -5,25 +5,25 @@ import org.bukkit.entity.Player
 import java.util.*
 
 object GameManager {
-    val GAMES: MutableMap<String, Game> = mutableMapOf()
+    val games: MutableMap<String, Game> = mutableMapOf()
 
     private val playerCacheByUUID: MutableMap<UUID, NeoPlayer> = hashMapOf()
 
     fun add(game: Game) {
-        GAMES[game.id] = game
+        games[game.id] = game
     }
 
     fun remove(game: Game) {
-        GAMES.remove(game.id)
+        games.remove(game.id)
         game.initialPlayers.forEach { playerCacheByUUID.remove(it.uuid()) }
     }
 
     operator fun get(id: String): Game? {
-        return GAMES[id]
+        return games[id]
     }
 
     operator fun get(scoreboardIDs: Collection<String>): Game? {
-        for (game in GAMES.values) {
+        for (game in games.values) {
             if (scoreboardIDs.contains(game.id)) return game
         }
         return null
@@ -34,7 +34,7 @@ object GameManager {
         if (cached != null && (!onlyAlive || cached.game.players.contains(cached)))
             return cached
 
-        for (game in GAMES.values) {
+        for (game in games.values) {
             val neoPlayer = game.player(player, onlyAlive)
             if (neoPlayer != null) {
                 playerCacheByUUID[player.uniqueId] = neoPlayer

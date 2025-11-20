@@ -32,7 +32,7 @@ object GameEvents : Listener {
     @EventHandler
     fun onServerTickEnd(event: ServerTickEndEvent) {
         runCatching {
-            GameManager.GAMES.values.forEach { it.tick(Ticking.Tick(event.tickNumber)) }
+            GameManager.games.values.forEach { it.tick(Ticking.Tick(event.tickNumber)) }
         }
     }
 
