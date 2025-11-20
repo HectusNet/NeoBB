@@ -34,17 +34,119 @@ structure-mode: local
 max-arena-height: 9
 
 
-## Production Mode ##
-# If this is set to true, the plugin will be loaded in production mode.
-# Production mode will start a game based on the "starting-players" and restart the
-# server once the current game ends. This is only useful for full-scale servers.
-production: false
+## Restart after Game ##
+# Whether to restart the server after a game ends or not.
+# Might interfere with the queue system, as this does not care
+# if another game is running while said game ends.
+restart-after-game: false
 
 
-## At how many players a game will start. ##
-# This will only count players which are in adventure mode and have an empty inventory.
-# Default: 2
-starting-players: 2
+# An ordered list of commands to execute after a game ended.
+# This, unlike `queue.pre-commands` and `queue.post-commands`, will execute even if the queue is disabled.
+#   Available Placeholders:
+#     | -> '{id}'       : started game's ID
+#     | -> '{mode}'     : started game's game-mode
+#     | -> '{players}'  : amount of players in the started game
+#     | -> '{world}'    : name of the game's world
+#     | -> '{x}'        : the game's center location's x-component
+#     | -> '{y}'        : the game's center location's y-component
+#     | -> '{z}'        : the game's center location's z-component
+#     | -> '{forced}'   : "true" if forced (via `/game stop` or stopping server), "false" otherwise
+#     | -> '{winner}'   : the winner's name, or "null" if it's a draw
+ending-commands:
+  - "/say Ending game... ({winner} won)" # <- example, you can freely remove this and leave the list empty.
+
+
+## Respawn at Config ##
+# Whether to respawn players at the configured `player-spawn` below instead of making them spectate.
+# If spectating (=false), it will spawn players in spectator mode in the middle of the game.
+# Default: false
+respawn-at-config: false
+
+
+## Player Spawn ##
+# Where and how to spawn players after the game ends.
+# If above value is set to true, players will also spawn here when dying.
+player-spawn:
+
+  # The game mode to set players to when spawning here.
+  game-mode: adventure
+
+  # The world to spawn in. The default world is called "world".
+  world: world
+
+  # The location to spawn the player at.
+  # If the y-component is set to -64.0, the player will spawn at the world spawn.
+  location: [ 0.0, -64.0, 0.0 ]
+
+
+## Queue ##
+# The optional queue module for automatically starting games when enough players joined.
+queue:
+
+  # Whether the queue module is enabled or not.
+  enabled: false
+
+  # The minimum amount of players needed to start a game.
+  min-players: 2
+
+  # The maximum amount of players before splitting the queue.
+  max-players: 5
+
+  # The interval in seconds between checking if the amount of player is valid and starting a game.
+  # Set to -1 to start instantly as soon as `min-players` queued.
+  check-interval: 15
+
+  # How players enter or leave the queue.
+  #   Available Methods:
+  #     | -> command  : use '/queue' to enter the queue
+  #     | -> auto     : anyone not in a game is automatically in the queue
+  method: command
+
+  # The game mode to use when starting a new game using the queue.
+  #   Available Modes:
+  #     | -> default  : the default NeoBB ruleset
+  #     | -> card     : very boring, similar to a card game
+  #     | -> person   : imbalanced, like Person98's remake in 2023
+  mode: default
+
+  # The difficulty to set when starting a new game using the queue.
+  #   Available Difficulties:
+  #     | -> easy   : no ranking, no rules, and more time
+  #     | -> normal : normal settings
+  #     | -> hard   : no suggestions, full rules, and less time
+  #     | -> champ  : like hard, but even less time
+  difficulty: normal
+
+  # The world to start the game in.
+  #   Available Placeholders:
+  #     | -> '{id}'       : started game's ID
+  #     | -> '{mode}'     : started game's game-mode
+  #     | -> '{players}'  : amount of players in the started game
+  world: "game-{id}"
+
+  # The location to start the game at.
+  # If the y-component is set to -64.0, the game will start at the world spawn.
+  location: [ 0.0, -64.0, 0.0 ]
+
+  # An ordered list of commands to execute before any world or location is accessed.
+  # This should only really be used to create a world for the game when using another plugin like MultiVerse.
+  #   Available Placeholders:
+  #     | -> '{id}'       : started game's ID
+  #     | -> '{mode}'     : started game's game-mode
+  #     | -> '{players}'  : amount of players in the started game
+  pre-commands:
+    - "/say Initializing game with {players} players..." # <- example, you can freely remove this and leave the list empty.
+
+  # An ordered list of commands to execute after the world and location of the game were accessed.
+  # Things like creating a world for the game cannot happen here anymore.
+  #   Available Placeholders:
+  #     | -> '{id}'       : started game's ID
+  #     | -> '{mode}'     : started game's game-mode
+  #     | -> '{players}'  : amount of players in the started game
+  #     | -> '{world}'    : name of the game's world
+  post-commands:
+    - "/say Starting game at {x}/{y}/{z}..." # <- example, you can freely remove this and leave the list empty.
 
 
 ## The database configuration. ##
@@ -59,7 +161,7 @@ database:
   address: localhost
 
   # The port of the database. If set to 0, it will use the database's default port.
-  port: 5432
+  port: 0
 
   # The name of the database.
   database: database_name
@@ -98,3 +200,8 @@ warps:
   person_snow: [ -358, 13, 245 ] # TODO: Build this!
   person_villager: [ 0, 0, 0 ] # TODO: Build this!
   person_void: [ -138, 22, 302 ] # TODO: Build this!
+
+
+## The Configuration Version ##
+# DO NOT MODIFY THIS, OR THE CONFIGURATION WILL LIKELY BREAK OR BE RESET!
+config-version: 2

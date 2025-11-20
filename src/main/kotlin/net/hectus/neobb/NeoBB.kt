@@ -31,7 +31,7 @@ class NeoBB : KotlinPlugin(Companion) {
 
         InvUI.getInstance().setPlugin(this)
 
-        loadTranslations(URI(if (Configuration.OFFLINE) "offline://mode.is/enabled" else "https://marcpg.com/neobb/lang/all"))
+        loadTranslations(URI(if (Configuration.offline) "offline://mode.is/enabled" else "https://marcpg.com/neobb/lang/all"))
         connectDatabase()
 
         StructureManager.load()
@@ -54,18 +54,18 @@ class NeoBB : KotlinPlugin(Companion) {
     }
 
     private fun connectDatabase() {
-        if (!Configuration.OFFLINE && Configuration.DATABASE_ENABLED) {
+        if (!Configuration.offline && Configuration.databaseEnabled) {
             try {
                 DATABASE = AutoCatchingSQLConnection(
                     DatabaseInfo(
                         SQLConnection.DatabaseType.POSTGRESQL,
-                        Configuration.CONFIG.getString("database.address")!!,
-                        Configuration.CONFIG.getInt("database.port", 0),
-                        Configuration.CONFIG.getString("database.database", "hectus") ?: "hectus",
-                        Configuration.CONFIG.getString("database.user")!!,
-                        Configuration.CONFIG.getString("database.passwd")!!
+                        Configuration.databaseAddress,
+                        Configuration.databasePort,
+                        Configuration.databaseName,
+                        Configuration.databaseUser,
+                        Configuration.databasePassword
                     ),
-                    Configuration.CONFIG.getString("database.table", "neobb_playerdata") ?: "neobb_playerdata",
+                    Configuration.databaseTable,
                     "uuid"
                 )
                 DATABASE.exceptionHandling = { LOG.error("Database error.", it) }

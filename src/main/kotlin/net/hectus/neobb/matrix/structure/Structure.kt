@@ -8,6 +8,7 @@ import net.hectus.neobb.NeoBB
 import net.hectus.neobb.matrix.BlockInfo
 import net.hectus.neobb.matrix.BlockSpace
 import net.hectus.neobb.util.Configuration
+import net.hectus.neobb.util.StructureMode
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
@@ -23,7 +24,7 @@ data class PlacedStructure(val structure: Structure, val lastBlock: Block)
 open class Structure(
     val name: String,
     val materials: MutableMap<Material, Int> = mutableMapOf(),
-    val blocks: BlockSpace = BlockSpace(y = Configuration.MAX_ARENA_HEIGHT),
+    val blocks: BlockSpace = BlockSpace(y = Configuration.maxArenaHeight),
     @Transient @kotlin.jvm.Transient var rotated: Structure? = null
 ): java.io.Serializable {
     companion object {
@@ -56,10 +57,10 @@ open class Structure(
     constructor(name: String, world: World, corner1: Cord, corner2: Cord): this(name, blocks(world, corner1, corner2))
 
     fun save() {
-        if (Configuration.STRUCTURE_MODE == Configuration.StructureMode.SERVER) {
+        if (Configuration.structureMode == StructureMode.SERVER) {
             NeoBB.LOG.warn("Saving structures to the server is not yet supported yet.")
         } else {
-            val file: Path = Configuration.STRUCTURE_MODE.pathSupplier().resolve("$name.json")
+            val file: Path = Configuration.structureMode.pathSupplier().resolve("$name.json")
             runCatching {
                 JsonUtils.save(this, file.toFile())
                 NeoBB.LOG.info("Saved structure $name to $file.")
@@ -70,10 +71,10 @@ open class Structure(
     }
 
     fun remove() {
-        if (Configuration.STRUCTURE_MODE == Configuration.StructureMode.SERVER) {
+        if (Configuration.structureMode == StructureMode.SERVER) {
             NeoBB.LOG.warn("Removing structures from the server is not yet supported yet.")
         } else {
-            val file: Path = Configuration.STRUCTURE_MODE.pathSupplier().resolve("$name.json")
+            val file: Path = Configuration.structureMode.pathSupplier().resolve("$name.json")
             runCatching {
                 Files.delete(file)
                 NeoBB.LOG.info("Deleted structure $name from $file.")

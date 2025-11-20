@@ -9,8 +9,8 @@ import org.bukkit.block.Block
 import org.bukkit.entity.Entity
 
 class Arena(val game: Game) {
-    val completeSpace: BlockSpace = BlockSpace(y = Configuration.MAX_ARENA_HEIGHT)
-    val placedSpace: BlockSpace = BlockSpace(y = Configuration.MAX_ARENA_HEIGHT)
+    val completeSpace: BlockSpace = BlockSpace(y = Configuration.maxArenaHeight)
+    val placedSpace: BlockSpace = BlockSpace(y = Configuration.maxArenaHeight)
     var placedBlocks = 0
         private set
 

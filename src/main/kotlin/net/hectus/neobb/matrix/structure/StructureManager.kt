@@ -3,6 +3,7 @@ package net.hectus.neobb.matrix.structure
 import com.google.gson.Gson
 import net.hectus.neobb.matrix.Arena
 import net.hectus.neobb.util.Configuration
+import net.hectus.neobb.util.StructureMode
 import org.bukkit.Material
 import java.io.FileReader
 import java.net.URI
@@ -86,12 +87,12 @@ object StructureManager {
     }
 
     private fun getStructures(): List<Structure> {
-        if (Configuration.STRUCTURE_MODE == Configuration.StructureMode.SERVER) {
+        if (Configuration.structureMode == StructureMode.SERVER) {
             val request = HttpRequest.newBuilder(URI("https://marcpg.com/neobb/structure/all")).GET().build()
             val response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString()).body()
             return Gson().fromJson(response, object : com.google.gson.reflect.TypeToken<List<Structure>>() {})
         } else {
-            val structureDir = Configuration.STRUCTURE_MODE.pathSupplier().toFile()
+            val structureDir = Configuration.structureMode.pathSupplier().toFile()
             saveFromResources(structureDir.toPath())
 
             val structures = mutableListOf<Structure>()

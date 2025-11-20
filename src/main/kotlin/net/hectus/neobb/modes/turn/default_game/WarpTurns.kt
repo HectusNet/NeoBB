@@ -26,8 +26,8 @@ abstract class WarpTurn(namespace: String) : StructureTurn(namespace), WarpFunct
     abstract val temperature: Temperature
 
     val bounds: Bounds = Bounds(
-        dimensions = Cord(9.0, Configuration.MAX_ARENA_HEIGHT.toDouble(), 9.0),
-        low = Cord.ofList(Configuration.CONFIG.getIntegerList("warps.${namespace.removeSuffix("_warp")}"))
+        dimensions = Cord(9.0, Configuration.maxArenaHeight.toDouble(), 9.0),
+        low = Cord.ofList(Configuration.provider.getIntList("warps.${namespace.removeSuffix("_warp")}")!!)
     )
 
     open fun canBePlayed(exec: TurnExec<PlacedStructure>): Boolean = true
