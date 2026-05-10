@@ -48,9 +48,6 @@ restart-after-game: false
 #     | -> '{mode}'     : started game's game-mode
 #     | -> '{players}'  : amount of players in the started game
 #     | -> '{world}'    : name of the game's world
-#     | -> '{x}'        : the game's center location's x-component
-#     | -> '{y}'        : the game's center location's y-component
-#     | -> '{z}'        : the game's center location's z-component
 #     | -> '{forced}'   : "true" if forced (via `/game stop` or stopping server), "false" otherwise
 #     | -> '{winner}'   : the winner's name, or "null" if it's a draw
 ending-commands:
@@ -125,10 +122,6 @@ queue:
   #     | -> '{players}'  : amount of players in the started game
   world: "game-{id}"
 
-  # The location to start the game at.
-  # If the y-component is set to -64.0, the game will start at the world spawn.
-  location: [ 0.0, -64.0, 0.0 ]
-
   # An ordered list of commands to execute before any world or location is accessed.
   # This should only really be used to create a world for the game when using another plugin like MultiVerse.
   #   Available Placeholders:
@@ -202,6 +195,14 @@ warps:
   person_void: [ -138, 22, 302 ] # TODO: Build this!
 
 
+# Disable FastStats Integration #
+# FastStats sends completely anonymous data about the server's Minecraft version, used game modes, etc.
+# to improve the plugin based on real usage data.
+# If you do not want to send this data, feel free to opt out here, in FastStats' own configuration,
+# or using the `-Dfaststats.enabled=false` JVM flag to disable FastStats globally.
+disable-faststats: false
+
+
 ## The Configuration Version ##
 # DO NOT MODIFY THIS, OR THE CONFIGURATION WILL LIKELY BREAK OR BE RESET!
-config-version: 2
+version: 3

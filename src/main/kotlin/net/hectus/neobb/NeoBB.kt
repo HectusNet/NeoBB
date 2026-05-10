@@ -35,6 +35,7 @@ class NeoBB : KotlinPlugin(Companion) {
         connectDatabase()
 
         StructureManager.load()
+        Metrics.start()
 
         addListeners(GameEvents, PlayerEvents, TurnEvents)
         addCommands(
@@ -48,9 +49,12 @@ class NeoBB : KotlinPlugin(Companion) {
     }
 
     override fun disable() {
+        Metrics.forceSubmit()
+
         GameManager.games.values.forEach { it.draw(true) }
         Bukkit.unloadWorld("world", false) // Prevent the saving of the worlds.
-        DATABASE.closeConnection()
+
+        Metrics.shutdown()
     }
 
     private fun connectDatabase() {
