@@ -1,46 +1,60 @@
 plugins {
-    id("java")
+    java
 
-    kotlin("jvm") version "2.2.0"
-    kotlin("plugin.serialization") version "2.2.0"
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.shadow)
 
-    id("com.gradleup.shadow") version "8.3.8"
-    id("xyz.jpenilla.run-paper") version "2.3.1"
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.18"
+    alias(libs.plugins.jpnilla.runPaper)
+    alias(libs.plugins.paperweight.userdev)
+
+    alias(libs.plugins.versionCatalogueUpdate)
 }
 
 group = "net.hectus.neobb"
-version = "0.2.1"
+version = "0.2.2"
 description = "A better version of Block Battles, where multiple players compete in a turn-based game, similar to chess or card games."
+
+versionCatalogUpdate {
+    pin { // Don't auto-update these.
+        versions.add("invui")
+        versions.add("kotlin")
+        versions.add("paper")
+    }
+    keep { // Don't auto-remove these.
+        versions.add("paper")
+    }
+}
 
 kotlin {
     jvmToolchain(21)
-    compilerOptions {
-        freeCompilerArgs.add("-opt-in=kotlin.time.ExperimentalTime")
-    }
+//    compilerOptions {
+//        freeCompilerArgs.add("-opt-in=kotlin.time.ExperimentalTime")
+//    }
 }
 
 repositories {
     mavenLocal()
     mavenCentral()
 
+//    maven("https://marcpg.com/repo/")
+    maven("https://repo.faststats.dev/releases/")
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://repo.xenondevs.xyz/releases/")
-    maven("https://marcpg.com/repo/")
 }
 
 dependencies {
-    paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle(libs.versions.paper.get())
 
-    implementation("com.marcpg:ktlibpg-platform-paper:2.0.0")
-    implementation("com.marcpg:ktlibpg-storage-database-sql:2.0.0")
-    implementation("com.marcpg:ktlibpg-storage-json:2.0.0")
+    implementation(libs.ktlibpg.paper)
+    implementation(libs.ktlibpg.storage.sql)
 
-    compileOnly("xyz.xenondevs.invui:invui:1.47")
+    compileOnly(libs.invui)
+    compileOnly(libs.faststats)
 
-    implementation(kotlin("stdlib"))
+    compileOnly(kotlin("stdlib"))
     implementation(kotlin("reflect"))
-    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.9.0")
+    implementation(libs.kotlin.serialization.json)
 }
 
 tasks {
@@ -56,5 +70,6 @@ tasks {
     }
     shadowJar {
         archiveClassifier.set("")
+        relocate("dev.faststats", "$group.libs.faststats")
     }
 }
